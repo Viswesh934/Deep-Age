@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "deep-age": {
+      "command": "node",
+      "args": ["/workspaces/Deep-dream/backend/dist/index.js"],
+      "env": {
+        "PORT": "3001",
+        "HEADLESS_BROWSER": "true",
+        "NODE_ENV": "production"
+      },
+      "description": "Deep Age — AI Agent Test-Drive, WebMCP Inspection, & Friction Observability Layer"
+    }
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "name": "@deep-age/demo",
+  "version": "0.1.0",
+  "type": "module",
+  "main": "src/index.ts",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "tsx src/index.ts"
+  },
+  "dependencies": {
+    "@deep-age/shared": "*",
+    "@hono/node-server": "^1.11.1",
+    "dotenv": "^17.4.2",
+    "hono": "^4.3.11"
+  },
+  "devDependencies": {
+    "@types/node": "^20.12.12",
+    "tsx": "^4.10.5",
+    "typescript": "^5.4.5"
+  }
+}
