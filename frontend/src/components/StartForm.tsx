@@ -5,25 +5,52 @@ import { ArrowUp, RotateCw, Globe, Sparkles, SlidersHorizontal, Check, ChevronDo
 import { useTestDriveContext } from '@/context/TestDriveContext';
 import { Button } from '@/components/ui/button';
 
-export const StartForm: React.FC = () => {
-  const { url, setUrl, task, setTask, isLoading, startTestDrive, runDemoScenario } = useTestDriveContext();
+interface StartFormProps {
+  url?: string;
+  setUrl?: (url: string) => void;
+  task?: string;
+  setTask?: (task: string) => void;
+  mode?: UserMode;
+  isLoading?: boolean;
+  onStart?: () => void;
+  onRunDemoPreset?: (enableAddToCart: boolean) => void;
+}
+
+export function StartForm(props: StartFormProps) {
+  const context = useTestDriveContext();
   const location = useLocation();
   const [showUrlConfig, setShowUrlConfig] = useState<boolean>(false);
   const [isMinimized, setIsMinimized] = useState<boolean>(false);
 
-  const currentMode: UserMode = location.pathname.includes('inspect')
-    ? 'inspect'
-    : location.pathname.includes('debug')
-    ? 'debug'
-    : 'explore';
+  const currentMode: UserMode = props.mode ?? (
+    location.pathname.includes('inspect')
+      ? 'inspect'
+      : location.pathname.includes('debug')
+      ? 'debug'
+      : 'explore'
+  );
+
+  const url = props.url ?? context.url;
+  const setUrl = props.setUrl ?? context.setUrl;
+  const task = props.task ?? context.task;
+  const setTask = props.setTask ?? context.setTask;
+  const isLoading = props.isLoading ?? context.isLoading;
 
   const handleStart = () => {
     if (!task.trim() && !url.trim()) return;
-    startTestDrive(url, task, currentMode);
+    if (props.onStart) {
+      props.onStart();
+    } else {
+      context.startTestDrive(url, task, currentMode);
+    }
   };
 
   const handleRunPreset = (enableAddToCart: boolean) => {
-    runDemoScenario(enableAddToCart, currentMode);
+    if (props.onRunDemoPreset) {
+      props.onRunDemoPreset(enableAddToCart);
+    } else {
+      context.runDemoScenario(enableAddToCart, currentMode);
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -158,6 +185,7 @@ export const StartForm: React.FC = () => {
       </div>
     </div>
   );
-};
+}
 
 export default StartForm;
+

@@ -1,8 +1,17 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Bot, Bug, ArrowRight, Play, CheckCircle2, AlertTriangle } from 'lucide-react';
+import {
+  Compass,
+  Bug,
+  Play,
+  CheckCircle2,
+  AlertTriangle,
+  ArrowRight,
+  Check,
+  XCircle,
+} from 'lucide-react';
 import { useTestDriveContext } from '@/context/TestDriveContext';
-import { Card } from '@/components/ui/card';
+import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 
@@ -12,24 +21,24 @@ export const ExplorePage: React.FC = () => {
 
   if (!activeRun) {
     return (
-      <Card className="p-10 text-center space-y-3 border-dashed border-border/80 font-sans shadow-xs rounded-2xl">
-        <div className="w-10 h-10 rounded-2xl bg-secondary text-primary mx-auto flex items-center justify-center">
-          <Bot className="w-5 h-5" />
+      <Card className="p-10 text-center space-y-4 border-dashed border-border/80 bg-card shadow-xs rounded-3xl font-sans">
+        <div className="w-12 h-12 rounded-2xl bg-secondary text-primary mx-auto flex items-center justify-center shadow-xs">
+          <Compass className="w-6 h-6" />
         </div>
-        <div className="space-y-1 max-w-sm mx-auto">
-          <h3 className="text-sm font-bold text-foreground">No Active Session</h3>
-          <p className="text-xs text-muted-foreground">
-            Enter a URL and task in the bar above or trigger a demo run.
+        <div className="space-y-1 max-w-md mx-auto">
+          <h3 className="text-base font-bold text-foreground">Explore AI Agent Reality</h3>
+          <p className="text-xs text-muted-foreground leading-relaxed">
+            Test-drive any website to see exactly how autonomous AI agents experience your pages, reason through tasks, and complete actions in real-time.
           </p>
         </div>
         <Button
           size="sm"
           onClick={() => startTestDrive(undefined, undefined, 'explore')}
           disabled={isLoading}
-          className="gap-2 font-semibold text-xs rounded-full px-5 h-8"
+          className="gap-2 font-semibold text-xs rounded-full px-6 h-9"
         >
-          <Play className="w-3 h-3 fill-current" />
-          Run Test-Drive
+          <Play className="w-3.5 h-3.5 fill-current" />
+          <span>Launch Initial Test-Drive</span>
         </Button>
       </Card>
     );
@@ -38,43 +47,105 @@ export const ExplorePage: React.FC = () => {
   const isCompleted = activeRun.summary.taskStatus === 'completed';
 
   return (
-    <div className="flex flex-col gap-4 font-sans animate-fade-in">
-      {/* High-Impact Main View: Live Viewport + Immediate Telemetry */}
+    <div className="flex flex-col gap-4 font-sans animate-fade-in text-foreground">
+      {/* 1. Top 3 Minimal Metric Cards */}
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
+        {/* Metric 1: Outcome */}
+        <Card className="p-4 border-border/80 bg-card shadow-xs rounded-2xl flex items-center justify-between">
+          <div className="space-y-0.5">
+            <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block">
+              Task Outcome
+            </span>
+            <div className="text-base font-bold text-foreground flex items-center gap-2">
+              {isCompleted ? (
+                <>
+                  <CheckCircle2 className="w-4 h-4 text-[#5ae561]" />
+                  <span>Success (0 Friction)</span>
+                </>
+              ) : (
+                <>
+                  <AlertTriangle className="w-4 h-4 text-[#ff8527]" />
+                  <span>Friction Blocked</span>
+                </>
+              )}
+            </div>
+          </div>
+          <Badge
+            variant={isCompleted ? 'success' : 'warning'}
+            className="text-[10px] font-mono font-bold uppercase rounded-full px-2.5 py-0.5"
+          >
+            {isCompleted ? 'OK' : `${activeRun.frictions.length} Friction`}
+          </Badge>
+        </Card>
+
+        {/* Metric 2: Execution Time */}
+        <Card className="p-4 border-border/80 bg-card shadow-xs rounded-2xl flex items-center justify-between">
+          <div className="space-y-0.5">
+            <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block">
+              Execution Time
+            </span>
+            <div className="text-base font-bold text-foreground font-mono">
+              {activeRun.summary.durationMs || 0} ms
+            </div>
+          </div>
+          <Badge variant="outline" className="text-[10px] font-mono border-border/80 text-muted-foreground rounded-full">
+            CDP Stream
+          </Badge>
+        </Card>
+
+        {/* Metric 3: WebMCP Tools */}
+        <Card className="p-4 border-border/80 bg-card shadow-xs rounded-2xl flex items-center justify-between">
+          <div className="space-y-0.5">
+            <span className="text-[11px] font-semibold text-muted-foreground uppercase tracking-wider block">
+              WebMCP Tools
+            </span>
+            <div className="text-base font-bold text-foreground">
+              {activeRun.tools.length} <span className="text-xs font-normal text-muted-foreground">Discovered</span>
+            </div>
+          </div>
+          <Badge variant="outline" className="text-[10px] font-mono border-border/80 text-muted-foreground rounded-full">
+            modelContext
+          </Badge>
+        </Card>
+      </div>
+
+      {/* 2. Main Viewport & Execution Timeline Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 items-start">
-        {/* Left: Real Browser Viewport (Headless Chromium Live Capture) */}
-        <div className="lg:col-span-7 bg-card border border-border/80 rounded-2xl overflow-hidden shadow-xs flex flex-col">
-          {/* Simulated Browser Chrome Top Bar */}
-          <div className="px-3.5 py-2.5 bg-secondary/60 border-b border-border/60 flex items-center justify-between">
-            <div className="flex items-center gap-1.5">
-              <span className="w-2.5 h-2.5 rounded-full bg-neutral-300 dark:bg-neutral-700"></span>
-              <span className="w-2.5 h-2.5 rounded-full bg-neutral-300 dark:bg-neutral-700"></span>
-              <span className="w-2.5 h-2.5 rounded-full bg-neutral-300 dark:bg-neutral-700"></span>
+        {/* Left (7 Cols): Headless Chromium Viewport */}
+        <Card className="lg:col-span-7 overflow-hidden flex flex-col border-border/80 shadow-xs bg-card rounded-2xl">
+          <CardHeader className="px-3.5 py-2.5 bg-secondary/60 border-b border-border/60 flex flex-row items-center justify-between space-y-0">
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5 shrink-0 mr-1">
+                <span className="w-2.5 h-2.5 rounded-full bg-neutral-300 dark:bg-neutral-700"></span>
+                <span className="w-2.5 h-2.5 rounded-full bg-neutral-300 dark:bg-neutral-700"></span>
+                <span className="w-2.5 h-2.5 rounded-full bg-neutral-300 dark:bg-neutral-700"></span>
+              </div>
+              <div className="flex items-center gap-1.5 px-3 py-0.5 bg-background/80 rounded-full border border-border/60 text-[11px] font-mono text-muted-foreground max-w-xs truncate">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#5ae561]"></span>
+                <span className="truncate">{activeRun.url}</span>
+              </div>
             </div>
-
-            <div className="flex items-center gap-1.5 px-3 py-0.5 bg-background/80 rounded-full border border-border/60 text-[11px] font-mono text-muted-foreground max-w-xs truncate">
-              <span className="w-1.5 h-1.5 rounded-full bg-[#5ae561]"></span>
-              <span className="truncate">{activeRun.url}</span>
-            </div>
-
-            <Badge variant="outline" className="text-[10px] rounded-full font-mono">
+            <Badge variant="outline" className="text-[10px] font-mono text-muted-foreground border-border/80 rounded-full">
               Chromium Live
             </Badge>
-          </div>
+          </CardHeader>
 
-          <div className="p-3 bg-secondary/20 flex items-center justify-center min-h-[380px]">
+          <CardContent className="p-3 flex-1 flex flex-col items-center justify-center bg-secondary/20 min-h-[360px]">
             {activeRun.screenshot ? (
               <img
                 src={`data:image/jpeg;base64,${activeRun.screenshot}`}
                 alt="Headless browser capture"
-                className="w-full h-auto max-h-[460px] object-contain rounded-xl border border-border/70 shadow-xs"
+                className="w-full h-auto max-h-[440px] object-contain rounded-xl border border-border/70 shadow-xs"
               />
             ) : (
-              <p className="text-xs text-muted-foreground font-medium">Capture unavailable.</p>
+              <p className="text-xs text-muted-foreground font-mono">
+                Capture unavailable.
+              </p>
             )}
-          </div>
-        </div>
+          </CardContent>
+        </Card>
 
-        {/* Right: Direct Diagnostics & Action Engine */}
+        {/* Right (5 Cols): Diagnostics HUD & Action Log */}
         <div className="lg:col-span-5 flex flex-col gap-3">
           {/* Status Verdict Banner */}
           <div
@@ -107,53 +178,61 @@ export const ExplorePage: React.FC = () => {
             </div>
           </div>
 
-          {/* Key Facts / Execution HUD */}
-          <Card className="p-4 border-border/80 shadow-xs rounded-2xl space-y-3 font-mono text-xs">
-            <div className="space-y-2">
-              <div className="flex justify-between items-center py-1 border-b border-border/50">
-                <span className="text-muted-foreground text-[11px]">Task:</span>
-                <span className="font-sans font-medium text-foreground text-right truncate max-w-[200px]">
-                  {activeRun.task}
-                </span>
-              </div>
-
-              <div className="flex justify-between items-center py-1 border-b border-border/50">
-                <span className="text-muted-foreground text-[11px]">Target URL:</span>
-                <span className="text-foreground truncate max-w-[200px]">{activeRun.url}</span>
-              </div>
-
-              <div className="flex justify-between items-center py-1 border-b border-border/50">
-                <span className="text-muted-foreground text-[11px]">Discovered Tools:</span>
-                <span className="font-bold text-foreground">
-                  {activeRun.tools.length > 0 ? (
-                    <span className="text-[#5ae561]">
-                      {activeRun.tools.length} WebMCP ({activeRun.tools.map((t) => t.name).join(', ')})
-                    </span>
-                  ) : (
-                    <span className="text-[#ff8527]">0 tools registered</span>
-                  )}
-                </span>
-              </div>
-
-              <div className="flex justify-between items-center py-1 border-b border-border/50">
-                <span className="text-muted-foreground text-[11px]">Execution Latency:</span>
-                <span className="text-foreground">{activeRun.summary.durationMs || 0}ms</span>
-              </div>
-
-              <div className="flex justify-between items-center py-1">
-                <span className="text-muted-foreground text-[11px]">Network Calls:</span>
-                <span className="text-foreground">{activeRun.network.length} intercepted</span>
-              </div>
+          {/* Action Log Card */}
+          <Card className="p-4 border-border/80 shadow-xs rounded-2xl space-y-3 font-sans text-xs">
+            <div className="flex items-center justify-between pb-2 border-b border-border/60">
+              <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                Agent Action Log
+              </span>
+              <span className="text-[11px] font-mono text-muted-foreground">
+                {activeRun.timeline?.length || 0} milestones
+              </span>
             </div>
+
+            {activeRun.timeline && activeRun.timeline.length > 0 && (
+              <div className="space-y-2 max-h-[220px] overflow-y-auto pr-1">
+                {activeRun.timeline.map((step, idx) => (
+                  <div
+                    key={step.id || idx}
+                    className="p-2.5 rounded-xl bg-secondary/30 border border-border/60 flex items-start gap-2.5 text-xs"
+                  >
+                    <div className="mt-0.5 shrink-0">
+                      {step.status === 'success' ? (
+                        <div className="w-4 h-4 rounded-full bg-[#5ae561]/20 text-[#36533f] dark:text-[#74b684] flex items-center justify-center">
+                          <Check className="w-2.5 h-2.5" />
+                        </div>
+                      ) : step.status === 'warning' ? (
+                        <div className="w-4 h-4 rounded-full bg-[#ff8527]/20 text-[#ff8527] flex items-center justify-center">
+                          <AlertTriangle className="w-2.5 h-2.5" />
+                        </div>
+                      ) : (
+                        <div className="w-4 h-4 rounded-full bg-rose-500/20 text-rose-600 dark:text-rose-400 flex items-center justify-center">
+                          <XCircle className="w-2.5 h-2.5" />
+                        </div>
+                      )}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between gap-1">
+                        <span className="font-semibold text-foreground text-xs truncate">{step.label}</span>
+                        {step.durationMs && (
+                          <span className="text-[10px] text-muted-foreground font-mono shrink-0">+{step.durationMs}ms</span>
+                        )}
+                      </div>
+                      <p className="text-[11px] text-muted-foreground mt-0.5 leading-snug">{step.detail}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
 
             {/* Direct Action: Jump to Debugger */}
             <div className="pt-2">
               <Button
                 onClick={() => navigate('/debug')}
-                className="w-full gap-2 text-xs font-semibold h-9 rounded-full bg-primary text-primary-foreground hover:bg-primary/90"
+                className="w-full gap-2 text-xs font-semibold h-9 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 cursor-pointer"
               >
                 <Bug className="w-3.5 h-3.5" />
-                Open Developer Debugger & Code Fixes
+                <span>Open Developer Debugger & Code Fixes</span>
                 <ArrowRight className="w-3.5 h-3.5" />
               </Button>
             </div>
@@ -165,3 +244,5 @@ export const ExplorePage: React.FC = () => {
 };
 
 export default ExplorePage;
+
+
