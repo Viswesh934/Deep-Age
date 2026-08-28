@@ -195,13 +195,13 @@ export const BrowserViewportWithScrubber: React.FC<BrowserViewportWithScrubberPr
                     onClick={() => setSelectedStepIndex(idx)}
                     className={`flex items-center gap-2 px-3.5 py-2 rounded-xl text-xs font-semibold shrink-0 border transition-all duration-150 cursor-pointer ${
                       isSelected
-                        ? 'bg-primary text-primary-foreground border-primary shadow-glow-primary scale-102 font-bold'
+                        ? 'bg-[#ff8527] text-white border-[#ff8527] shadow-sm font-bold scale-[1.02]'
                         : 'bg-card/90 text-muted-foreground hover:text-foreground border-border/80 hover:border-border'
                     }`}
                   >
                     {getStepIcon(step.phase)}
-                    <span className="truncate max-w-[140px] font-tech">{step.label}</span>
-                    <span className={`text-[10px] font-mono px-1.5 py-0.2 rounded-md ${isSelected ? 'bg-white/20' : 'bg-muted text-muted-foreground'}`}>
+                    <span className="truncate max-w-[140px]">{step.label}</span>
+                    <span className={`text-[10px] font-mono px-1.5 py-0.2 rounded-md ${isSelected ? 'bg-black/20 text-white' : 'bg-muted text-muted-foreground'}`}>
                       #{idx + 1}
                     </span>
                   </button>

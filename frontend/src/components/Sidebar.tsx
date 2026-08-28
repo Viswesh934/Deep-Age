@@ -81,14 +81,14 @@ export const Sidebar: React.FC = () => {
               className={({ isActive }) =>
                 `w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs transition-all ${
                   isActive
-                    ? 'bg-secondary text-secondary-foreground font-semibold shadow-xs'
+                    ? 'bg-[#ff8527]/12 text-foreground font-semibold shadow-2xs border border-[#ff8527]/30'
                     : 'text-muted-foreground hover:bg-secondary/60 hover:text-foreground font-medium'
                 }`
               }
             >
               {({ isActive }) => (
                 <>
-                  <span className={`p-1.5 rounded-lg ${isActive ? 'bg-primary text-primary-foreground' : 'bg-secondary text-muted-foreground'}`}>
+                  <span className={`p-1.5 rounded-lg transition-all ${isActive ? 'bg-[#ff8527] text-white shadow-xs' : 'bg-secondary text-muted-foreground'}`}>
                     <Sparkles className="w-3.5 h-3.5" />
                   </span>
                   <div>
@@ -104,14 +104,14 @@ export const Sidebar: React.FC = () => {
               className={({ isActive }) =>
                 `w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs transition-all ${
                   isActive
-                    ? 'bg-secondary text-secondary-foreground font-semibold shadow-xs'
+                    ? 'bg-[#ff8527]/12 text-foreground font-semibold shadow-2xs border border-[#ff8527]/30'
                     : 'text-muted-foreground hover:bg-secondary/60 hover:text-foreground font-medium'
                 }`
               }
             >
               {({ isActive }) => (
                 <>
-                  <span className={`p-1.5 rounded-lg ${isActive ? 'bg-primary text-primary-foreground' : 'bg-secondary text-muted-foreground'}`}>
+                  <span className={`p-1.5 rounded-lg transition-all ${isActive ? 'bg-[#ff8527] text-white shadow-xs' : 'bg-secondary text-muted-foreground'}`}>
                     <Compass className="w-3.5 h-3.5" />
                   </span>
                   <div>
@@ -127,14 +127,14 @@ export const Sidebar: React.FC = () => {
               className={({ isActive }) =>
                 `w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs transition-all ${
                   isActive
-                    ? 'bg-secondary text-secondary-foreground font-semibold shadow-xs'
+                    ? 'bg-[#ff8527]/12 text-foreground font-semibold shadow-2xs border border-[#ff8527]/30'
                     : 'text-muted-foreground hover:bg-secondary/60 hover:text-foreground font-medium'
                 }`
               }
             >
               {({ isActive }) => (
                 <>
-                  <span className={`p-1.5 rounded-lg ${isActive ? 'bg-primary text-primary-foreground' : 'bg-secondary text-muted-foreground'}`}>
+                  <span className={`p-1.5 rounded-lg transition-all ${isActive ? 'bg-[#ff8527] text-white shadow-xs' : 'bg-secondary text-muted-foreground'}`}>
                     <Bug className="w-3.5 h-3.5" />
                   </span>
                   <div>
@@ -150,14 +150,14 @@ export const Sidebar: React.FC = () => {
               className={({ isActive }) =>
                 `w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs transition-all ${
                   isActive
-                    ? 'bg-secondary text-secondary-foreground font-semibold shadow-xs'
+                    ? 'bg-[#ff8527]/12 text-foreground font-semibold shadow-2xs border border-[#ff8527]/30'
                     : 'text-muted-foreground hover:bg-secondary/60 hover:text-foreground font-medium'
                 }`
               }
             >
               {({ isActive }) => (
                 <>
-                  <span className={`p-1.5 rounded-lg ${isActive ? 'bg-primary text-primary-foreground' : 'bg-secondary text-muted-foreground'}`}>
+                  <span className={`p-1.5 rounded-lg transition-all ${isActive ? 'bg-[#ff8527] text-white shadow-xs' : 'bg-secondary text-muted-foreground'}`}>
                     <ShieldCheck className="w-3.5 h-3.5" />
                   </span>
                   <div>

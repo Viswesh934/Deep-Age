@@ -67,12 +67,14 @@ export const NetworkWaterfall: React.FC<NetworkWaterfallProps> = ({ run }) => {
             />
           </div>
 
-          <div className="flex items-center gap-1 bg-background/90 p-1 rounded-xl border border-border/80 text-xs shadow-inner-glow font-tech">
+          <div className="flex items-center gap-1 bg-background/90 p-1 rounded-full border border-border/80 text-xs shadow-inner">
             <button
               type="button"
               onClick={() => setFilterOrigin('all')}
-              className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
-                filterOrigin === 'all' ? 'bg-primary text-primary-foreground shadow-xs' : 'text-muted-foreground hover:text-foreground'
+              className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
+                filterOrigin === 'all'
+                  ? 'bg-[#ff8527] text-white shadow-xs font-bold'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-secondary/60'
               }`}
             >
               All
@@ -80,8 +82,10 @@ export const NetworkWaterfall: React.FC<NetworkWaterfallProps> = ({ run }) => {
             <button
               type="button"
               onClick={() => setFilterOrigin('first-party')}
-              className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
-                filterOrigin === 'first-party' ? 'bg-indigo-600 text-white shadow-xs' : 'text-muted-foreground hover:text-foreground'
+              className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
+                filterOrigin === 'first-party'
+                  ? 'bg-[#ff8527] text-white shadow-xs font-bold'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-secondary/60'
               }`}
             >
               1st-Party
@@ -89,8 +93,10 @@ export const NetworkWaterfall: React.FC<NetworkWaterfallProps> = ({ run }) => {
             <button
               type="button"
               onClick={() => setFilterOrigin('third-party')}
-              className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
-                filterOrigin === 'third-party' ? 'bg-amber-600 text-white shadow-xs' : 'text-muted-foreground hover:text-foreground'
+              className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
+                filterOrigin === 'third-party'
+                  ? 'bg-[#ff8527] text-white shadow-xs font-bold'
+                  : 'text-muted-foreground hover:text-foreground hover:bg-secondary/60'
               }`}
             >
               3rd-Party

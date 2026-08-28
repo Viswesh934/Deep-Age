@@ -132,12 +132,14 @@ if (window.modelContext) {
         </div>
 
         {/* Severity Filter Pills */}
-        <div className="flex items-center gap-1 bg-background/90 p-1.5 rounded-xl border border-border/80 text-xs shadow-inner-glow">
+        <div className="flex items-center gap-1 bg-background/90 p-1.5 rounded-full border border-border/80 text-xs shadow-inner">
           <button
             type="button"
             onClick={() => setSeverityFilter('all')}
-            className={`px-3 py-1 rounded-lg text-xs font-tech font-semibold transition-all cursor-pointer ${
-              severityFilter === 'all' ? 'bg-primary text-primary-foreground shadow-xs' : 'text-muted-foreground hover:text-foreground'
+            className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
+              severityFilter === 'all'
+                ? 'bg-[#ff8527] text-white shadow-xs font-bold'
+                : 'text-muted-foreground hover:text-foreground hover:bg-secondary/60'
             }`}
           >
             All ({run.frictions.length})
@@ -145,8 +147,10 @@ if (window.modelContext) {
           <button
             type="button"
             onClick={() => setSeverityFilter('high')}
-            className={`px-3 py-1 rounded-lg text-xs font-tech font-semibold transition-all cursor-pointer ${
-              severityFilter === 'high' ? 'bg-rose-500 text-white shadow-xs' : 'text-muted-foreground hover:text-foreground'
+            className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
+              severityFilter === 'high'
+                ? 'bg-[#ff8527] text-white shadow-xs font-bold'
+                : 'text-muted-foreground hover:text-foreground hover:bg-secondary/60'
             }`}
           >
             High ({run.frictions.filter((f) => f.severity === 'high').length})
@@ -154,8 +158,10 @@ if (window.modelContext) {
           <button
             type="button"
             onClick={() => setSeverityFilter('medium')}
-            className={`px-3 py-1 rounded-lg text-xs font-tech font-semibold transition-all cursor-pointer ${
-              severityFilter === 'medium' ? 'bg-amber-500 text-white shadow-xs' : 'text-muted-foreground hover:text-foreground'
+            className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
+              severityFilter === 'medium'
+                ? 'bg-[#ff8527] text-white shadow-xs font-bold'
+                : 'text-muted-foreground hover:text-foreground hover:bg-secondary/60'
             }`}
           >
             Medium ({run.frictions.filter((f) => f.severity === 'medium').length})
@@ -269,16 +275,16 @@ if (window.modelContext) {
                       </div>
 
                       {/* Framework Selector Tabs */}
-                      <div className="flex items-center gap-1 bg-muted/60 p-1 rounded-xl border border-border/60 text-xs font-tech">
+                      <div className="flex items-center gap-1 bg-muted/60 p-1 rounded-full border border-border/60 text-xs">
                         <button
                           type="button"
                           onClick={() =>
                             setSelectedFrameworks((prev) => ({ ...prev, [friction.id]: 'webmcp' }))
                           }
-                          className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                          className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
                             currentFramework === 'webmcp'
-                              ? 'bg-background text-foreground shadow-xs font-bold'
-                              : 'text-muted-foreground hover:text-foreground'
+                              ? 'bg-[#ff8527] text-white shadow-xs font-bold'
+                              : 'text-muted-foreground hover:text-foreground hover:bg-secondary/60'
                           }`}
                         >
                           Vanilla WebMCP
@@ -288,10 +294,10 @@ if (window.modelContext) {
                           onClick={() =>
                             setSelectedFrameworks((prev) => ({ ...prev, [friction.id]: 'react' }))
                           }
-                          className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                          className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
                             currentFramework === 'react'
-                              ? 'bg-background text-foreground shadow-xs font-bold'
-                              : 'text-muted-foreground hover:text-foreground'
+                              ? 'bg-[#ff8527] text-white shadow-xs font-bold'
+                              : 'text-muted-foreground hover:text-foreground hover:bg-secondary/60'
                           }`}
                         >
                           React Hook
@@ -301,10 +307,10 @@ if (window.modelContext) {
                           onClick={() =>
                             setSelectedFrameworks((prev) => ({ ...prev, [friction.id]: 'node' }))
                           }
-                          className={`px-3 py-1 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                          className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
                             currentFramework === 'node'
-                              ? 'bg-background text-foreground shadow-xs font-bold'
-                              : 'text-muted-foreground hover:text-foreground'
+                              ? 'bg-[#ff8527] text-white shadow-xs font-bold'
+                              : 'text-muted-foreground hover:text-foreground hover:bg-secondary/60'
                           }`}
                         >
                           Node / Express

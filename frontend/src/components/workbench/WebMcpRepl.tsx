@@ -152,13 +152,16 @@ export const WebMcpRepl: React.FC<WebMcpReplProps> = ({ run }) => {
                     onClick={() => setSelectedToolIndex(idx)}
                     className={`w-full text-left p-3.5 rounded-xl border transition-all duration-150 cursor-pointer ${
                       isSelected
-                        ? 'bg-primary/10 border-primary text-foreground shadow-xs font-bold'
+                        ? 'bg-[#ff8527]/10 border-[#ff8527] text-foreground shadow-xs font-bold ring-1 ring-[#ff8527]/30'
                         : 'bg-background/80 hover:bg-muted/60 border-border/70 text-muted-foreground hover:text-foreground'
                     }`}
                   >
                     <div className="flex items-center justify-between">
                       <span className="font-mono text-xs font-bold text-foreground">{tool.name}</span>
-                      <Badge variant="outline" className="text-[10px] font-mono border-border/60 rounded-md">
+                      <Badge
+                        variant={isSelected ? 'warning' : 'outline'}
+                        className={`text-[10px] font-mono rounded-md ${isSelected ? 'bg-[#ff8527] text-white border-transparent' : 'border-border/60'}`}
+                      >
                         {propCount} params
                       </Badge>
                     </div>
