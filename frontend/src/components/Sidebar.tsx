@@ -26,8 +26,8 @@ export const Sidebar: React.FC = () => {
   return (
     <aside className="w-64 bg-card text-card-foreground border-r border-border/70 flex flex-col justify-between shrink-0 font-sans select-none transition-colors sticky top-0 h-screen overflow-y-auto z-40">
       <div className="flex flex-col">
-        {/* Brand Header */}
-        <div className="p-4 flex items-center justify-between">
+        {/* Workspace Brand Header */}
+        <div className="p-4 flex items-center justify-between border-b border-border/70">
           <div className="flex items-center gap-2.5">
             {/* Wajo-style Geometric Logo Badge */}
             <div className="w-8 h-8 rounded-xl bg-primary text-primary-foreground flex items-center justify-center font-bold text-xs shadow-xs tracking-wider">
@@ -46,7 +46,7 @@ export const Sidebar: React.FC = () => {
             </div>
           </div>
 
-          <TooltipProvider delayDuration={200}>
+          <TooltipProvider delayDuration={150}>
             <Tooltip>
               <TooltipTrigger asChild>
                 <Button
@@ -63,16 +63,13 @@ export const Sidebar: React.FC = () => {
                   )}
                 </Button>
               </TooltipTrigger>
-              <TooltipContent side="right">
-                <p>{isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}</p>
+              <TooltipContent side="right" className="text-xs">
+                <p>{isDark ? 'Light Theme' : 'Dark Theme'}</p>
               </TooltipContent>
             </Tooltip>
           </TooltipProvider>
         </div>
 
-        <Separator className="border-border/60" />
-
-        {/* Persona Modes Navigation */}
         <div className="p-3">
           <label className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground px-2 mb-2 block">
             Navigation
@@ -177,17 +174,18 @@ export const Sidebar: React.FC = () => {
       {/* Footer / MCP Tools */}
       <div className="p-3 space-y-2">
         <Separator className="mb-2 border-border/60" />
+
         <Button
           variant="outline"
           size="sm"
           onClick={() => setShowMcpModal(true)}
-          className="w-full justify-between text-xs h-9 rounded-full border-border/80 hover:bg-secondary"
+          className="w-full justify-between text-xs h-9 rounded-full border-border/80 hover:bg-secondary cursor-pointer"
         >
           <span className="flex items-center gap-2 font-medium">
             <Terminal className="w-3.5 h-3.5 text-primary" />
-            Agent MCP Config
+            Connect Agent (MCP)
           </span>
-          <ArrowUpRight className="w-3.5 h-3.5 text-muted-foreground" />
+          <ArrowUpRight className="w-3 h-3 text-muted-foreground" />
         </Button>
 
         <div className="px-2 text-[10px] text-muted-foreground flex items-center gap-1.5">
@@ -200,3 +198,4 @@ export const Sidebar: React.FC = () => {
 };
 
 export default Sidebar;
+

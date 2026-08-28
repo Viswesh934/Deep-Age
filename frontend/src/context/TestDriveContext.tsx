@@ -37,6 +37,15 @@ export const TestDriveProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     }
   }, [isDark]);
 
+  // Automatically start initial baseline run on first load for instant rich dashboard
+  useEffect(() => {
+    if (!activeRun && !isLoading) {
+      startTestDrive(env.demoUrl, task, 'explore').catch((e) =>
+        console.log('Auto-initialization fallback:', e)
+      );
+    }
+  }, []);
+
   const toggleTheme = () => {
     setIsDark((prev) => !prev);
   };
@@ -93,3 +102,4 @@ export function useTestDriveContext(): ITestDriveContext {
   }
   return context;
 }
+
