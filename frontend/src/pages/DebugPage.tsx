@@ -419,13 +419,13 @@ app.get('/.well-known/webmcp.json', (req, res) => {
 
   if (!activeRun) {
     return (
-      <Card className="p-8 text-center space-y-4 border-dashed font-sans">
-        <div className="w-12 h-12 rounded-2xl bg-primary/10 text-primary mx-auto flex items-center justify-center">
+      <Card className="p-8 text-center space-y-4 border-dashed border-border/80 font-sans shadow-xs">
+        <div className="w-12 h-12 rounded-2xl bg-secondary text-primary mx-auto flex items-center justify-center">
           <Bug className="w-6 h-6" />
         </div>
         <div className="space-y-1 max-w-md mx-auto">
           <CardTitle className="text-base font-bold">Diagnostic Workbench Idle</CardTitle>
-          <CardDescription className="text-xs">
+          <CardDescription className="text-xs text-muted-foreground">
             Launch a test-drive to inspect WebMCP schemas, diagnosed friction points, simulated in-browser REPL tools, decision traces, and network HAR streams.
           </CardDescription>
         </div>
@@ -433,7 +433,7 @@ app.get('/.well-known/webmcp.json', (req, res) => {
           size="sm"
           onClick={() => startTestDrive(undefined, undefined, 'debug')}
           disabled={isLoading}
-          className="gap-2 font-bold text-xs"
+          className="gap-2 font-semibold text-xs rounded-full px-5 h-9"
         >
           <Play className="w-3.5 h-3.5 fill-current" />
           Run Test-Drive in Debug Mode
@@ -443,27 +443,27 @@ app.get('/.well-known/webmcp.json', (req, res) => {
   }
 
   return (
-    <div className="flex flex-col gap-5 font-sans animate-fade-in text-foreground">
+    <div className="flex flex-col gap-4 font-sans animate-fade-in text-foreground">
       {/* TOP COCKPIT: AGENT-READINESS SCORECARD & TELEMETRY */}
-      <Card className="space-y-4 p-5">
-        <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-border">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-xl bg-primary text-primary-foreground flex items-center justify-center shadow-sm">
-              <Cpu className="w-5 h-5" />
+      <Card className="space-y-3 p-4 border-border/70 shadow-xs">
+        <div className="flex flex-wrap items-center justify-between gap-2.5 pb-2.5 border-b border-border/60">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-xl bg-primary text-primary-foreground flex items-center justify-center shadow-xs">
+              <Cpu className="w-4 h-4" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-bold text-sm tracking-tight uppercase font-mono">
-                  DEVELOPER // WEBMCP DIAGNOSTIC WORKBENCH
+                <span className="font-bold text-xs tracking-tight uppercase font-mono">
+                  WEBMCP DIAGNOSTIC WORKBENCH
                 </span>
                 <Badge
                   variant={activeRun.summary.taskStatus === 'completed' ? 'success' : 'warning'}
-                  className="font-mono font-bold uppercase text-[10px]"
+                  className="font-mono font-bold uppercase text-[10px] rounded-full"
                 >
                   {activeRun.summary.taskStatus === 'completed' ? 'PASS (0 Friction)' : 'INCOMPLETE (Friction)'}
                 </Badge>
               </div>
-              <p className="text-xs text-muted-foreground font-mono mt-0.5">
+              <p className="text-[11px] text-muted-foreground font-mono mt-0.5">
                 Target: <span className="text-foreground font-medium">{activeRun.url}</span> • Duration:{' '}
                 <span className="text-foreground font-medium">{activeRun.summary.durationMs || 0}ms</span>
               </p>
@@ -475,83 +475,83 @@ app.get('/.well-known/webmcp.json', (req, res) => {
               variant="outline"
               size="sm"
               onClick={handleExportDiagnostics}
-              className="h-8 gap-1.5 text-xs font-medium"
+              className="h-7 px-3 gap-1.5 text-xs font-medium rounded-full border-border/80 hover:bg-secondary"
               title="Download full JSON & HAR diagnostic audit bundle"
             >
-              <Download className="w-3.5 h-3.5 text-primary" />
-              Export HAR / Report
+              <Download className="w-3 h-3 text-primary" />
+              Export HAR
             </Button>
             <Button
               variant="outline"
               size="sm"
               onClick={() => handleCopy('run-json', JSON.stringify(activeRun, null, 2))}
-              className="h-8 gap-1.5 text-xs font-medium"
+              className="h-7 px-3 gap-1.5 text-xs font-medium rounded-full border-border/80 hover:bg-secondary"
             >
-              {copiedId === 'run-json' ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
-              {copiedId === 'run-json' ? 'Copied' : 'Copy Run JSON'}
+              {copiedId === 'run-json' ? <Check className="w-3 h-3 text-[#5ae561]" /> : <Copy className="w-3 h-3" />}
+              {copiedId === 'run-json' ? 'Copied' : 'JSON'}
             </Button>
           </div>
         </div>
 
         {/* Scorecard Metrics */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-          <Card className="p-3.5 bg-muted/40 flex items-center justify-between">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5">
+          <Card className="p-3 bg-secondary/40 border-border/60 flex items-center justify-between">
             <div>
               <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider block">
                 Agent Readiness
               </span>
               <div
-                className={`text-2xl font-black mt-0.5 font-mono ${
+                className={`text-xl font-black mt-0.5 font-mono ${
                   scorecard.overallScore >= 80
-                    ? 'text-emerald-600 dark:text-emerald-400'
+                    ? 'text-emerald-700 dark:text-[#5ae561]'
                     : scorecard.overallScore >= 50
-                    ? 'text-amber-600 dark:text-amber-400'
+                    ? 'text-amber-700 dark:text-[#f3c83d]'
                     : 'text-destructive'
                 }`}
               >
                 {scorecard.overallScore}%
               </div>
             </div>
-            <div className="w-9 h-9 rounded-full bg-background border border-border flex items-center justify-center font-bold text-xs shadow-sm">
+            <div className="w-8 h-8 rounded-full bg-background border border-border/80 flex items-center justify-center font-bold text-xs shadow-xs">
               {scorecard.overallScore >= 90 ? 'A+' : scorecard.overallScore >= 75 ? 'B' : scorecard.overallScore >= 50 ? 'C' : 'F'}
             </div>
           </Card>
 
-          <Card className="p-3.5 bg-muted/40">
+          <Card className="p-3 bg-secondary/40 border-border/60">
             <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider block">
-              WebMCP Tool Coverage
+              Tool Coverage
             </span>
-            <div className="text-2xl font-black text-foreground mt-0.5 font-mono">
+            <div className="text-xl font-black text-foreground mt-0.5 font-mono">
               {activeRun.tools.length}{' '}
-              <span className="text-xs font-normal text-muted-foreground">
-                ({scorecard.toolCoverageScore}% matched)
+              <span className="text-[11px] font-normal text-muted-foreground">
+                ({scorecard.toolCoverageScore}% match)
               </span>
             </div>
           </Card>
 
-          <Card className="p-3.5 bg-muted/40">
+          <Card className="p-3 bg-secondary/40 border-border/60">
             <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider block">
               Diagnosed Frictions
             </span>
             <div
-              className={`text-2xl font-black mt-0.5 font-mono ${
-                activeRun.frictions.length > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400'
+              className={`text-xl font-black mt-0.5 font-mono ${
+                activeRun.frictions.length > 0 ? 'text-amber-700 dark:text-[#f3c83d]' : 'text-emerald-700 dark:text-[#5ae561]'
               }`}
             >
               {activeRun.frictions.length}{' '}
-              <span className="text-xs font-normal text-muted-foreground">
+              <span className="text-[11px] font-normal text-muted-foreground">
                 ({scorecard.highFrictions} High)
               </span>
             </div>
           </Card>
 
-          <Card className="p-3.5 bg-muted/40">
+          <Card className="p-3 bg-secondary/40 border-border/60">
             <span className="text-[10px] uppercase font-bold text-muted-foreground tracking-wider block">
-              Intercepted Network
+              Network Calls
             </span>
-            <div className="text-2xl font-black text-foreground mt-0.5 font-mono">
+            <div className="text-xl font-black text-foreground mt-0.5 font-mono">
               {activeRun.network.length}{' '}
-              <span className="text-xs font-normal text-muted-foreground">
+              <span className="text-[11px] font-normal text-muted-foreground">
                 ({scorecard.errorCount} Errors)
               </span>
             </div>
@@ -561,46 +561,50 @@ app.get('/.well-known/webmcp.json', (req, res) => {
 
       {/* WORKBENCH TABS */}
       <Tabs value={activeTab} onValueChange={(val) => setActiveTab(val as WorkbenchTab)} className="w-full">
-        <TabsList className="w-full justify-start h-10 p-1 bg-muted/70 overflow-x-auto">
-          <TabsTrigger value="frictions" className="gap-2 text-xs font-bold font-mono shrink-0">
-            <Activity className="w-3.5 h-3.5 text-amber-500" />
-            Friction Diagnostics ({activeRun.frictions.length})
+        <TabsList className="w-full justify-start h-11 p-1 bg-secondary/90 rounded-full border border-border/80 overflow-x-auto shadow-inner">
+          <TabsTrigger value="frictions" className="gap-1.5 text-xs font-semibold font-mono shrink-0 rounded-full h-8 px-3.5">
+            <Activity className="w-3.5 h-3.5" />
+            Friction ({activeRun.frictions.length})
           </TabsTrigger>
-          <TabsTrigger value="tools" className="gap-2 text-xs font-bold font-mono shrink-0">
-            <Terminal className="w-3.5 h-3.5 text-indigo-500" />
+          <TabsTrigger value="tools" className="gap-1.5 text-xs font-semibold font-mono shrink-0 rounded-full h-8 px-3.5">
+            <Terminal className="w-3.5 h-3.5" />
             WebMCP Tools & REPL ({activeRun.tools.length})
           </TabsTrigger>
-          <TabsTrigger value="sandbox" className="gap-2 text-xs font-bold font-mono shrink-0">
-            <FlaskConical className="w-3.5 h-3.5 text-cyan-500" />
-            Virtual WebMCP Sandbox
+          <TabsTrigger value="sandbox" className="gap-1.5 text-xs font-semibold font-mono shrink-0 rounded-full h-8 px-3.5">
+            <FlaskConical className="w-3.5 h-3.5" />
+            Virtual Sandbox
           </TabsTrigger>
-          <TabsTrigger value="trace" className="gap-2 text-xs font-bold font-mono shrink-0">
-            <Clock className="w-3.5 h-3.5 text-indigo-400" />
-            Decision Trace ({activeRun.timeline.length})
+          <TabsTrigger value="trace" className="gap-1.5 text-xs font-semibold font-mono shrink-0 rounded-full h-8 px-3.5">
+            <Clock className="w-3.5 h-3.5" />
+            Trace ({activeRun.timeline.length})
           </TabsTrigger>
-          <TabsTrigger value="network" className="gap-2 text-xs font-bold font-mono shrink-0">
-            <Layers className="w-3.5 h-3.5 text-indigo-400" />
-            Network & HAR ({activeRun.network.length})
+          <TabsTrigger value="network" className="gap-1.5 text-xs font-semibold font-mono shrink-0 rounded-full h-8 px-3.5">
+            <Layers className="w-3.5 h-3.5" />
+            Network ({activeRun.network.length})
           </TabsTrigger>
-          <TabsTrigger value="dom" className="gap-2 text-xs font-bold font-mono shrink-0">
-            <Eye className="w-3.5 h-3.5 text-indigo-400" />
-            Viewport & DOM ({activeRun.domInteractions.length})
+          <TabsTrigger value="dom" className="gap-1.5 text-xs font-semibold font-mono shrink-0 rounded-full h-8 px-3.5">
+            <Eye className="w-3.5 h-3.5" />
+            DOM Viewport ({activeRun.domInteractions.length})
           </TabsTrigger>
         </TabsList>
 
         {/* TAB 1: FRICTIONS */}
         <TabsContent value="frictions" className="space-y-4 pt-2 font-mono text-xs">
-          <Card className="p-3.5 flex items-center justify-between">
+          <Card className="p-3.5 flex items-center justify-between border-border/70 shadow-xs">
             <div className="flex items-center gap-2">
               <span className="text-muted-foreground font-bold uppercase text-[10px]">Filter Severity:</span>
-              <div className="flex gap-1">
+              <div className="flex gap-1.5">
                 {(['all', 'high', 'medium', 'low'] as const).map((sev) => (
                   <Button
                     key={sev}
                     variant={frictionFilter === sev ? 'default' : 'secondary'}
                     size="sm"
                     onClick={() => setFrictionFilter(sev)}
-                    className="h-7 px-2.5 text-[11px] capitalize font-medium"
+                    className={`h-7 px-3 text-[11px] capitalize font-semibold rounded-full transition-all ${
+                      frictionFilter === sev
+                        ? 'bg-[#ff8527] text-white hover:bg-[#ea580c] shadow-xs'
+                        : 'bg-secondary text-muted-foreground hover:text-foreground border border-border/60'
+                    }`}
                   >
                     {sev} ({sev === 'all' ? activeRun.frictions.length : activeRun.frictions.filter((f) => f.severity === sev).length})
                   </Button>
@@ -614,10 +618,10 @@ app.get('/.well-known/webmcp.json', (req, res) => {
           </Card>
 
           {filteredFrictions.length === 0 ? (
-            <Card className="p-8 text-center space-y-2 border-emerald-500/30">
-              <CheckCircle2 className="w-8 h-8 text-emerald-500 mx-auto" />
-              <CardTitle className="text-sm">Zero Friction Detected</CardTitle>
-              <CardDescription className="font-sans text-xs">
+            <Card className="p-8 text-center space-y-2 border-[#5ae561]/30 border-dashed rounded-2xl">
+              <CheckCircle2 className="w-8 h-8 text-[#5ae561] mx-auto" />
+              <CardTitle className="text-sm font-bold">Zero Friction Detected</CardTitle>
+              <CardDescription className="font-sans text-xs text-muted-foreground">
                 All agent intents are backed by discoverable WebMCP tools and valid HTTP responses.
               </CardDescription>
             </Card>
@@ -629,7 +633,7 @@ app.get('/.well-known/webmcp.json', (req, res) => {
               return (
                 <Card
                   key={friction.id}
-                  className="border-amber-500/30 overflow-hidden shadow-sm transition-all"
+                  className="border-border/80 overflow-hidden shadow-xs transition-all rounded-2xl"
                 >
                   <div
                     onClick={() =>
@@ -638,12 +642,12 @@ app.get('/.well-known/webmcp.json', (req, res) => {
                         [friction.id]: !isExpanded,
                       }))
                     }
-                    className="p-4 bg-muted/30 flex items-center justify-between cursor-pointer hover:bg-muted/50 transition-colors"
+                    className="p-4 bg-secondary/30 flex items-center justify-between cursor-pointer hover:bg-secondary/50 transition-colors"
                   >
                     <div className="flex items-center gap-2.5">
                       <Badge
                         variant={friction.severity === 'high' ? 'destructive' : friction.severity === 'medium' ? 'warning' : 'secondary'}
-                        className="text-[10px] font-bold uppercase font-mono"
+                        className="text-[10px] font-bold uppercase font-mono rounded-full"
                       >
                         {friction.severity} SEVERITY
                       </Badge>
@@ -657,19 +661,19 @@ app.get('/.well-known/webmcp.json', (req, res) => {
                   </div>
 
                   {isExpanded && (
-                    <CardContent className="p-5 space-y-4 border-t border-border">
+                    <CardContent className="p-5 space-y-4 border-t border-border/60">
                       <p className="text-muted-foreground font-sans text-xs leading-relaxed">
                         {friction.description}
                       </p>
 
-                      <div className="p-3.5 bg-muted/40 rounded-lg border border-border space-y-2">
+                      <div className="p-3.5 bg-secondary/40 rounded-xl border border-border/60 space-y-2">
                         <span className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5">
                           <Activity className="w-3 h-3 text-primary" />
                           Multi-Modal Evidence Log
                         </span>
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-2 text-[11px]">
                           {friction.evidence.relevantApiEndpoint && (
-                            <div className="p-2 bg-background rounded border border-border">
+                            <div className="p-2 bg-background rounded-lg border border-border/70">
                               <span className="text-muted-foreground block text-[10px]">API Endpoint:</span>
                               <span className="text-primary font-bold">
                                 {friction.evidence.relevantApiEndpoint}
@@ -677,15 +681,15 @@ app.get('/.well-known/webmcp.json', (req, res) => {
                             </div>
                           )}
                           {friction.evidence.domElementDetected && (
-                            <div className="p-2 bg-background rounded border border-border">
+                            <div className="p-2 bg-background rounded-lg border border-border/70">
                               <span className="text-muted-foreground block text-[10px]">DOM Control:</span>
-                              <span className="text-emerald-600 dark:text-emerald-400 font-bold">
+                              <span className="text-emerald-700 dark:text-[#5ae561] font-bold">
                                 {friction.evidence.domElementDetected}
                               </span>
                             </div>
                           )}
                           {friction.evidence.toolsDiscovered && (
-                            <div className="p-2 bg-background rounded border border-border md:col-span-2">
+                            <div className="p-2 bg-background rounded-lg border border-border/70 md:col-span-2">
                               <span className="text-muted-foreground block text-[10px]">Discovered Tools:</span>
                               <span className="text-foreground">
                                 [{friction.evidence.toolsDiscovered.join(', ') || 'none'}]
@@ -693,7 +697,7 @@ app.get('/.well-known/webmcp.json', (req, res) => {
                             </div>
                           )}
                           {friction.evidence.errorMessage && (
-                            <div className="p-2 bg-background rounded border border-destructive/30 text-destructive md:col-span-2">
+                            <div className="p-2 bg-background rounded-lg border border-destructive/30 text-destructive md:col-span-2">
                               <span className="block text-[10px] font-bold">Error Message:</span>
                               <span>{friction.evidence.errorMessage}</span>
                             </div>
@@ -701,16 +705,16 @@ app.get('/.well-known/webmcp.json', (req, res) => {
                         </div>
                       </div>
 
-                      <div className="p-4 bg-slate-950 dark:bg-black text-slate-100 rounded-xl border border-border space-y-3">
-                        <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-slate-800">
+                      <div className="p-4 bg-[#121212] text-[#fafafa] rounded-2xl border border-border/80 space-y-3">
+                        <div className="flex flex-wrap items-center justify-between gap-2 pb-2 border-b border-neutral-800">
                           <div className="flex items-center gap-2">
-                            <Code2 className="w-4 h-4 text-cyan-400" />
+                            <Code2 className="w-4 h-4 text-[#5ae561]" />
                             <span className="font-bold text-xs text-white">1-Click Drop-in Fix:</span>
                           </div>
 
-                          <div className="flex items-center gap-1 bg-slate-900 p-0.5 rounded-lg text-[10px]">
+                          <div className="flex items-center gap-1 bg-neutral-900 p-0.5 rounded-full text-[10px] border border-neutral-800">
                             <Button
-                              variant={activeFramework === 'webmcp' ? 'default' : 'ghost'}
+                              variant="ghost"
                               size="sm"
                               onClick={() =>
                                 setCodeFramework((prev) => ({
@@ -718,12 +722,16 @@ app.get('/.well-known/webmcp.json', (req, res) => {
                                   [friction.id]: 'webmcp',
                                 }))
                               }
-                              className="h-6 px-2 text-[10px]"
+                              className={`h-6 px-3 text-[10px] rounded-full transition-all ${
+                                activeFramework === 'webmcp'
+                                  ? 'bg-[#ff8527] text-white font-bold shadow-xs'
+                                  : 'text-neutral-400 hover:text-white hover:bg-neutral-800'
+                              }`}
                             >
                               Chrome WebMCP Standard
                             </Button>
                             <Button
-                              variant={activeFramework === 'react' ? 'default' : 'ghost'}
+                              variant="ghost"
                               size="sm"
                               onClick={() =>
                                 setCodeFramework((prev) => ({
@@ -731,12 +739,16 @@ app.get('/.well-known/webmcp.json', (req, res) => {
                                   [friction.id]: 'react',
                                 }))
                               }
-                              className="h-6 px-2 text-[10px]"
+                              className={`h-6 px-3 text-[10px] rounded-full transition-all ${
+                                activeFramework === 'react'
+                                  ? 'bg-[#ff8527] text-white font-bold shadow-xs'
+                                  : 'text-neutral-400 hover:text-white hover:bg-neutral-800'
+                              }`}
                             >
                               React Hook
                             </Button>
                             <Button
-                              variant={activeFramework === 'node' ? 'default' : 'ghost'}
+                              variant="ghost"
                               size="sm"
                               onClick={() =>
                                 setCodeFramework((prev) => ({
@@ -744,17 +756,21 @@ app.get('/.well-known/webmcp.json', (req, res) => {
                                   [friction.id]: 'node',
                                 }))
                               }
-                              className="h-6 px-2 text-[10px]"
+                              className={`h-6 px-3 text-[10px] rounded-full transition-all ${
+                                activeFramework === 'node'
+                                  ? 'bg-[#ff8527] text-white font-bold shadow-xs'
+                                  : 'text-neutral-400 hover:text-white hover:bg-neutral-800'
+                              }`}
                             >
                               Node.js Proxy
                             </Button>
                           </div>
                         </div>
 
-                        <p className="text-slate-400 font-sans text-xs">{friction.recommendation}</p>
+                        <p className="text-neutral-400 font-sans text-xs">{friction.recommendation}</p>
 
                         <div className="relative group">
-                          <pre className="p-3.5 bg-slate-900 rounded-lg text-cyan-300 text-[11px] font-mono overflow-x-auto leading-relaxed border border-slate-800">
+                          <pre className="p-3.5 bg-neutral-900/80 rounded-xl text-[#74b684] text-[11px] font-mono overflow-x-auto leading-relaxed border border-neutral-800">
                             {getCodeSnippet(friction, activeFramework)}
                           </pre>
                         </div>
@@ -767,7 +783,7 @@ app.get('/.well-known/webmcp.json', (req, res) => {
                               setSandboxCode(getCodeSnippet(friction, 'webmcp'));
                               setActiveTab('sandbox');
                             }}
-                            className="h-8 gap-1.5 text-xs text-cyan-400"
+                            className="h-8 gap-1.5 text-xs text-[#38bdf8] rounded-full bg-neutral-800 hover:bg-neutral-700"
                           >
                             <FlaskConical className="w-3.5 h-3.5" />
                             Load into Virtual Sandbox
@@ -775,9 +791,9 @@ app.get('/.well-known/webmcp.json', (req, res) => {
                           <Button
                             size="sm"
                             onClick={() => handleCopy(friction.id, getCodeSnippet(friction, activeFramework))}
-                            className="h-8 gap-1.5 text-xs font-bold"
+                            className="h-8 gap-1.5 text-xs font-semibold rounded-full px-4"
                           >
-                            {copiedId === friction.id ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                            {copiedId === friction.id ? <Check className="w-3.5 h-3.5 text-[#5ae561]" /> : <Copy className="w-3.5 h-3.5" />}
                             {copiedId === friction.id ? 'Copied to Clipboard' : 'Copy Code Fix'}
                           </Button>
                         </div>
@@ -793,13 +809,13 @@ app.get('/.well-known/webmcp.json', (req, res) => {
         {/* TAB 2: TOOLS */}
         <TabsContent value="tools" className="pt-2 font-mono text-xs">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-            <Card className="lg:col-span-6 p-5 space-y-4">
-              <div className="flex items-center justify-between pb-3 border-b border-border">
+            <Card className="lg:col-span-6 p-5 space-y-4 border-border/70 shadow-xs rounded-2xl">
+              <div className="flex items-center justify-between pb-3 border-b border-border/60">
                 <CardTitle className="text-xs uppercase flex items-center gap-2">
                   <Boxes className="w-4 h-4 text-primary" />
                   Discovered WebMCP Tools ({activeRun.tools.length})
                 </CardTitle>
-                <span className="text-[10px] text-muted-foreground">document.modelContext</span>
+                <span className="text-[10px] text-muted-foreground font-mono">document.modelContext</span>
               </div>
 
               {activeRun.tools.length === 0 ? (
@@ -812,15 +828,15 @@ app.get('/.well-known/webmcp.json', (req, res) => {
                     <div
                       key={t.name}
                       onClick={() => handleToolSelect(idx)}
-                      className={`p-3.5 rounded-lg border transition-all cursor-pointer ${
+                      className={`p-3.5 rounded-xl border transition-all cursor-pointer ${
                         selectedToolIndex === idx
-                          ? 'bg-primary/5 border-primary shadow-sm'
-                          : 'bg-muted/30 border-border hover:border-muted-foreground/40'
+                          ? 'bg-secondary border-primary/80 shadow-xs'
+                          : 'bg-secondary/30 border-border/70 hover:border-border'
                       }`}
                     >
                       <div className="flex items-center justify-between">
-                        <span className="font-bold text-primary dark:text-cyan-400 text-xs">{t.name}()</span>
-                        <Badge variant="outline" className="text-[10px] uppercase">
+                        <span className="font-bold text-foreground text-xs">{t.name}()</span>
+                        <Badge variant="outline" className="text-[10px] uppercase rounded-full">
                           {t.source || 'modelContext'}
                         </Badge>
                       </div>
@@ -828,7 +844,7 @@ app.get('/.well-known/webmcp.json', (req, res) => {
                         {t.description}
                       </p>
 
-                      <div className="mt-2.5 p-2 bg-background rounded border border-border text-[10px]">
+                      <div className="mt-2.5 p-2 bg-background rounded-lg border border-border/70 text-[10px]">
                         <span className="text-muted-foreground block font-bold mb-1">
                           INPUT SCHEMA (JSON):
                         </span>
@@ -842,14 +858,14 @@ app.get('/.well-known/webmcp.json', (req, res) => {
               )}
             </Card>
 
-            <Card className="lg:col-span-6 p-5 flex flex-col justify-between space-y-4">
+            <Card className="lg:col-span-6 p-5 flex flex-col justify-between space-y-4 border-border/70 shadow-xs rounded-2xl">
               <div className="space-y-3">
-                <div className="flex items-center justify-between pb-3 border-b border-border">
+                <div className="flex items-center justify-between pb-3 border-b border-border/60">
                   <CardTitle className="text-xs uppercase flex items-center gap-2">
                     <Terminal className="w-4 h-4 text-primary" />
                     Live In-Browser Tool REPL
                   </CardTitle>
-                  <Badge variant="success" className="text-[10px] font-bold">
+                  <Badge variant="success" className="text-[10px] font-bold rounded-full">
                     ● ACTIVE REPL
                   </Badge>
                 </div>
@@ -863,7 +879,7 @@ app.get('/.well-known/webmcp.json', (req, res) => {
                           variant={selectedToolIndex === idx ? 'default' : 'outline'}
                           size="sm"
                           onClick={() => handleToolSelect(idx)}
-                          className="h-7 text-xs font-medium"
+                          className="h-7 text-xs font-medium rounded-full"
                         >
                           {t.name}()
                         </Button>
@@ -885,22 +901,22 @@ app.get('/.well-known/webmcp.json', (req, res) => {
                         value={simInput}
                         onChange={(e) => setSimInput(e.target.value)}
                         rows={5}
-                        className="font-mono text-xs dark:bg-black text-cyan-400"
+                        className="font-mono text-xs bg-[#121212] text-[#74b684] rounded-xl border-border/80"
                       />
                     </div>
 
                     <Button
                       onClick={handleRunSimulation}
                       disabled={isSimulating}
-                      className="w-full gap-2 text-xs font-bold h-9"
+                      className="w-full gap-2 text-xs font-semibold h-9 rounded-full bg-primary text-primary-foreground hover:bg-primary/90"
                     >
                       {isSimulating ? <RotateCw className="w-3.5 h-3.5 animate-spin" /> : <Play className="w-3.5 h-3.5 fill-current" />}
                       Execute Tool in Live Context
                     </Button>
 
                     {simOutput && (
-                      <div className="p-3.5 bg-slate-950 dark:bg-black border border-emerald-500/30 rounded-lg text-emerald-400 text-xs overflow-x-auto space-y-1">
-                        <div className="text-[10px] font-bold text-emerald-300 uppercase">Execution Output:</div>
+                      <div className="p-3.5 bg-[#121212] border border-[#5ae561]/30 rounded-xl text-[#5ae561] text-xs overflow-x-auto space-y-1">
+                        <div className="text-[10px] font-bold text-[#5ae561] uppercase">Execution Output:</div>
                         <pre className="text-[11px]">{simOutput}</pre>
                       </div>
                     )}
@@ -908,9 +924,9 @@ app.get('/.well-known/webmcp.json', (req, res) => {
                 )}
               </div>
 
-              <Alert variant="info">
+              <Alert variant="info" className="rounded-xl">
                 <Info className="w-4 h-4" />
-                <AlertDescription className="text-[11px] font-sans">
+                <AlertDescription className="text-[11px] font-sans text-muted-foreground">
                   Executes the tool's JavaScript handler inside the real Chromium browser session and verifies schema adherence.
                 </AlertDescription>
               </Alert>
@@ -920,14 +936,14 @@ app.get('/.well-known/webmcp.json', (req, res) => {
 
         {/* TAB 3: SANDBOX */}
         <TabsContent value="sandbox" className="pt-2 font-mono text-xs">
-          <Card className="p-5 space-y-5">
-            <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-border">
+          <Card className="p-5 space-y-5 border-border/70 shadow-xs rounded-2xl">
+            <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-border/60">
               <div>
                 <CardTitle className="text-sm uppercase flex items-center gap-2">
-                  <FlaskConical className="w-4 h-4 text-cyan-500" />
+                  <FlaskConical className="w-4 h-4 text-[#38bdf8]" />
                   Virtual WebMCP In-Browser Bridge (Live Prototyping)
                 </CardTitle>
-                <CardDescription className="font-sans text-xs mt-0.5">
+                <CardDescription className="font-sans text-xs text-muted-foreground mt-0.5">
                   Prototype and validate Chrome WebMCP tools on your target site without redeploying code.
                 </CardDescription>
               </div>
@@ -960,7 +976,7 @@ document.modelContext.registerTool({
   }
 });`)
                   }
-                  className="h-7 text-[11px]"
+                  className="h-7 text-[11px] rounded-full"
                 >
                   + Cart Tool Fix
                 </Button>
@@ -970,40 +986,40 @@ document.modelContext.registerTool({
             <div className="space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-[10px] font-bold text-muted-foreground uppercase flex items-center gap-1.5">
-                  <FileCode2 className="w-3.5 h-3.5 text-cyan-400" />
+                  <FileCode2 className="w-3.5 h-3.5 text-[#5ae561]" />
                   Candidate Tool Script (document.modelContext.registerTool):
                 </span>
-                <span className="text-[10px] text-muted-foreground">JavaScript / In-Page Context</span>
+                <span className="text-[10px] text-muted-foreground font-sans">JavaScript / In-Page Context</span>
               </div>
 
               <Textarea
                 value={sandboxCode}
                 onChange={(e) => setSandboxCode(e.target.value)}
                 rows={12}
-                className="font-mono text-xs leading-relaxed bg-slate-950 dark:bg-black text-cyan-300 border-border"
+                className="font-mono text-xs leading-relaxed bg-[#121212] text-[#74b684] border-border/80 rounded-xl"
               />
 
               <Button
                 onClick={handleInjectAndTestSandbox}
                 disabled={isInjectingSandbox}
-                className="w-full gap-2 text-xs font-bold h-10 bg-cyan-600 hover:bg-cyan-700 text-white"
+                className="w-full gap-2 text-xs font-semibold h-10 rounded-full bg-primary text-primary-foreground hover:bg-primary/90"
               >
-                {isInjectingSandbox ? <RotateCw className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4 fill-current" />}
+                {isInjectingSandbox ? <RotateCw className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4 fill-current text-[#f3c83d]" />}
                 Simulate Virtual Tool Injection & Re-evaluate Friction
               </Button>
             </div>
 
             {sandboxResult && (
-              <Alert variant={sandboxResult.success ? 'success' : 'destructive'} className="space-y-2">
+              <Alert variant={sandboxResult.success ? 'success' : 'destructive'} className="space-y-2 rounded-xl">
                 {sandboxResult.success ? <CheckCircle2 className="w-4 h-4" /> : <XCircle className="w-4 h-4" />}
                 <div className="flex items-center justify-between">
                   <AlertTitle className="text-sm font-bold">{sandboxResult.message}</AlertTitle>
-                  <Badge variant="outline" className="font-mono font-bold">
+                  <Badge variant="outline" className="font-mono font-bold rounded-full">
                     Simulated Score: {sandboxResult.simulatedScore}%
                   </Badge>
                 </div>
                 <AlertDescription>
-                  <div className="p-3 bg-background/80 dark:bg-black rounded-lg border border-border text-foreground dark:text-cyan-300 text-[11px] font-mono overflow-x-auto mt-2">
+                  <div className="p-3 bg-[#121212] text-[#74b684] rounded-xl border border-border/80 text-[11px] font-mono overflow-x-auto mt-2">
                     <pre>{JSON.stringify(sandboxResult.details, null, 2)}</pre>
                   </div>
                 </AlertDescription>
@@ -1014,8 +1030,8 @@ document.modelContext.registerTool({
 
         {/* TAB 4: TRACE */}
         <TabsContent value="trace" className="pt-2 font-mono text-xs">
-          <Card className="p-5 space-y-4">
-            <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-border">
+          <Card className="p-5 space-y-4 border-border/70 shadow-xs rounded-2xl">
+            <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-border/60">
               <CardTitle className="text-xs uppercase flex items-center gap-2">
                 <Clock className="w-4 h-4 text-primary" />
                 Chronological Agent Decision Trace ({activeRun.timeline.length} Steps)
@@ -1029,12 +1045,12 @@ document.modelContext.registerTool({
                     placeholder="Filter step text..."
                     value={traceSearch}
                     onChange={(e) => setTraceSearch(e.target.value)}
-                    className="pl-8 h-8 w-44 text-xs"
+                    className="pl-8 h-8 w-44 text-xs rounded-full"
                   />
                 </div>
 
                 <Select value={tracePhaseFilter} onValueChange={setTracePhaseFilter}>
-                  <SelectTrigger className="w-32 h-8 text-xs">
+                  <SelectTrigger className="w-32 h-8 text-xs rounded-full">
                     <SelectValue placeholder="Phase" />
                   </SelectTrigger>
                   <SelectContent>
@@ -1049,7 +1065,7 @@ document.modelContext.registerTool({
                 </Select>
 
                 <Select value={traceStatusFilter} onValueChange={setTraceStatusFilter}>
-                  <SelectTrigger className="w-32 h-8 text-xs">
+                  <SelectTrigger className="w-32 h-8 text-xs rounded-full">
                     <SelectValue placeholder="Status" />
                   </SelectTrigger>
                   <SelectContent>
@@ -1070,7 +1086,7 @@ document.modelContext.registerTool({
                 return (
                   <div
                     key={step.id || idx}
-                    className="p-3 rounded-lg bg-muted/40 border border-border space-y-1.5"
+                    className="p-3.5 rounded-xl bg-secondary/30 border border-border/70 space-y-1.5"
                   >
                     <div
                       onClick={() =>
@@ -1087,11 +1103,11 @@ document.modelContext.registerTool({
                             step.status === 'error'
                               ? 'bg-destructive'
                               : step.status === 'warning'
-                              ? 'bg-amber-500'
-                              : 'bg-emerald-500'
+                              ? 'bg-[#ff8527]'
+                              : 'bg-[#5ae561]'
                           }`}
                         />
-                        <Badge variant="outline" className="text-[10px] font-bold uppercase">
+                        <Badge variant="outline" className="text-[10px] font-bold uppercase rounded-full">
                           {step.phase}
                         </Badge>
                         <span className="font-bold text-foreground text-xs">{step.label}</span>
@@ -1115,8 +1131,8 @@ document.modelContext.registerTool({
 
         {/* TAB 5: NETWORK */}
         <TabsContent value="network" className="pt-2 font-mono text-xs">
-          <Card className="p-5 space-y-4">
-            <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-border">
+          <Card className="p-5 space-y-4 border-border/70 shadow-xs rounded-2xl">
+            <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-border/60">
               <CardTitle className="text-xs uppercase flex items-center gap-2">
                 <Layers className="w-4 h-4 text-primary" />
                 Intercepted Network Stream ({activeRun.network.length} Requests)
@@ -1128,7 +1144,7 @@ document.modelContext.registerTool({
                   placeholder="Search URL / endpoint..."
                   value={netSearch}
                   onChange={(e) => setNetSearch(e.target.value)}
-                  className="h-8 w-48 text-xs"
+                  className="h-8 w-48 text-xs rounded-full"
                 />
                 <div className="flex gap-1">
                   {(['all', 'api', 'first-party', 'third-party', 'errors'] as const).map((filter) => (
@@ -1137,7 +1153,7 @@ document.modelContext.registerTool({
                       variant={netFilter === filter ? 'default' : 'secondary'}
                       size="sm"
                       onClick={() => setNetFilter(filter)}
-                      className="h-7 px-2 text-[10px] uppercase font-bold"
+                      className="h-7 px-3 text-[10px] uppercase font-semibold rounded-full"
                     >
                       {filter}
                     </Button>
@@ -1166,13 +1182,13 @@ document.modelContext.registerTool({
                     <TableRow
                       key={net.id}
                       onClick={() => setSelectedNetworkEvent(selectedNetworkEvent?.id === net.id ? null : net)}
-                      className="cursor-pointer"
+                      className="cursor-pointer hover:bg-secondary/40"
                     >
                       <TableCell className="font-bold text-foreground">{net.method}</TableCell>
                       <TableCell>
                         <Badge
                           variant={net.status < 400 ? 'success' : 'destructive'}
-                          className="text-[10px] font-bold"
+                          className="text-[10px] font-bold rounded-full"
                         >
                           {net.status}
                         </Badge>
@@ -1183,7 +1199,7 @@ document.modelContext.registerTool({
                       <TableCell>
                         <Badge
                           variant={net.origin === 'first-party' ? 'outline' : 'warning'}
-                          className="text-[10px] uppercase"
+                          className="text-[10px] uppercase rounded-full"
                         >
                           {net.origin}
                         </Badge>
@@ -1191,7 +1207,7 @@ document.modelContext.registerTool({
                       <TableCell className="text-muted-foreground">{net.durationMs}ms</TableCell>
                       <TableCell>
                         {isCartOrAction && !hasTool ? (
-                          <Badge variant="warning" className="text-[10px] font-bold">
+                          <Badge variant="warning" className="text-[10px] font-bold rounded-full">
                             ⚠️ Missing WebMCP Wrapper
                           </Badge>
                         ) : (
@@ -1205,16 +1221,16 @@ document.modelContext.registerTool({
             </Table>
 
             {selectedNetworkEvent && (
-              <div className="p-4 bg-slate-950 dark:bg-black text-slate-100 rounded-xl border border-border space-y-2">
-                <div className="flex items-center justify-between text-xs pb-2 border-b border-slate-800">
-                  <span className="font-bold text-cyan-400">
+              <div className="p-4 bg-[#121212] text-[#fafafa] rounded-2xl border border-border/80 space-y-2">
+                <div className="flex items-center justify-between text-xs pb-2 border-b border-neutral-800">
+                  <span className="font-bold text-[#74b684]">
                     Request Details: {selectedNetworkEvent.method} {selectedNetworkEvent.url}
                   </span>
                   <Button
                     variant="ghost"
                     size="sm"
                     onClick={() => setSelectedNetworkEvent(null)}
-                    className="h-6 text-slate-400 hover:text-white"
+                    className="h-6 text-neutral-400 hover:text-white rounded-full"
                   >
                     Close
                   </Button>
@@ -1222,16 +1238,16 @@ document.modelContext.registerTool({
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-[11px]">
                   {selectedNetworkEvent.requestHeaders && (
                     <div>
-                      <span className="text-slate-400 block mb-1">Request Headers:</span>
-                      <pre className="p-2 bg-slate-900 rounded text-slate-300 overflow-x-auto">
+                      <span className="text-neutral-400 block mb-1">Request Headers:</span>
+                      <pre className="p-2 bg-neutral-900 rounded-lg text-neutral-300 overflow-x-auto">
                         {JSON.stringify(selectedNetworkEvent.requestHeaders, null, 2)}
                       </pre>
                     </div>
                   )}
                   {selectedNetworkEvent.responseHeaders && (
                     <div>
-                      <span className="text-slate-400 block mb-1">Response Headers:</span>
-                      <pre className="p-2 bg-slate-900 rounded text-slate-300 overflow-x-auto">
+                      <span className="text-neutral-400 block mb-1">Response Headers:</span>
+                      <pre className="p-2 bg-neutral-900 rounded-lg text-neutral-300 overflow-x-auto">
                         {JSON.stringify(selectedNetworkEvent.responseHeaders, null, 2)}
                       </pre>
                     </div>
@@ -1245,8 +1261,8 @@ document.modelContext.registerTool({
         {/* TAB 6: DOM */}
         <TabsContent value="dom" className="pt-2 font-mono text-xs">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-5">
-            <Card className="lg:col-span-6 p-5 space-y-3 flex flex-col justify-between">
-              <div className="flex items-center justify-between pb-3 border-b border-border">
+            <Card className="lg:col-span-6 p-5 space-y-3 flex flex-col justify-between border-border/70 shadow-xs rounded-2xl">
+              <div className="flex items-center justify-between pb-3 border-b border-border/60">
                 <CardTitle className="text-xs uppercase flex items-center gap-2">
                   <Eye className="w-4 h-4 text-primary" />
                   Live Chromium Viewport
@@ -1255,19 +1271,19 @@ document.modelContext.registerTool({
                   variant="ghost"
                   size="sm"
                   onClick={() => setIsScreenshotExpanded(!isScreenshotExpanded)}
-                  className="h-7 text-muted-foreground hover:text-foreground gap-1 text-[11px]"
+                  className="h-7 text-muted-foreground hover:text-foreground gap-1 text-[11px] rounded-full"
                 >
                   {isScreenshotExpanded ? <Minimize2 className="w-3.5 h-3.5" /> : <Maximize2 className="w-3.5 h-3.5" />}
                   {isScreenshotExpanded ? 'Collapse' : 'Expand'}
                 </Button>
               </div>
 
-              <div className="p-3 bg-muted/30 rounded-lg border border-border flex items-center justify-center">
+              <div className="p-3 bg-secondary/30 rounded-xl border border-border/70 flex items-center justify-center">
                 {activeRun.screenshot ? (
                   <img
                     src={`data:image/jpeg;base64,${activeRun.screenshot}`}
                     alt="Live Browser Session"
-                    className={`w-full object-contain rounded transition-all duration-300 ${
+                    className={`w-full object-contain rounded-lg transition-all duration-300 ${
                       isScreenshotExpanded ? 'max-h-[550px]' : 'max-h-[300px]'
                     }`}
                   />
@@ -1281,13 +1297,13 @@ document.modelContext.registerTool({
               </span>
             </Card>
 
-            <Card className="lg:col-span-6 p-5 space-y-3">
-              <div className="flex items-center justify-between pb-3 border-b border-border">
+            <Card className="lg:col-span-6 p-5 space-y-3 border-border/70 shadow-xs rounded-2xl">
+              <div className="flex items-center justify-between pb-3 border-b border-border/60">
                 <CardTitle className="text-xs uppercase flex items-center gap-2">
                   <MousePointerClick className="w-4 h-4 text-primary" />
                   Captured DOM Controls ({activeRun.domInteractions.length})
                 </CardTitle>
-                <Badge variant="outline" className="text-[10px]">
+                <Badge variant="outline" className="text-[10px] rounded-full">
                   DOM TREE SCAN
                 </Badge>
               </div>
@@ -1300,11 +1316,11 @@ document.modelContext.registerTool({
                     activeRun.domInteractions.map((dom) => (
                       <div
                         key={dom.id}
-                        className="p-3 bg-muted/40 rounded-lg border border-border space-y-1"
+                        className="p-3 bg-secondary/30 rounded-xl border border-border/70 space-y-1"
                       >
                         <div className="flex items-center justify-between">
-                          <span className="font-bold text-primary dark:text-cyan-400">{dom.selector}</span>
-                          <Badge variant="secondary" className="text-[10px]">
+                          <span className="font-bold text-foreground">{dom.selector}</span>
+                          <Badge variant="secondary" className="text-[10px] rounded-full">
                             &lt;{dom.elementTag}&gt;
                           </Badge>
                         </div>

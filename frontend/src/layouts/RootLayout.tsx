@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Outlet } from 'react-router-dom';
+import { Outlet, useLocation } from 'react-router-dom';
 import { useTestDriveContext } from '@/context/TestDriveContext';
 import { Sidebar } from '@/components/Sidebar';
 import { StartForm } from '@/components/StartForm';
@@ -22,6 +22,8 @@ export const RootLayout: React.FC = () => {
   const [copiedMcp, setCopiedMcp] = useState<boolean>(false);
   const [mcpTab, setMcpTab] = useState<'remote' | 'cli' | 'tools'>('remote');
   const [dynamicMcpConfig, setDynamicMcpConfig] = useState<any>(null);
+  const location = useLocation();
+  const isLandingPage = location.pathname === '/';
 
   useEffect(() => {
     if (showMcpModal) {
@@ -70,35 +72,38 @@ export const RootLayout: React.FC = () => {
   };
 
   return (
-    <div className={`min-h-screen flex font-sans ${isDark ? 'dark bg-background text-foreground' : 'bg-slate-50/50 text-foreground'}`}>
-      {/* Persistent Left Sidebar */}
+    <div className={`min-h-screen flex font-sans ${isDark ? 'dark bg-background text-foreground' : 'bg-[#faf9f5] text-foreground'}`}>
+      {/* Persistent Sticky Left Sidebar */}
       <Sidebar />
 
-      {/* Main Content Viewport */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-y-auto">
-        <main className="flex-1 max-w-6xl w-full mx-auto p-4 md:p-6 flex flex-col gap-6">
-          {/* Top Control Bench */}
-          <StartForm />
-
-          {/* Active Route Page */}
+      {/* Main Total Scroll Viewport */}
+      <div className="flex-1 flex flex-col min-w-0 min-h-screen relative">
+        {/* Full Document Flow Content */}
+        <main className={`flex-1 p-4 md:p-6 ${isLandingPage ? 'pb-12' : 'pb-40'} max-w-7xl w-full mx-auto`}>
           <Outlet />
         </main>
 
-        {/* Persistent Footer */}
-        <footer className="border-t border-border py-3.5 px-6 text-center text-xs text-muted-foreground bg-card font-sans">
-          Deep Age • 100% Real Headless Chromium Execution • Chrome WebMCP Specification
-        </footer>
+        {/* Floating Bottom AI Chat / Command Prompt Bar (Hidden on Landing Page) */}
+        {!isLandingPage && (
+          <div className="sticky bottom-0 left-0 right-0 p-4 md:p-6 bg-gradient-to-t from-background via-background/95 to-transparent pointer-events-none z-30 mt-auto">
+            <div className="max-w-5xl mx-auto pointer-events-auto">
+              <StartForm />
+            </div>
+          </div>
+        )}
       </div>
 
       {/* MCP Configuration Dialog */}
       <Dialog open={showMcpModal} onOpenChange={setShowMcpModal}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-2xl border-border/80">
           <DialogHeader>
-            <DialogTitle className="flex items-center gap-2 text-sm">
-              <Terminal className="w-4 h-4 text-primary" />
+            <DialogTitle className="flex items-center gap-2.5 text-sm font-bold">
+              <span className="p-1.5 rounded-full bg-primary text-primary-foreground">
+                <Terminal className="w-3.5 h-3.5" />
+              </span>
               Agent MCP Configuration (Deployment Ready)
             </DialogTitle>
-            <DialogDescription className="text-xs leading-relaxed">
+            <DialogDescription className="text-xs leading-relaxed text-muted-foreground">
               Auto-configured for your deployment environment. Add this block into Claude Desktop, Cursor, Antigravity, or LangChain agents to let them inspect websites via Deep Age.
             </DialogDescription>
           </DialogHeader>
@@ -107,11 +112,11 @@ export const RootLayout: React.FC = () => {
             <TabsList className="grid grid-cols-3 w-full h-9">
               <TabsTrigger value="remote" className="gap-1.5 text-xs">
                 <Globe className="w-3.5 h-3.5" />
-                Remote MCP (HTTP / SSE)
+                Remote MCP
               </TabsTrigger>
               <TabsTrigger value="cli" className="gap-1.5 text-xs">
                 <Server className="w-3.5 h-3.5" />
-                Local Stdio (Node CLI)
+                Local Stdio
               </TabsTrigger>
               <TabsTrigger value="tools" className="gap-1.5 text-xs">
                 <Terminal className="w-3.5 h-3.5" />
@@ -121,28 +126,28 @@ export const RootLayout: React.FC = () => {
           </Tabs>
 
           <div className="relative mt-1">
-            <pre className="p-4 bg-slate-950 text-slate-200 dark:bg-black rounded-lg text-xs font-mono overflow-x-auto border border-border">
+            <pre className="p-4 bg-[#121212] text-[#fafafa] rounded-xl text-xs font-mono overflow-x-auto border border-border/80 leading-relaxed">
               {activeMcpText}
             </pre>
             <Button
               size="sm"
               variant="secondary"
               onClick={handleCopyMcp}
-              className="absolute top-2.5 right-2.5 h-7 text-xs gap-1 shadow-sm font-medium"
+              className="absolute top-2.5 right-2.5 h-7 text-xs gap-1.5 shadow-xs font-medium rounded-full bg-secondary/90 hover:bg-secondary"
             >
-              {copiedMcp ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+              {copiedMcp ? <Check className="w-3.5 h-3.5 text-[#5ae561]" /> : <Copy className="w-3.5 h-3.5" />}
               {copiedMcp ? 'Copied' : 'Copy Config'}
             </Button>
           </div>
 
-          <Separator className="my-1" />
+          <Separator className="my-1 border-border/60" />
 
           <DialogFooter className="flex items-center justify-between sm:justify-between w-full text-xs text-muted-foreground">
-            <span>Direct Discovery URL: <code className="text-primary font-mono">/mcp.json</code></span>
+            <span>Direct Discovery URL: <code className="text-primary font-mono font-medium px-1.5 py-0.5 rounded-md bg-secondary/80">/mcp.json</code></span>
             <Button
               size="sm"
               onClick={() => setShowMcpModal(false)}
-              className="h-8 px-4 text-xs font-bold"
+              className="h-8 px-5 text-xs font-semibold rounded-full"
             >
               Close
             </Button>

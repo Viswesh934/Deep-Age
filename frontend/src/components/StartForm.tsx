@@ -1,17 +1,15 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { UserMode } from '@deep-age/shared';
-import { Play, RotateCw, Sparkles, AlertCircle } from 'lucide-react';
+import { ArrowUp, RotateCw, Globe, Sparkles, SlidersHorizontal, Check, ChevronDown, ChevronUp } from 'lucide-react';
 import { useTestDriveContext } from '@/context/TestDriveContext';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Badge } from '@/components/ui/badge';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
 
 export const StartForm: React.FC = () => {
   const { url, setUrl, task, setTask, isLoading, startTestDrive, runDemoScenario } = useTestDriveContext();
   const location = useLocation();
+  const [showUrlConfig, setShowUrlConfig] = useState<boolean>(false);
+  const [isMinimized, setIsMinimized] = useState<boolean>(false);
 
   const currentMode: UserMode = location.pathname.includes('inspect')
     ? 'inspect'
@@ -20,6 +18,7 @@ export const StartForm: React.FC = () => {
     : 'explore';
 
   const handleStart = () => {
+    if (!task.trim() && !url.trim()) return;
     startTestDrive(url, task, currentMode);
   };
 
@@ -27,109 +26,137 @@ export const StartForm: React.FC = () => {
     runDemoScenario(enableAddToCart, currentMode);
   };
 
+  const handleKeyDown = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter' && !e.shiftKey && !isLoading) {
+      e.preventDefault();
+      handleStart();
+    }
+  };
+
+  if (isMinimized) {
+    return (
+      <div className="flex items-center justify-between gap-3 bg-card/95 backdrop-blur-2xl border border-border/90 rounded-full shadow-xl px-4 py-2 ring-1 ring-black/5 dark:ring-white/5 animate-fade-in max-w-lg mx-auto">
+        <div className="flex items-center gap-2 font-mono text-xs truncate">
+          <Globe className="w-3.5 h-3.5 text-primary shrink-0" />
+          <span className="truncate text-foreground font-medium">{url || 'http://127.0.0.1:3002'}</span>
+        </div>
+
+        <button
+          onClick={() => setIsMinimized(false)}
+          className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90 transition-all shrink-0"
+        >
+          <Sparkles className="w-3 h-3" />
+          <span>Ask AI</span>
+          <ChevronUp className="w-3 h-3 ml-0.5" />
+        </button>
+      </div>
+    );
+  }
+
   return (
-    <Card className="font-sans">
-      <CardHeader className="pb-4">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
-          <div>
-            <CardTitle className="text-base flex items-center gap-2">
-              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-              Test-Drive a Website
-            </CardTitle>
-            <CardDescription className="mt-1">
-              Enter any website and question. Deep Age launches headless Chromium to interact with the site and collect evidence.
-            </CardDescription>
-          </div>
+    <div className="bg-card/95 backdrop-blur-2xl border border-border/90 rounded-3xl shadow-2xl p-3.5 md:p-4 space-y-3 transition-all ring-1 ring-black/5 dark:ring-white/5 animate-fade-in">
+      {/* Top Meta Strip: Target URL + Presets + Minimize */}
+      <div className="flex flex-wrap items-center justify-between gap-2.5 px-1 text-xs">
+        <div className="flex items-center gap-2 flex-1 min-w-[240px]">
+          <button
+            type="button"
+            onClick={() => setShowUrlConfig(!showUrlConfig)}
+            className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-secondary/80 hover:bg-secondary text-foreground font-mono text-xs border border-border/70 transition-all shrink-0 shadow-2xs"
+            title="Click to edit target website URL"
+          >
+            <Globe className="w-3.5 h-3.5 text-primary shrink-0" />
+            <span className="truncate max-w-[280px] font-semibold text-foreground">
+              {url || 'Set Target URL'}
+            </span>
+            <SlidersHorizontal className="w-3 h-3 text-muted-foreground ml-0.5" />
+          </button>
 
-          <div className="flex items-center gap-2 text-xs">
-            <span className="text-muted-foreground">Active View:</span>
-            <Badge variant="outline" className="capitalize font-semibold">
-              {currentMode} Mode
-            </Badge>
-          </div>
-        </div>
-      </CardHeader>
-
-      <Separator />
-
-      <CardContent className="pt-5 space-y-5">
-        {/* Target Inputs */}
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
-          <div className="md:col-span-5 flex flex-col gap-1.5">
-            <label className="text-xs font-semibold text-foreground">
-              Target Website URL
-            </label>
-            <Input
-              type="text"
-              value={url}
-              onChange={(e) => setUrl(e.target.value)}
-              placeholder="http://127.0.0.1:3002 or https://news.ycombinator.com"
-              className="font-mono"
-            />
-          </div>
-
-          <div className="md:col-span-7 flex flex-col gap-1.5">
-            <label className="text-xs font-semibold text-foreground">
-              Task or Question for AI Agent
-            </label>
-            <Input
-              type="text"
-              value={task}
-              onChange={(e) => setTask(e.target.value)}
-              placeholder="What should the agent do or inspect on this website?"
-            />
-          </div>
+          {showUrlConfig && (
+            <div className="flex items-center gap-1.5 flex-1 animate-fade-in">
+              <input
+                type="text"
+                value={url}
+                onChange={(e) => setUrl(e.target.value)}
+                placeholder="e.g. http://127.0.0.1:3002"
+                autoFocus
+                className="flex-1 px-3 py-1.5 rounded-full bg-background border border-primary/50 text-xs font-mono outline-none text-foreground shadow-inner"
+              />
+              <button
+                type="button"
+                onClick={() => setShowUrlConfig(false)}
+                className="p-1.5 rounded-full bg-secondary hover:bg-secondary/80 text-foreground"
+              >
+                <Check className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          )}
         </div>
 
-        <Separator />
-
-        {/* Action Row */}
-        <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
-          <div className="flex items-center gap-2 text-xs">
-            <span className="text-muted-foreground">Demo Presets:</span>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => handleRunPreset(false)}
-              className="h-8 text-xs border-amber-500/30 text-amber-700 dark:text-amber-300 hover:bg-amber-500/10 gap-1.5 font-medium"
-            >
-              <AlertCircle className="w-3.5 h-3.5 text-amber-500" />
-              1. Missing Tool (Friction)
-            </Button>
-            <Button
-              type="button"
-              variant="outline"
-              size="sm"
-              onClick={() => handleRunPreset(true)}
-              className="h-8 text-xs border-emerald-500/30 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-500/10 gap-1.5 font-medium"
-            >
-              <Sparkles className="w-3.5 h-3.5 text-emerald-500" />
-              2. WebMCP Fixed (Pass)
-            </Button>
-          </div>
-
+        <div className="flex items-center gap-2 shrink-0">
+          <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider hidden sm:inline">
+            Presets:
+          </span>
           <Button
             type="button"
-            onClick={handleStart}
-            disabled={isLoading}
-            className="font-bold gap-2 text-xs h-9 px-5 shadow-sm"
+            variant="ghost"
+            size="sm"
+            onClick={() => handleRunPreset(false)}
+            className="h-7 px-3 text-xs text-foreground font-medium rounded-full bg-secondary/70 hover:bg-secondary border border-border/60 shadow-2xs"
+            title="Simulate target site missing WebMCP action tool"
           >
-            {isLoading ? (
-              <>
-                <RotateCw className="w-3.5 h-3.5 animate-spin" />
-                Driving Live Chromium...
-              </>
-            ) : (
-              <>
-                <Play className="w-3.5 h-3.5 fill-current" />
-                Run Test-Drive
-              </>
-            )}
+            <span className="w-2 h-2 rounded-full bg-[#ff8527] mr-1.5"></span>
+            Friction Demo
           </Button>
+          <Button
+            type="button"
+            variant="ghost"
+            size="sm"
+            onClick={() => handleRunPreset(true)}
+            className="h-7 px-3 text-xs text-foreground font-medium rounded-full bg-secondary/70 hover:bg-secondary border border-border/60 shadow-2xs"
+            title="Simulate target site with WebMCP tool registered"
+          >
+            <span className="w-2 h-2 rounded-full bg-[#5ae561] mr-1.5"></span>
+            WebMCP Pass
+          </Button>
+
+          <button
+            type="button"
+            onClick={() => setIsMinimized(true)}
+            className="p-1 rounded-full text-muted-foreground hover:text-foreground hover:bg-secondary/80 ml-1 transition-colors"
+            title="Minimize prompt bar to view total page"
+          >
+            <ChevronDown className="w-4 h-4" />
+          </button>
         </div>
-      </CardContent>
-    </Card>
+      </div>
+
+      {/* Main Spacious Chat Input Row */}
+      <div className="flex items-center gap-3 bg-secondary/40 focus-within:bg-secondary/80 focus-within:border-primary/60 focus-within:ring-2 focus-within:ring-primary/10 rounded-2xl px-4 py-2.5 border border-border/80 transition-all shadow-inner">
+        <Sparkles className="w-5 h-5 text-primary shrink-0 opacity-80" />
+        <input
+          type="text"
+          value={task}
+          onChange={(e) => setTask(e.target.value)}
+          onKeyDown={handleKeyDown}
+          placeholder="Instruct the AI agent (e.g. Find a laptop under ₹80k and add to cart)..."
+          className="bg-transparent text-sm md:text-base outline-none w-full text-foreground placeholder:text-muted-foreground/70 py-1 font-sans"
+        />
+
+        <Button
+          type="button"
+          onClick={handleStart}
+          disabled={isLoading || (!task.trim() && !url.trim())}
+          className="font-semibold text-sm h-9 w-9 md:h-10 md:w-10 p-0 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 active:scale-95 shrink-0 shadow-sm flex items-center justify-center disabled:opacity-40 transition-all"
+          aria-label="Send test-drive command"
+        >
+          {isLoading ? (
+            <RotateCw className="w-4 h-4 md:w-5 md:h-5 animate-spin" />
+          ) : (
+            <ArrowUp className="w-4 h-4 md:w-5 md:h-5 stroke-[2.5]" />
+          )}
+        </Button>
+      </div>
+    </div>
   );
 };
 

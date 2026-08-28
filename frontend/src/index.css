@@ -4,65 +4,103 @@
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Wajo.ai Warm Studio Light Palette */
+    --background: 40 20% 98.8%;
+    --foreground: 0 0% 9%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 0 0% 9%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 0 0% 9%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    /* Wajo Primary: Deep Obsidian / Charcoal */
+    --primary: 0 0% 9%;
+    --primary-foreground: 0 0% 98%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* Wajo Secondary: Subtle Glass Tint */
+    --secondary: 40 10% 94%;
+    --secondary-foreground: 0 0% 9%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    /* Wajo Muted & Accent: Soft Cream / Warm Paper */
+    --muted: 40 12% 95%;
+    --muted-foreground: 0 0% 45%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 40 12% 94%;
+    --accent-foreground: 0 0% 9%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    /* Wajo Destructive: Deep Crimson */
+    --destructive: 0 74% 54%;
+    --destructive-foreground: 0 0% 98%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    /* Wajo Hairline Borders */
+    --border: 40 6% 90%;
+    --input: 40 6% 90%;
+    --ring: 0 0% 20%;
 
-    --radius: 0.5rem;
+    --radius: 0.875rem;
+
+    /* Wajo Signature Brand Colors */
+    --wajo-accent: 138 22% 27%;
+    --wajo-olive: 82 25% 42%;
+    --wajo-cream: 45 35% 98.5%;
+    --wajo-cream-2: 45 15% 95%;
+    --wajo-paper: 0 0% 100%;
+    --wajo-text: 0 0% 9%;
+    --wajo-text-2: 0 0% 45%;
+
+    /* Wajo Pixels & Chips */
+    --pixel-yellow: #f3c83d;
+    --pixel-orange: #ff8527;
+    --pixel-pink: #f6a1c8;
+    --pixel-green: #5ae561;
+    --pixel-plum: #7a2e5e;
+
+    --chip-email: #ffdbdc;
+    --chip-phone: #f2e2fc;
+    --chip-card: #d5efff;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    /* Wajo.ai Obsidian Dark Palette */
+    --background: 0 0% 7.1%;
+    --foreground: 0 0% 98%;
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
+    --card: 0 0% 9.8%;
+    --card-foreground: 0 0% 98%;
 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 0 0% 11.5%;
+    --popover-foreground: 0 0% 98%;
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    /* Wajo Primary: Pristine Porcelain in Dark Mode */
+    --primary: 0 0% 98%;
+    --primary-foreground: 0 0% 9%;
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    /* Wajo Dark Elevated Surfaces */
+    --secondary: 0 0% 14.5%;
+    --secondary-foreground: 0 0% 98%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 0 0% 13%;
+    --muted-foreground: 0 0% 64%;
 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 0 0% 14.5%;
+    --accent-foreground: 0 0% 98%;
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 62% 40%;
+    --destructive-foreground: 0 0% 98%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.8 75% 80%;
+    --border: 0 0% 18%;
+    --input: 0 0% 18%;
+    --ring: 0 0% 64%;
+
+    /* Wajo Signature Brand Colors (Dark) */
+    --wajo-accent: 138 28% 48%;
+    --wajo-olive: 82 25% 62%;
+    --wajo-cream: 0 0% 12%;
+    --wajo-cream-2: 0 0% 16%;
+    --wajo-paper: 0 0% 10%;
+    --wajo-text: 0 0% 98%;
+    --wajo-text-2: 0 0% 70%;
   }
 
   * {
@@ -73,11 +111,49 @@
     @apply bg-background text-foreground;
     margin: 0;
     min-height: 100vh;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    font-family: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     -webkit-font-smoothing: antialiased;
+    letter-spacing: -0.01em;
   }
 
   code, pre, kbd, samp {
-    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+    font-family: 'Geist Mono', 'DM Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   }
 }
+
+/* Wajo Chip Background Helpers */
+.bg-chip-email {
+  background-color: var(--chip-email);
+  color: #7a2e5e;
+}
+
+.bg-chip-phone {
+  background-color: var(--chip-phone);
+  color: #581c87;
+}
+
+.bg-chip-card {
+  background-color: var(--chip-card);
+  color: #0369a1;
+}
+
+.bg-pixel-green {
+  background-color: var(--pixel-green);
+}
+
+.bg-pixel-yellow {
+  background-color: var(--pixel-yellow);
+}
+
+.bg-pixel-orange {
+  background-color: var(--pixel-orange);
+}
+
+.bg-pixel-pink {
+  background-color: var(--pixel-pink);
+}
+
+.bg-pixel-plum {
+  background-color: var(--pixel-plum);
+}
+

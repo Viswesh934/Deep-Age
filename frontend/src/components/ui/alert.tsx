@@ -3,19 +3,21 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const alertVariants = cva(
-  "relative w-full rounded-xl border p-4 [&>svg~*]:pl-7 [&>svg+div]:translate-y-[-3px] [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&>svg]:text-foreground",
+  "relative w-full rounded-2xl border p-4 [&>svg~*]:pl-7 [&>svg+div]:translate-y-[-3px] [&>svg]:absolute [&>svg]:left-4 [&>svg]:top-4 [&>svg]:text-foreground",
   {
     variants: {
       variant: {
-        default: "bg-background text-foreground",
+        default: "bg-card text-foreground border-border/80",
         destructive:
-          "border-destructive/50 text-destructive dark:border-destructive [&>svg]:text-destructive",
+          "border-destructive/30 bg-destructive/10 text-destructive dark:border-destructive/40 [&>svg]:text-destructive",
         success:
-          "border-emerald-500/30 bg-emerald-500/10 text-emerald-900 dark:text-emerald-300 [&>svg]:text-emerald-600 dark:[&>svg]:text-emerald-400",
+          "border-emerald-500/20 bg-emerald-500/10 text-emerald-950 dark:text-emerald-200 [&>svg]:text-emerald-600 dark:[&>svg]:text-emerald-400",
         warning:
-          "border-amber-500/30 bg-amber-500/10 text-amber-900 dark:text-amber-300 [&>svg]:text-amber-600 dark:[&>svg]:text-amber-400",
+          "border-amber-500/20 bg-amber-500/10 text-amber-950 dark:text-amber-200 [&>svg]:text-amber-600 dark:[&>svg]:text-amber-400",
         info:
-          "border-indigo-500/30 bg-indigo-500/10 text-indigo-900 dark:text-indigo-300 [&>svg]:text-indigo-600 dark:[&>svg]:text-indigo-400",
+          "border-sky-500/20 bg-sky-500/10 text-sky-950 dark:text-sky-200 [&>svg]:text-sky-600 dark:[&>svg]:text-sky-400",
+        olive:
+          "border-[#36533f]/20 bg-[#36533f]/10 text-[#36533f] dark:text-[#74b684] [&>svg]:text-[#36533f] dark:[&>svg]:text-[#74b684]",
       },
     },
     defaultVariants: {
