@@ -1,5 +1,5 @@
 import { TestDriveRun, UserMode } from '@deep-age/shared';
-import { env } from '../config/env.js';
+import { env } from '@/config/env';
 
 export class ApiService {
   private static get baseUrl(): string {
