@@ -1,118 +1,136 @@
+import React from 'react';
+import { useLocation } from 'react-router-dom';
 import { UserMode } from '@deep-age/shared';
 import { Play, RotateCw, Sparkles, AlertCircle } from 'lucide-react';
+import { useTestDriveContext } from '@/context/TestDriveContext';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
 
-interface StartFormProps {
-  url: string;
-  setUrl: (url: string) => void;
-  task: string;
-  setTask: (task: string) => void;
-  mode: UserMode;
-  isLoading: boolean;
-  onStart: () => void;
-  onRunDemoPreset: (enableAddToCart: boolean) => void;
-}
+export const StartForm: React.FC = () => {
+  const { url, setUrl, task, setTask, isLoading, startTestDrive, runDemoScenario } = useTestDriveContext();
+  const location = useLocation();
 
-export function StartForm({
-  url,
-  setUrl,
-  task,
-  setTask,
-  mode,
-  isLoading,
-  onStart,
-  onRunDemoPreset,
-}: StartFormProps) {
+  const currentMode: UserMode = location.pathname.includes('inspect')
+    ? 'inspect'
+    : location.pathname.includes('debug')
+    ? 'debug'
+    : 'explore';
+
+  const handleStart = () => {
+    startTestDrive(url, task, currentMode);
+  };
+
+  const handleRunPreset = (enableAddToCart: boolean) => {
+    runDemoScenario(enableAddToCart, currentMode);
+  };
+
   return (
-    <section className="bg-white dark:bg-zinc-950 border border-slate-200 dark:border-zinc-800 rounded-xl p-5 shadow-sm font-sans">
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-4 border-b border-slate-100 dark:border-zinc-800">
-        <div>
-          <h2 className="text-base font-bold text-slate-900 dark:text-white flex items-center gap-2">
-            <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
-            Test-Drive a Website
-          </h2>
-          <p className="text-xs text-slate-500 dark:text-zinc-400 mt-0.5">
-            Enter any website and question. Deep Age launches headless Chromium to interact with the site and collect evidence.
-          </p>
+    <Card className="font-sans">
+      <CardHeader className="pb-4">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
+          <div>
+            <CardTitle className="text-base flex items-center gap-2">
+              <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+              Test-Drive a Website
+            </CardTitle>
+            <CardDescription className="mt-1">
+              Enter any website and question. Deep Age launches headless Chromium to interact with the site and collect evidence.
+            </CardDescription>
+          </div>
+
+          <div className="flex items-center gap-2 text-xs">
+            <span className="text-muted-foreground">Active View:</span>
+            <Badge variant="outline" className="capitalize font-semibold">
+              {currentMode} Mode
+            </Badge>
+          </div>
+        </div>
+      </CardHeader>
+
+      <Separator />
+
+      <CardContent className="pt-5 space-y-5">
+        {/* Target Inputs */}
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-4">
+          <div className="md:col-span-5 flex flex-col gap-1.5">
+            <label className="text-xs font-semibold text-foreground">
+              Target Website URL
+            </label>
+            <Input
+              type="text"
+              value={url}
+              onChange={(e) => setUrl(e.target.value)}
+              placeholder="http://127.0.0.1:3002 or https://news.ycombinator.com"
+              className="font-mono"
+            />
+          </div>
+
+          <div className="md:col-span-7 flex flex-col gap-1.5">
+            <label className="text-xs font-semibold text-foreground">
+              Task or Question for AI Agent
+            </label>
+            <Input
+              type="text"
+              value={task}
+              onChange={(e) => setTask(e.target.value)}
+              placeholder="What should the agent do or inspect on this website?"
+            />
+          </div>
         </div>
 
-        <div className="flex items-center gap-2 text-xs">
-          <span className="text-slate-400 dark:text-zinc-500">Active View:</span>
-          <span className="px-2.5 py-1 rounded-md bg-slate-100 dark:bg-zinc-900 border border-slate-200 dark:border-zinc-800 text-slate-800 dark:text-zinc-200 font-semibold capitalize">
-            {mode} Mode
-          </span>
-        </div>
-      </div>
+        <Separator />
 
-      {/* Target Inputs */}
-      <div className="grid grid-cols-1 md:grid-cols-12 gap-4 mt-4">
-        <div className="md:col-span-5 flex flex-col gap-1.5">
-          <label className="text-xs font-semibold text-slate-700 dark:text-zinc-300">
-            Target Website URL
-          </label>
-          <input
-            type="text"
-            value={url}
-            onChange={(e) => setUrl(e.target.value)}
-            placeholder="http://127.0.0.1:3002 or https://news.ycombinator.com"
-            className="w-full bg-slate-50 dark:bg-black border border-slate-200 dark:border-zinc-800 rounded-lg px-3.5 py-2 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500 transition-colors font-mono"
-          />
-        </div>
+        {/* Action Row */}
+        <div className="flex flex-wrap items-center justify-between gap-3 pt-1">
+          <div className="flex items-center gap-2 text-xs">
+            <span className="text-muted-foreground">Demo Presets:</span>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => handleRunPreset(false)}
+              className="h-8 text-xs border-amber-500/30 text-amber-700 dark:text-amber-300 hover:bg-amber-500/10 gap-1.5 font-medium"
+            >
+              <AlertCircle className="w-3.5 h-3.5 text-amber-500" />
+              1. Missing Tool (Friction)
+            </Button>
+            <Button
+              type="button"
+              variant="outline"
+              size="sm"
+              onClick={() => handleRunPreset(true)}
+              className="h-8 text-xs border-emerald-500/30 text-emerald-700 dark:text-emerald-300 hover:bg-emerald-500/10 gap-1.5 font-medium"
+            >
+              <Sparkles className="w-3.5 h-3.5 text-emerald-500" />
+              2. WebMCP Fixed (Pass)
+            </Button>
+          </div>
 
-        <div className="md:col-span-7 flex flex-col gap-1.5">
-          <label className="text-xs font-semibold text-slate-700 dark:text-zinc-300">
-            Task or Question for AI Agent
-          </label>
-          <input
-            type="text"
-            value={task}
-            onChange={(e) => setTask(e.target.value)}
-            placeholder="What should the agent do or inspect on this website?"
-            className="w-full bg-slate-50 dark:bg-black border border-slate-200 dark:border-zinc-800 rounded-lg px-3.5 py-2 text-xs text-slate-900 dark:text-white focus:outline-none focus:border-indigo-500 transition-colors"
-          />
-        </div>
-      </div>
-
-      {/* Action Row */}
-      <div className="flex flex-wrap items-center justify-between gap-3 mt-4 pt-3.5 border-t border-slate-100 dark:border-zinc-800">
-        <div className="flex items-center gap-2 text-xs">
-          <span className="text-slate-400 dark:text-zinc-500">Demo Presets:</span>
-          <button
+          <Button
             type="button"
-            onClick={() => onRunDemoPreset(false)}
-            className="px-3 py-1 rounded-md bg-amber-50 hover:bg-amber-100 dark:bg-amber-500/10 dark:hover:bg-amber-500/20 text-amber-700 dark:text-amber-300 border border-amber-200 dark:border-amber-500/30 text-xs font-medium transition-colors flex items-center gap-1"
+            onClick={handleStart}
+            disabled={isLoading}
+            className="font-bold gap-2 text-xs h-9 px-5 shadow-sm"
           >
-            <AlertCircle className="w-3.5 h-3.5" />
-            1. Missing Tool (Friction)
-          </button>
-          <button
-            type="button"
-            onClick={() => onRunDemoPreset(true)}
-            className="px-3 py-1 rounded-md bg-emerald-50 hover:bg-emerald-100 dark:bg-emerald-500/10 dark:hover:bg-emerald-500/20 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-500/30 text-xs font-medium transition-colors flex items-center gap-1"
-          >
-            <Sparkles className="w-3.5 h-3.5" />
-            2. WebMCP Fixed (Pass)
-          </button>
+            {isLoading ? (
+              <>
+                <RotateCw className="w-3.5 h-3.5 animate-spin" />
+                Driving Live Chromium...
+              </>
+            ) : (
+              <>
+                <Play className="w-3.5 h-3.5 fill-current" />
+                Run Test-Drive
+              </>
+            )}
+          </Button>
         </div>
-
-        <button
-          type="button"
-          onClick={onStart}
-          disabled={isLoading}
-          className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold px-5 py-2 rounded-lg text-xs flex items-center gap-2 transition-all shadow-sm disabled:opacity-50"
-        >
-          {isLoading ? (
-            <>
-              <RotateCw className="w-3.5 h-3.5 animate-spin" />
-              Driving Live Chromium...
-            </>
-          ) : (
-            <>
-              <Play className="w-3.5 h-3.5 fill-current" />
-              Run Test-Drive
-            </>
-          )}
-        </button>
-      </div>
-    </section>
+      </CardContent>
+    </Card>
   );
-}
+};
+
+export default StartForm;
