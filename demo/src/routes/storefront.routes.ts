@@ -12,31 +12,38 @@ storefrontRouter.get('/', (c) => {
   <meta charset="UTF-8">
   <title>ElectroVault — Deep Age Demo Store</title>
   <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="anonymous" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300..800&family=Geist+Mono:wght@400;500;600;700&display=swap" />
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    code, pre, .font-mono { font-family: 'Geist Mono', monospace; }
+  </style>
 </head>
-<body class="bg-zinc-950 text-zinc-100 min-h-screen p-6 font-sans">
+<body class="bg-[#121212] text-[#fafafa] min-h-screen p-6 font-sans antialiased">
   <div class="max-w-4xl mx-auto">
-    <header class="flex justify-between items-center border-b border-zinc-800 pb-4 mb-6">
+    <header class="flex justify-between items-center border-b border-neutral-800 pb-4 mb-6">
       <div>
-        <h1 class="text-xl font-bold text-zinc-100 font-mono">⚡ ElectroVault Storefront</h1>
-        <p class="text-xs text-zinc-400">Target site conforming to Chrome WebMCP (document.modelContext)</p>
+        <h1 class="text-xl font-bold text-neutral-100 flex items-center gap-2">⚡ ElectroVault Storefront</h1>
+        <p class="text-xs text-neutral-400 font-mono mt-0.5">Target site conforming to Chrome WebMCP (document.modelContext)</p>
       </div>
       <div class="flex items-center gap-3">
-        <span class="text-xs px-2.5 py-1 bg-zinc-900 border border-zinc-700 font-mono">
-          WebMCP add_to_cart: <strong id="status-tag" class="${isAddToCartEnabled ? 'text-emerald-400' : 'text-amber-400'}">${isAddToCartEnabled ? 'EXPOSED' : 'MISSING (Friction)'}</strong>
+        <span class="text-xs px-3 py-1 bg-neutral-900 border border-neutral-800 rounded-full font-mono">
+          WebMCP add_to_cart: <strong id="status-tag" class="${isAddToCartEnabled ? 'text-[#5ae561]' : 'text-[#ff8527]'}">${isAddToCartEnabled ? 'EXPOSED' : 'MISSING (Friction)'}</strong>
         </span>
-        <button onclick="toggleCapability()" class="text-xs bg-zinc-100 hover:bg-white text-zinc-950 font-bold px-3 py-1.5 transition-colors font-mono">Toggle Capability</button>
+        <button onclick="toggleCapability()" class="text-xs bg-[#fafafa] hover:bg-white text-[#121212] font-semibold px-4 py-1.5 rounded-full transition-all active:scale-95 font-mono shadow-xs">Toggle Capability</button>
       </div>
     </header>
 
     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
       ${PRODUCTS.map(p => `
-        <div class="bg-black border border-zinc-800 p-4 flex flex-col justify-between">
+        <div class="bg-neutral-900/80 border border-neutral-800/80 p-5 rounded-2xl flex flex-col justify-between shadow-xs">
           <div>
-            <h3 class="font-bold text-base text-zinc-100">${p.name}</h3>
-            <p class="text-xs text-zinc-400 font-mono mt-0.5">${p.ram}GB RAM • In Stock</p>
-            <p class="text-lg font-bold text-emerald-400 mt-2 font-mono">₹${p.price.toLocaleString()}</p>
+            <h3 class="font-bold text-base text-neutral-100">${p.name}</h3>
+            <p class="text-xs text-neutral-400 font-mono mt-0.5">${p.ram}GB RAM • In Stock</p>
+            <p class="text-lg font-bold text-[#5ae561] mt-2 font-mono">₹${p.price.toLocaleString()}</p>
           </div>
-          <button data-product-id="${p.id}" class="btn-add-to-cart mt-4 bg-zinc-900 hover:bg-zinc-800 border border-zinc-700 text-zinc-200 text-xs font-mono py-2 transition-colors">
+          <button data-product-id="${p.id}" class="btn-add-to-cart mt-4 bg-neutral-800 hover:bg-neutral-700 border border-neutral-700/80 text-neutral-200 text-xs font-mono py-2 px-4 rounded-xl transition-all active:scale-95">
             Add to Cart (DOM button)
           </button>
         </div>

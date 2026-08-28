@@ -3,23 +3,31 @@ import { cva, type VariantProps } from "class-variance-authority"
 import { cn } from "@/lib/utils"
 
 const badgeVariants = cva(
-  "inline-flex items-center rounded-md border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
+  "inline-flex items-center rounded-full border px-2.5 py-0.5 text-[11px] font-medium transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2",
   {
     variants: {
       variant: {
         default:
-          "border-transparent bg-primary text-primary-foreground shadow hover:bg-primary/80",
+          "border-transparent bg-primary text-primary-foreground shadow-xs hover:bg-primary/90",
         secondary:
           "border-transparent bg-secondary text-secondary-foreground hover:bg-secondary/80",
         destructive:
-          "border-transparent bg-destructive text-destructive-foreground shadow hover:bg-destructive/80",
-        outline: "text-foreground",
+          "border-transparent bg-destructive text-destructive-foreground shadow-xs hover:bg-destructive/90",
+        outline: "text-foreground border-border/80",
         success:
-          "border-emerald-500/30 bg-emerald-500/10 text-emerald-600 dark:text-emerald-400",
+          "border-emerald-500/20 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300 font-medium",
         warning:
-          "border-amber-500/30 bg-amber-500/10 text-amber-600 dark:text-amber-400",
+          "border-amber-500/20 bg-amber-500/10 text-amber-800 dark:text-amber-300 font-medium",
         info:
-          "border-indigo-500/30 bg-indigo-500/10 text-indigo-600 dark:text-indigo-400",
+          "border-sky-500/20 bg-sky-500/10 text-sky-800 dark:text-sky-300 font-medium",
+        olive:
+          "border-transparent bg-[#36533f]/10 text-[#36533f] dark:bg-[#528e5e]/20 dark:text-[#74b684] font-medium",
+        "chip-email":
+          "border-transparent bg-[#ffdbdc] text-[#7a2e5e] font-medium",
+        "chip-phone":
+          "border-transparent bg-[#f2e2fc] text-[#581c87] font-medium",
+        "chip-card":
+          "border-transparent bg-[#d5efff] text-[#0369a1] font-medium",
       },
     },
     defaultVariants: {
@@ -39,3 +47,4 @@ function Badge({ className, variant, ...props }: BadgeProps) {
 }
 
 export { Badge, badgeVariants }
+
