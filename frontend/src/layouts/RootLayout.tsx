@@ -15,7 +15,6 @@ import {
 } from '@/components/ui/dialog';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
 
 export const RootLayout: React.FC = () => {
   const { isDark, showMcpModal, setShowMcpModal } = useTestDriveContext();
@@ -93,46 +92,41 @@ export const RootLayout: React.FC = () => {
         )}
       </div>
 
-      {/* MCP Configuration Dialog */}
+      {/* Compact, Non-overflowing MCP Dialog */}
       <Dialog open={showMcpModal} onOpenChange={setShowMcpModal}>
-        <DialogContent className="max-w-xl border-border/80 bg-card text-foreground shadow-2xl rounded-3xl p-6 font-sans">
-          <DialogHeader className="space-y-1.5 pb-2">
-            <div className="flex items-center justify-between">
-              <DialogTitle className="text-sm font-bold flex items-center gap-2">
-                <Terminal className="w-4 h-4 text-[#ff8527]" />
-                <span>Connect Agent via MCP</span>
-              </DialogTitle>
-              <Badge variant="outline" className="text-[10px] font-mono border-border/80 text-muted-foreground rounded-full">
-                JSON-RPC 2.0
-              </Badge>
-            </div>
-            <DialogDescription className="text-xs text-muted-foreground leading-relaxed">
-              Add Deep Age to Claude Desktop, Cursor, Antigravity, or LangChain to test-drive web applications.
+        <DialogContent className="max-w-lg border-border/80 bg-card text-foreground shadow-xl rounded-2xl p-5 font-sans">
+          <DialogHeader className="space-y-1">
+            <DialogTitle className="text-sm font-bold flex items-center gap-2">
+              <Terminal className="w-4 h-4 text-[#ff8527]" />
+              <span>Connect Agent (MCP)</span>
+            </DialogTitle>
+            <DialogDescription className="text-xs text-muted-foreground">
+              Add this configuration to Cursor, Claude Desktop, or Antigravity.
             </DialogDescription>
           </DialogHeader>
 
-          <Tabs value={mcpTab} onValueChange={(val) => setMcpTab(val as 'remote' | 'cli' | 'tools')} className="w-full space-y-3">
-            <TabsList className="grid grid-cols-3 w-full h-9 p-1 bg-secondary/80 rounded-full border border-border/70">
-              <TabsTrigger value="remote" className="text-xs font-semibold rounded-full">
+          <Tabs value={mcpTab} onValueChange={(val) => setMcpTab(val as 'remote' | 'cli' | 'tools')} className="w-full space-y-2.5 my-1">
+            <TabsList className="grid grid-cols-3 w-full h-8 p-0.5 bg-secondary/80 rounded-full border border-border/70">
+              <TabsTrigger value="remote" className="text-xs font-medium rounded-full h-7">
                 Remote SSE
               </TabsTrigger>
-              <TabsTrigger value="cli" className="text-xs font-semibold rounded-full">
+              <TabsTrigger value="cli" className="text-xs font-medium rounded-full h-7">
                 Local Stdio
               </TabsTrigger>
-              <TabsTrigger value="tools" className="text-xs font-semibold rounded-full">
-                API Endpoints
+              <TabsTrigger value="tools" className="text-xs font-medium rounded-full h-7">
+                Endpoints
               </TabsTrigger>
             </TabsList>
 
             <div className="relative">
-              <pre className="p-3.5 bg-secondary/30 text-foreground rounded-2xl text-[11px] font-mono overflow-x-auto border border-border/80 leading-relaxed max-h-56">
+              <pre className="p-3 bg-secondary/30 text-foreground rounded-xl text-[11px] font-mono overflow-x-auto border border-border/70 max-h-48 leading-relaxed">
                 {activeMcpText}
               </pre>
               <Button
                 size="xs"
                 variant="outline"
                 onClick={handleCopyMcp}
-                className="absolute top-2.5 right-2.5 h-7 text-[11px] gap-1 font-medium rounded-full bg-card/90 hover:bg-card border-border/80 cursor-pointer"
+                className="absolute top-2 right-2 h-6 text-[10px] px-2.5 gap-1 font-medium rounded-full bg-card/90 hover:bg-card border-border/80 cursor-pointer shadow-xs"
               >
                 {copiedMcp ? <Check className="w-3 h-3 text-[#5ae561]" /> : <Copy className="w-3 h-3" />}
                 <span>{copiedMcp ? 'Copied' : 'Copy'}</span>
@@ -140,29 +134,16 @@ export const RootLayout: React.FC = () => {
             </div>
           </Tabs>
 
-          <div className="grid grid-cols-3 gap-2 pt-1 text-[11px] text-muted-foreground font-mono">
-            <div className="p-2.5 rounded-xl bg-secondary/30 border border-border/60">
-              <span className="font-bold text-foreground block text-xs">Cursor IDE</span>
-              <span className="text-[10px]">.cursor/mcp.json</span>
-            </div>
-            <div className="p-2.5 rounded-xl bg-secondary/30 border border-border/60">
-              <span className="font-bold text-foreground block text-xs">Claude</span>
-              <span className="text-[10px]">claude_desktop_config.json</span>
-            </div>
-            <div className="p-2.5 rounded-xl bg-secondary/30 border border-border/60">
-              <span className="font-bold text-foreground block text-xs">Antigravity</span>
-              <span className="text-[10px]">agy mcp add</span>
-            </div>
-          </div>
-
-          <DialogFooter className="flex items-center justify-between sm:justify-between w-full pt-2 text-xs text-muted-foreground border-t border-border/60">
-            <span className="text-[11px]">Direct manifest: <code className="text-foreground font-mono font-medium px-1.5 py-0.5 rounded bg-secondary/80">/mcp.json</code></span>
+          <DialogFooter className="flex items-center justify-between sm:justify-between w-full pt-1 text-xs text-muted-foreground border-t border-border/60">
+            <span className="text-[11px] font-mono">
+              Manifest: <code className="text-foreground font-semibold px-1 py-0.5 rounded bg-secondary/80">/mcp.json</code>
+            </span>
             <Button
               size="sm"
               onClick={() => setShowMcpModal(false)}
-              className="h-8 px-4 text-xs font-semibold rounded-full bg-primary text-primary-foreground hover:bg-primary/90 cursor-pointer"
+              className="h-7 px-4 text-xs font-semibold rounded-full bg-primary text-primary-foreground hover:bg-primary/90 cursor-pointer"
             >
-              Close
+              Done
             </Button>
           </DialogFooter>
         </DialogContent>
