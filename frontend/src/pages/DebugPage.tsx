@@ -1,22 +1,13 @@
 import React, { useState, useMemo } from 'react';
 import {
-  Terminal,
-  Activity,
   Copy,
   Check,
   Play,
-  Layers,
   Download,
   CheckCircle2,
-  FlaskConical,
   Bug,
-  Eye,
-  Split,
-  Cpu,
   RotateCw,
-  Zap,
   XCircle,
-  FileCode2,
 } from 'lucide-react';
 import { useTestDriveContext } from '@/context/TestDriveContext';
 import { Button } from '@/components/ui/button';
@@ -32,7 +23,7 @@ import { WebMcpRepl } from '@/components/workbench/WebMcpRepl';
 import { NetworkWaterfall } from '@/components/workbench/NetworkWaterfall';
 import { ParallelWorldsMatrix } from '@/components/workbench/ParallelWorldsMatrix';
 
-type WorkbenchTab = 'viewport' | 'frictions' | 'repl' | 'parallel' | 'sandbox' | 'network';
+type WorkbenchTab = 'frictions' | 'viewport' | 'repl' | 'parallel' | 'sandbox' | 'network';
 
 export const DebugPage: React.FC = () => {
   const { activeRun, startTestDrive, isLoading } = useTestDriveContext();
@@ -183,7 +174,7 @@ document.modelContext.registerTool({
       setSandboxResult({
         success: true,
         message: hasAddToCart
-          ? '🎉 Virtual WebMCP Tool Registered! Missing capability resolved. Autonomous agent can now complete purchase flow with 0 friction.'
+          ? 'Virtual WebMCP Tool Registered. Missing capability resolved.'
           : 'Virtual WebMCP Tool injected into live page context.',
         resolvedFrictionCount: hasAddToCart ? Math.max(1, activeRun.frictions.length) : 0,
         simulatedScore: hasAddToCart ? 100 : Math.min(90, scorecard.overallScore + 20),
@@ -215,7 +206,7 @@ document.modelContext.registerTool({
     return (
       <Card className="p-10 text-center space-y-4 border-dashed border-border/80 bg-card shadow-xs rounded-3xl font-sans">
         <div className="w-12 h-12 rounded-2xl bg-secondary text-primary mx-auto flex items-center justify-center shadow-xs">
-          <Bug className="w-6 h-6" />
+          <Bug className="w-6 h-6 text-[#ff8527]" />
         </div>
         <div className="space-y-1 max-w-md mx-auto">
           <CardTitle className="text-base font-bold text-foreground">Diagnostic Workbench Idle</CardTitle>
@@ -237,31 +228,26 @@ document.modelContext.registerTool({
   }
 
   return (
-    <div className="flex flex-col gap-5 font-sans animate-fade-in text-foreground">
+    <div className="flex flex-col gap-5 font-sans animate-fade-in text-foreground pb-12">
       {/* TOP COCKPIT: AGENT-READINESS SCORECARD & TELEMETRY */}
       <Card className="space-y-3.5 p-4 md:p-5 border-border/80 bg-card shadow-xs rounded-2xl">
         <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-border/70">
-          <div className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-xl bg-primary text-primary-foreground flex items-center justify-center shadow-xs">
-              <Cpu className="w-4 h-4" />
+          <div>
+            <div className="flex items-center gap-2">
+              <span className="font-bold text-xs md:text-sm tracking-tight text-foreground font-mono uppercase">
+                WebMCP Diagnostic Workbench
+              </span>
+              <Badge
+                variant={activeRun.summary.taskStatus === 'completed' ? 'success' : 'warning'}
+                className="font-mono font-bold uppercase text-[10px] rounded-full px-2.5 py-0.5"
+              >
+                {activeRun.summary.taskStatus === 'completed' ? 'PASS (0 Friction)' : `${activeRun.frictions.length} Issues`}
+              </Badge>
             </div>
-            <div>
-              <div className="flex items-center gap-2">
-                <span className="font-bold text-xs md:text-sm tracking-tight text-foreground font-mono uppercase">
-                  WebMCP Diagnostic Workbench
-                </span>
-                <Badge
-                  variant={activeRun.summary.taskStatus === 'completed' ? 'success' : 'warning'}
-                  className="font-mono font-bold uppercase text-[10px] rounded-full px-2.5 py-0.5"
-                >
-                  {activeRun.summary.taskStatus === 'completed' ? 'PASS (0 Friction)' : `${activeRun.frictions.length} Issues`}
-                </Badge>
-              </div>
-              <p className="text-[11px] text-muted-foreground font-mono mt-0.5">
-                Target: <span className="text-foreground font-medium">{activeRun.url}</span> • Duration:{' '}
-                <span className="text-foreground font-medium">{activeRun.summary.durationMs || 0}ms</span>
-              </p>
-            </div>
+            <p className="text-[11px] text-muted-foreground font-mono mt-0.5">
+              Target: <span className="text-foreground font-medium">{activeRun.url}</span> • Duration:{' '}
+              <span className="text-foreground font-medium">{activeRun.summary.durationMs || 0}ms</span>
+            </p>
           </div>
 
           <div className="flex items-center gap-2 font-mono text-xs">
@@ -270,9 +256,8 @@ document.modelContext.registerTool({
               size="xs"
               onClick={handleExportDiagnostics}
               className="h-8 px-3 gap-1.5 text-xs font-medium rounded-full border-border/80 hover:bg-secondary cursor-pointer"
-              title="Download full JSON & HAR diagnostic audit bundle"
             >
-              <Download className="w-3.5 h-3.5 text-primary" />
+              <Download className="w-3.5 h-3.5" />
               <span>Export HAR</span>
             </Button>
             <Button
@@ -297,9 +282,9 @@ document.modelContext.registerTool({
               <div
                 className={`text-xl font-bold mt-0.5 font-mono ${
                   scorecard.overallScore >= 80
-                    ? 'text-emerald-700 dark:text-[#5ae561]'
+                    ? 'text-[#5ae561]'
                     : scorecard.overallScore >= 50
-                    ? 'text-amber-700 dark:text-[#f3c83d]'
+                    ? 'text-[#f3c83d]'
                     : 'text-destructive'
                 }`}
               >
@@ -318,7 +303,7 @@ document.modelContext.registerTool({
             <div className="text-xl font-bold text-foreground mt-0.5 font-mono">
               {activeRun.tools.length}{' '}
               <span className="text-[11px] font-normal text-muted-foreground">
-                ({scorecard.toolCoverageScore}% match)
+                ({scorecard.toolCoverageScore}%)
               </span>
             </div>
           </Card>
@@ -355,32 +340,27 @@ document.modelContext.registerTool({
 
       {/* Unified Workbench Navigation Tabs */}
       <Tabs value={activeTab} onValueChange={(val) => setActiveTab(val as WorkbenchTab)} className="w-full">
-        <TabsList className="w-full justify-start h-11 p-1 bg-secondary/90 rounded-full border border-border/80 overflow-x-auto shadow-inner">
-          <TabsTrigger value="frictions" className="gap-1.5 text-xs font-semibold font-mono shrink-0 rounded-full h-8 px-3.5">
-            <Activity className="w-3.5 h-3.5" />
+        <TabsList className="w-full justify-start h-10 p-1 bg-secondary/90 rounded-full border border-border/80 overflow-x-auto">
+          <TabsTrigger value="frictions" className="text-xs font-medium font-mono shrink-0 rounded-full h-8 px-3.5">
             <span>Frictions ({activeRun.frictions.length})</span>
           </TabsTrigger>
-          <TabsTrigger value="viewport" className="gap-1.5 text-xs font-semibold font-mono shrink-0 rounded-full h-8 px-3.5">
-            <Eye className="w-3.5 h-3.5" />
+          <TabsTrigger value="viewport" className="text-xs font-medium font-mono shrink-0 rounded-full h-8 px-3.5">
             <span>Browser Scrubber</span>
           </TabsTrigger>
-          <TabsTrigger value="repl" className="gap-1.5 text-xs font-semibold font-mono shrink-0 rounded-full h-8 px-3.5">
-            <Terminal className="w-3.5 h-3.5" />
+          <TabsTrigger value="repl" className="text-xs font-medium font-mono shrink-0 rounded-full h-8 px-3.5">
             <span>WebMCP REPL ({activeRun.tools.length})</span>
           </TabsTrigger>
-          <TabsTrigger value="parallel" className="gap-1.5 text-xs font-semibold font-mono shrink-0 rounded-full h-8 px-3.5">
-            <Split className="w-3.5 h-3.5" />
+          <TabsTrigger value="parallel" className="text-xs font-medium font-mono shrink-0 rounded-full h-8 px-3.5">
             <span>Parallel Matrix</span>
           </TabsTrigger>
-          <TabsTrigger value="sandbox" className="gap-1.5 text-xs font-semibold font-mono shrink-0 rounded-full h-8 px-3.5">
-            <FlaskConical className="w-3.5 h-3.5" />
+          <TabsTrigger value="sandbox" className="text-xs font-medium font-mono shrink-0 rounded-full h-8 px-3.5">
             <span>Virtual Sandbox</span>
           </TabsTrigger>
-          <TabsTrigger value="network" className="gap-1.5 text-xs font-semibold font-mono shrink-0 rounded-full h-8 px-3.5">
-            <Layers className="w-3.5 h-3.5" />
+          <TabsTrigger value="network" className="text-xs font-medium font-mono shrink-0 rounded-full h-8 px-3.5">
             <span>Network ({activeRun.network.length})</span>
           </TabsTrigger>
         </TabsList>
+
         {/* TAB 1: FRICTIONS */}
         <TabsContent value="frictions" className="pt-2">
           <FrictionTriagePanel run={activeRun} />
@@ -403,11 +383,10 @@ document.modelContext.registerTool({
 
         {/* TAB 5: VIRTUAL SANDBOX */}
         <TabsContent value="sandbox" className="pt-2 font-mono text-xs">
-          <Card className="p-5 space-y-5 border-border/80 shadow-xs rounded-2xl bg-card">
+          <Card className="p-5 space-y-4 border-border/80 shadow-xs rounded-2xl bg-card">
             <div className="flex flex-wrap items-center justify-between gap-3 pb-3 border-b border-border/60">
               <div>
-                <CardTitle className="text-sm font-bold flex items-center gap-2 text-foreground">
-                  <FlaskConical className="w-4 h-4 text-cyan-500" />
+                <CardTitle className="text-xs font-bold text-foreground">
                   Virtual WebMCP Tool Injection Sandbox
                 </CardTitle>
                 <CardDescription className="font-sans text-xs text-muted-foreground mt-0.5">
@@ -444,34 +423,33 @@ document.modelContext.registerTool({
                   }
                   className="h-7 text-[11px] rounded-full border-border/80 hover:bg-secondary cursor-pointer"
                 >
-                  + Cart Tool Fix
+                  + Cart Tool Template
                 </Button>
               </div>
             </div>
 
             <div className="space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-[10px] font-bold text-muted-foreground uppercase flex items-center gap-1.5">
-                  <FileCode2 className="w-3.5 h-3.5 text-[#5ae561]" />
+                <span className="text-[10px] font-bold text-muted-foreground uppercase">
                   Candidate Tool Script (document.modelContext.registerTool):
                 </span>
-                <span className="text-[10px] text-muted-foreground font-sans">JavaScript / In-Page Context</span>
+                <span className="text-[10px] text-muted-foreground font-sans">JavaScript Context</span>
               </div>
 
               <Textarea
                 value={sandboxCode}
                 onChange={(e) => setSandboxCode(e.target.value)}
-                rows={12}
-                className="font-mono text-xs leading-relaxed bg-[#121212] text-[#74b684] border-border/80 rounded-xl"
+                rows={10}
+                className="font-mono text-xs leading-relaxed bg-secondary/30 text-foreground border-border/80 rounded-xl"
               />
 
               <Button
                 onClick={handleInjectAndTestSandbox}
                 disabled={isInjectingSandbox}
-                className="w-full gap-2 text-xs font-semibold h-10 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 cursor-pointer"
+                className="w-full gap-2 text-xs font-semibold h-9 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 cursor-pointer"
               >
-                {isInjectingSandbox ? <RotateCw className="w-4 h-4 animate-spin" /> : <Zap className="w-4 h-4 fill-current text-[#f3c83d]" />}
-                <span>Simulate Virtual Tool Injection & Re-evaluate Friction</span>
+                {isInjectingSandbox ? <RotateCw className="w-3.5 h-3.5 animate-spin" /> : null}
+                <span>Simulate Virtual Tool Injection & Re-evaluate</span>
               </Button>
             </div>
 
@@ -492,7 +470,7 @@ document.modelContext.registerTool({
                     Simulated Score: {sandboxResult.simulatedScore}%
                   </Badge>
                 </div>
-                <div className="p-3 bg-[#121212] text-[#74b684] rounded-xl border border-border/80 text-[11px] font-mono overflow-x-auto mt-2">
+                <div className="p-3 bg-secondary/40 text-foreground rounded-xl border border-border/80 text-[11px] font-mono overflow-x-auto mt-2">
                   <pre>{JSON.stringify(sandboxResult.details, null, 2)}</pre>
                 </div>
               </div>
@@ -510,4 +488,3 @@ document.modelContext.registerTool({
 };
 
 export default DebugPage;
-

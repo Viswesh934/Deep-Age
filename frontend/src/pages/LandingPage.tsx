@@ -2,18 +2,12 @@ import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Sparkles,
-  Bot,
   Terminal,
-  Cpu,
-  ShieldCheck,
   Check,
   Play,
-  Layers,
   Bug,
   Globe,
-  Code2,
   ChevronRight,
-  Zap,
   Copy,
 } from 'lucide-react';
 import { useTestDriveContext } from '@/context/TestDriveContext';
@@ -93,14 +87,14 @@ tools = client.get_tools() # ['run_test_drive', 'inspect_url', 'generate_patch']
   };
 
   return (
-    <div className="flex flex-col gap-10 font-sans animate-fade-in text-foreground max-w-6xl mx-auto pb-10">
+    <div className="flex flex-col gap-10 font-sans animate-fade-in text-foreground max-w-6xl mx-auto pb-12">
       {/* HERO SECTION */}
       <section className="text-center space-y-6 pt-4 md:pt-8">
         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-secondary/80 border border-border/80 text-xs font-mono shadow-2xs">
           <span className="w-2 h-2 rounded-full bg-[#5ae561] animate-pulse"></span>
           <span className="font-semibold text-foreground">Chrome WebMCP</span>
           <span className="text-muted-foreground">•</span>
-          <span className="text-muted-foreground">Universal Coding Agent MCP Gateway</span>
+          <span className="text-muted-foreground">Universal Coding Agent Gateway</span>
         </div>
 
         <div className="space-y-3 max-w-4xl mx-auto">
@@ -118,46 +112,41 @@ tools = client.get_tools() # ['run_test_drive', 'inspect_url', 'generate_patch']
           <Button
             size="lg"
             onClick={() => handleLaunchTestDrive()}
-            className="h-11 px-6 text-sm font-bold gap-2 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 shadow-md active:scale-95 transition-all"
+            className="h-11 px-6 text-sm font-bold gap-2 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 shadow-md active:scale-95 transition-all cursor-pointer"
           >
             <Play className="w-4 h-4 fill-current" />
-            Launch Live Test-Drive
+            <span>Launch Live Test-Drive</span>
           </Button>
 
           <Button
             variant="outline"
             size="lg"
             onClick={() => setShowMcpModal(true)}
-            className="h-11 px-6 text-sm font-semibold gap-2 rounded-full border-border/80 hover:bg-secondary shadow-2xs transition-all"
+            className="h-11 px-6 text-sm font-semibold gap-2 rounded-full border-border/80 hover:bg-secondary shadow-2xs transition-all cursor-pointer"
           >
             <Terminal className="w-4 h-4 text-primary" />
-            Connect Agent via MCP
+            <span>Connect Agent via MCP</span>
           </Button>
 
           <Button
             variant="ghost"
             size="lg"
             onClick={() => navigate('/debug')}
-            className="h-11 px-5 text-sm font-medium gap-1.5 rounded-full text-muted-foreground hover:text-foreground hover:bg-secondary/70"
+            className="h-11 px-5 text-sm font-medium gap-1.5 rounded-full text-muted-foreground hover:text-foreground hover:bg-secondary/70 cursor-pointer"
           >
             <Bug className="w-4 h-4" />
-            Developer Workbench
+            <span>Developer Workbench</span>
             <ChevronRight className="w-3.5 h-3.5 ml-0.5" />
           </Button>
         </div>
       </section>
 
       {/* INTERACTIVE TEST-DRIVE QUICK LAUNCHER */}
-      <section className="bg-card/90 backdrop-blur-xl border border-border/80 rounded-3xl p-5 md:p-6 shadow-xl space-y-4 ring-1 ring-black/5 dark:ring-white/5">
+      <section className="bg-card border border-border/80 rounded-3xl p-5 md:p-6 shadow-xl space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-border/60">
-          <div className="flex items-center gap-2">
-            <span className="p-1.5 rounded-xl bg-primary text-primary-foreground">
-              <Bot className="w-4 h-4" />
-            </span>
-            <div>
-              <h2 className="text-sm font-bold text-foreground">Interactive Browser Test-Drive Bench</h2>
-              <p className="text-[11px] text-muted-foreground font-mono">Real Headless Chromium • DOM Interception • WebMCP Evaluation</p>
-            </div>
+          <div>
+            <h2 className="text-sm font-bold text-foreground">Interactive Browser Test-Drive Bench</h2>
+            <p className="text-[11px] text-muted-foreground font-mono">Real Headless Chromium • DOM Interception • WebMCP Evaluation</p>
           </div>
 
           <div className="flex items-center gap-2">
@@ -172,7 +161,7 @@ tools = client.get_tools() # ['run_test_drive', 'inspect_url', 'generate_patch']
               className="h-7 px-3 text-xs font-medium rounded-full bg-secondary/80 hover:bg-secondary border border-border/60"
             >
               <span className="w-2 h-2 rounded-full bg-[#ff8527] mr-1.5"></span>
-              Friction Demo (Missing Tool)
+              Friction Demo
             </Button>
             <Button
               type="button"
@@ -182,14 +171,14 @@ tools = client.get_tools() # ['run_test_drive', 'inspect_url', 'generate_patch']
               className="h-7 px-3 text-xs font-medium rounded-full bg-secondary/80 hover:bg-secondary border border-border/60"
             >
               <span className="w-2 h-2 rounded-full bg-[#5ae561] mr-1.5"></span>
-              WebMCP Pass (0 Friction)
+              WebMCP Pass
             </Button>
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-12 gap-3 items-center">
-          <div className="md:col-span-4 flex items-center gap-2 bg-secondary/50 rounded-2xl px-3.5 py-2.5 border border-border/70 focus-within:border-primary/50">
-            <Globe className="w-4 h-4 text-primary shrink-0" />
+          <div className="md:col-span-4 flex items-center gap-2 bg-secondary/40 rounded-full px-4 py-2 border border-border/70 focus-within:border-primary/50">
+            <Globe className="w-3.5 h-3.5 text-muted-foreground shrink-0" />
             <input
               type="text"
               value={url}
@@ -199,8 +188,8 @@ tools = client.get_tools() # ['run_test_drive', 'inspect_url', 'generate_patch']
             />
           </div>
 
-          <div className="md:col-span-6 flex items-center gap-2 bg-secondary/50 rounded-2xl px-3.5 py-2.5 border border-border/70 focus-within:border-primary/50">
-            <Sparkles className="w-4 h-4 text-primary shrink-0 opacity-80" />
+          <div className="md:col-span-6 flex items-center gap-2 bg-secondary/40 rounded-full px-4 py-2 border border-border/70 focus-within:border-primary/50">
+            <Sparkles className="w-3.5 h-3.5 text-[#ff8527] shrink-0" />
             <input
               type="text"
               value={task}
@@ -214,10 +203,10 @@ tools = client.get_tools() # ['run_test_drive', 'inspect_url', 'generate_patch']
             <Button
               onClick={() => handleLaunchTestDrive()}
               disabled={isLoading}
-              className="w-full h-10 text-xs font-bold rounded-2xl bg-primary text-primary-foreground hover:bg-primary/90 shadow-xs"
+              className="w-full h-9 text-xs font-bold rounded-full bg-primary text-primary-foreground hover:bg-primary/90 shadow-xs cursor-pointer"
             >
-              <Play className="w-3.5 h-3.5 fill-current mr-1.5" />
-              Run Drive
+              <Play className="w-3 h-3 fill-current mr-1" />
+              <span>Run Drive</span>
             </Button>
           </div>
         </div>
@@ -226,7 +215,7 @@ tools = client.get_tools() # ['run_test_drive', 'inspect_url', 'generate_patch']
       {/* CONNECT YOUR CODING AGENT MCP SECTION */}
       <section className="space-y-4">
         <div className="text-center space-y-1">
-          <Badge variant="outline" className="font-mono text-[10px] uppercase font-bold rounded-full">
+          <Badge variant="outline" className="font-mono text-[10px] uppercase font-bold rounded-full border-border/80">
             MCP Integration Ready
           </Badge>
           <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-foreground">
@@ -237,23 +226,19 @@ tools = client.get_tools() # ['run_test_drive', 'inspect_url', 'generate_patch']
           </p>
         </div>
 
-        <Card className="border-border/80 shadow-lg rounded-3xl p-5 md:p-6 bg-card/90 space-y-4">
+        <Card className="border-border/80 shadow-lg rounded-3xl p-5 md:p-6 bg-card space-y-4">
           <Tabs value={agentTab} onValueChange={(v) => setAgentTab(v as any)} className="w-full">
             <TabsList className="grid grid-cols-2 sm:grid-cols-4 w-full h-10 p-1 bg-secondary/80 rounded-full border border-border/70">
-              <TabsTrigger value="cursor" className="text-xs font-semibold rounded-full gap-1.5">
-                <Code2 className="w-3.5 h-3.5 text-primary" />
+              <TabsTrigger value="cursor" className="text-xs font-semibold rounded-full">
                 Cursor / Windsurf
               </TabsTrigger>
-              <TabsTrigger value="claude" className="text-xs font-semibold rounded-full gap-1.5">
-                <Bot className="w-3.5 h-3.5 text-[#ff8527]" />
+              <TabsTrigger value="claude" className="text-xs font-semibold rounded-full">
                 Claude Desktop
               </TabsTrigger>
-              <TabsTrigger value="antigravity" className="text-xs font-semibold rounded-full gap-1.5">
-                <Terminal className="w-3.5 h-3.5 text-[#5ae561]" />
+              <TabsTrigger value="antigravity" className="text-xs font-semibold rounded-full">
                 Antigravity (agy)
               </TabsTrigger>
-              <TabsTrigger value="python" className="text-xs font-semibold rounded-full gap-1.5">
-                <Layers className="w-3.5 h-3.5 text-[#38bdf8]" />
+              <TabsTrigger value="python" className="text-xs font-semibold rounded-full">
                 Python SDK
               </TabsTrigger>
             </TabsList>
@@ -267,24 +252,24 @@ tools = client.get_tools() # ['run_test_drive', 'inspect_url', 'generate_patch']
               size="sm"
               variant="secondary"
               onClick={() => handleCopy(agentTab, mcpConfigs[agentTab])}
-              className="absolute top-3 right-3 h-7 text-xs gap-1.5 shadow-xs font-medium rounded-full bg-secondary/90 hover:bg-secondary"
+              className="absolute top-3 right-3 h-7 text-xs gap-1.5 shadow-xs font-medium rounded-full bg-secondary/90 hover:bg-secondary cursor-pointer"
             >
               {copiedKey === agentTab ? <Check className="w-3.5 h-3.5 text-[#5ae561]" /> : <Copy className="w-3.5 h-3.5" />}
-              {copiedKey === agentTab ? 'Copied' : 'Copy Config'}
+              <span>{copiedKey === agentTab ? 'Copied' : 'Copy Config'}</span>
             </Button>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
             <div className="p-3 bg-secondary/30 rounded-2xl border border-border/60 text-xs">
-              <span className="font-mono font-bold text-foreground block mb-0.5">🛠️ run_test_drive</span>
+              <span className="font-mono font-bold text-foreground block mb-0.5">run_test_drive</span>
               <p className="text-muted-foreground text-[11px]">Launches headless Chromium on any target URL and returns live diagnostics.</p>
             </div>
             <div className="p-3 bg-secondary/30 rounded-2xl border border-border/60 text-xs">
-              <span className="font-mono font-bold text-foreground block mb-0.5">🔍 inspect_url</span>
+              <span className="font-mono font-bold text-foreground block mb-0.5">inspect_url</span>
               <p className="text-muted-foreground text-[11px]">Discovers registered WebMCP tools, DOM action nodes, and security signals.</p>
             </div>
             <div className="p-3 bg-secondary/30 rounded-2xl border border-border/60 text-xs">
-              <span className="font-mono font-bold text-foreground block mb-0.5">🩹 generate_patch</span>
+              <span className="font-mono font-bold text-foreground block mb-0.5">generate_patch</span>
               <p className="text-muted-foreground text-[11px]">Outputs drop-in Chrome WebMCP JavaScript fixes for diagnosed friction.</p>
             </div>
           </div>
@@ -292,9 +277,9 @@ tools = client.get_tools() # ['run_test_drive', 'inspect_url', 'generate_patch']
       </section>
 
       {/* 3-STEP PIPELINE */}
-      <section className="space-y-6 pt-4">
+      <section className="space-y-6 pt-2">
         <div className="text-center space-y-1">
-          <Badge variant="outline" className="font-mono text-[10px] uppercase font-bold rounded-full">
+          <Badge variant="outline" className="font-mono text-[10px] uppercase font-bold rounded-full border-border/80">
             Architecture
           </Badge>
           <h2 className="text-2xl sm:text-3xl font-black tracking-tight text-foreground">
@@ -303,28 +288,28 @@ tools = client.get_tools() # ['run_test_drive', 'inspect_url', 'generate_patch']
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card className="p-5 space-y-2.5 border-border/70 shadow-xs rounded-2xl relative overflow-hidden">
-            <div className="w-8 h-8 rounded-xl bg-primary text-primary-foreground flex items-center justify-center font-bold text-xs">
+          <Card className="p-5 space-y-2.5 border-border/70 shadow-xs rounded-2xl">
+            <div className="w-7 h-7 rounded-full bg-secondary text-foreground flex items-center justify-center font-bold text-xs font-mono">
               1
             </div>
             <h3 className="text-sm font-bold text-foreground">Point & Simulate</h3>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              Enter any URL or staging environment. Deep Age launches an isolated, headless Chromium sandbox with DOM and network interception.
+              Enter any URL or staging environment. Deep Age launches an isolated headless Chromium sandbox with DOM and network interception.
             </p>
           </Card>
 
-          <Card className="p-5 space-y-2.5 border-border/70 shadow-xs rounded-2xl relative overflow-hidden">
-            <div className="w-8 h-8 rounded-xl bg-primary text-primary-foreground flex items-center justify-center font-bold text-xs">
+          <Card className="p-5 space-y-2.5 border-border/70 shadow-xs rounded-2xl">
+            <div className="w-7 h-7 rounded-full bg-secondary text-foreground flex items-center justify-center font-bold text-xs font-mono">
               2
             </div>
             <h3 className="text-sm font-bold text-foreground">Evaluate WebMCP & Friction</h3>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              Discovers client-side <code className="font-mono text-[11px] text-primary">document.modelContext</code> tools, validates input schemas, and pinpoints where autonomous agents get stuck.
+              Discovers client-side <code className="font-mono text-[11px] text-foreground font-semibold">document.modelContext</code> tools, validates input schemas, and pinpoints where autonomous agents get stuck.
             </p>
           </Card>
 
-          <Card className="p-5 space-y-2.5 border-border/70 shadow-xs rounded-2xl relative overflow-hidden">
-            <div className="w-8 h-8 rounded-xl bg-primary text-primary-foreground flex items-center justify-center font-bold text-xs">
+          <Card className="p-5 space-y-2.5 border-border/70 shadow-xs rounded-2xl">
+            <div className="w-7 h-7 rounded-full bg-secondary text-foreground flex items-center justify-center font-bold text-xs font-mono">
               3
             </div>
             <h3 className="text-sm font-bold text-foreground">Remediate & Serve via MCP</h3>
@@ -333,49 +318,6 @@ tools = client.get_tools() # ['run_test_drive', 'inspect_url', 'generate_patch']
             </p>
           </Card>
         </div>
-      </section>
-
-      {/* CORE CAPABILITY CARDS */}
-      <section className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <Card className="p-5 space-y-2 border-border/70 shadow-xs rounded-2xl hover:border-primary/40 transition-colors">
-          <span className="p-2 rounded-xl bg-secondary text-primary inline-block">
-            <Cpu className="w-5 h-5" />
-          </span>
-          <h3 className="text-xs font-bold uppercase tracking-wider text-foreground">100% Real Headless Engine</h3>
-          <p className="text-xs text-muted-foreground leading-relaxed">
-            Real Chromium browser executing live JavaScript, DOM mutations, and network requests with complete fidelity.
-          </p>
-        </Card>
-
-        <Card className="p-5 space-y-2 border-border/70 shadow-xs rounded-2xl hover:border-primary/40 transition-colors">
-          <span className="p-2 rounded-xl bg-secondary text-primary inline-block">
-            <Zap className="w-5 h-5 text-[#ff8527]" />
-          </span>
-          <h3 className="text-xs font-bold uppercase tracking-wider text-foreground">Chrome WebMCP Ready</h3>
-          <p className="text-xs text-muted-foreground leading-relaxed">
-            Support for the emerging Chrome standard allowing websites to expose structured tools directly to browser-resident LLMs.
-          </p>
-        </Card>
-
-        <Card className="p-5 space-y-2 border-border/70 shadow-xs rounded-2xl hover:border-primary/40 transition-colors">
-          <span className="p-2 rounded-xl bg-secondary text-primary inline-block">
-            <Bug className="w-5 h-5 text-[#5ae561]" />
-          </span>
-          <h3 className="text-xs font-bold uppercase tracking-wider text-foreground">Developer REPL & Sandbox</h3>
-          <p className="text-xs text-muted-foreground leading-relaxed">
-            Test candidate WebMCP tools live in-browser without code deployments, simulate payloads, and export HAR bundles.
-          </p>
-        </Card>
-
-        <Card className="p-5 space-y-2 border-border/70 shadow-xs rounded-2xl hover:border-primary/40 transition-colors">
-          <span className="p-2 rounded-xl bg-secondary text-primary inline-block">
-            <ShieldCheck className="w-5 h-5 text-[#38bdf8]" />
-          </span>
-          <h3 className="text-xs font-bold uppercase tracking-wider text-foreground">Agent Security & Privacy</h3>
-          <p className="text-xs text-muted-foreground leading-relaxed">
-            Audits third-party endpoints, detect prompt injection attack surfaces, and ensure safe agent interactions.
-          </p>
-        </Card>
       </section>
     </div>
   );
