@@ -9,11 +9,15 @@ import {
   ArrowRight,
   Check,
   XCircle,
+  Sparkles
 } from 'lucide-react';
 import { useTestDriveContext } from '@/context/TestDriveContext';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { StateGraphViewer } from '@/components/explore/StateGraphViewer';
+import { IntentPlanner } from '@/components/explore/IntentPlanner';
+import { CatalogExplorer } from '@/components/explore/CatalogExplorer';
 
 export const ExplorePage: React.FC = () => {
   const { activeRun, startTestDrive, isLoading } = useTestDriveContext();
@@ -47,7 +51,7 @@ export const ExplorePage: React.FC = () => {
   const isCompleted = activeRun.summary.taskStatus === 'completed';
 
   return (
-    <div className="flex flex-col gap-4 font-sans animate-fade-in text-foreground">
+    <div className="flex flex-col gap-5 font-sans animate-fade-in text-foreground pb-12">
       {/* 1. Top 3 Minimal Metric Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3.5">
         {/* Metric 1: Outcome */}
@@ -239,10 +243,27 @@ export const ExplorePage: React.FC = () => {
           </Card>
         </div>
       </div>
+
+      {/* 3. Deep Explore Layer (State Machine, Intent Resolver & Catalog) */}
+      <div className="space-y-4 pt-1">
+        <div className="flex items-center justify-between border-b border-border/80 pb-2">
+          <div className="flex items-center gap-2">
+            <Sparkles className="w-4 h-4 text-[#ff8527]" />
+            <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+              Site Exploration & Capability Surface
+            </h2>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <IntentPlanner siteUrl={activeRun.url} />
+          <CatalogExplorer siteUrl={activeRun.url} />
+        </div>
+
+        <StateGraphViewer graph={activeRun.stateGraph} />
+      </div>
     </div>
   );
 };
 
 export default ExplorePage;
-
-
