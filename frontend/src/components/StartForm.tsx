@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useLocation } from 'react-router-dom';
 import { UserMode } from '@deep-age/shared';
-import { ArrowUp, RotateCw, Globe, Sparkles, SlidersHorizontal, Check, ChevronDown, ChevronUp } from 'lucide-react';
+import { ArrowUp, RotateCw, Globe, SlidersHorizontal, Check, ChevronDown, ChevronUp } from 'lucide-react';
 import { useTestDriveContext } from '@/context/TestDriveContext';
 import { Button } from '@/components/ui/button';
 
@@ -70,10 +70,9 @@ export function StartForm(props: StartFormProps) {
 
         <button
           onClick={() => setIsMinimized(false)}
-          className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90 transition-all shrink-0"
+          className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90 transition-all shrink-0 cursor-pointer"
         >
-          <Sparkles className="w-3 h-3" />
-          <span>Ask AI</span>
+          <span>Prompt Bar</span>
           <ChevronUp className="w-3 h-3 ml-0.5" />
         </button>
       </div>
@@ -81,14 +80,14 @@ export function StartForm(props: StartFormProps) {
   }
 
   return (
-    <div className="bg-card/95 backdrop-blur-2xl border border-border/90 rounded-3xl shadow-2xl p-3.5 md:p-4 space-y-3 transition-all ring-1 ring-black/5 dark:ring-white/5 animate-fade-in">
+    <div className="bg-card/95 backdrop-blur-2xl border border-border/90 rounded-3xl shadow-2xl p-3.5 md:p-4 space-y-3 transition-all ring-1 ring-black/5 dark:ring-white/5 animate-fade-in font-sans">
       {/* Top Meta Strip: Target URL + Presets + Minimize */}
       <div className="flex flex-wrap items-center justify-between gap-2.5 px-1 text-xs">
         <div className="flex items-center gap-2 flex-1 min-w-[240px]">
           <button
             type="button"
             onClick={() => setShowUrlConfig(!showUrlConfig)}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-secondary/80 hover:bg-secondary text-foreground font-mono text-xs border border-border/70 transition-all shrink-0 shadow-2xs"
+            className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-secondary/80 hover:bg-secondary text-foreground font-mono text-xs border border-border/70 transition-all shrink-0 shadow-2xs cursor-pointer"
             title="Click to edit target website URL"
           >
             <Globe className="w-3.5 h-3.5 text-primary shrink-0" />
@@ -111,7 +110,7 @@ export function StartForm(props: StartFormProps) {
               <button
                 type="button"
                 onClick={() => setShowUrlConfig(false)}
-                className="p-1.5 rounded-full bg-secondary hover:bg-secondary/80 text-foreground"
+                className="p-1.5 rounded-full bg-secondary hover:bg-secondary/80 text-foreground cursor-pointer"
               >
                 <Check className="w-3.5 h-3.5" />
               </button>
@@ -128,29 +127,29 @@ export function StartForm(props: StartFormProps) {
             variant="ghost"
             size="sm"
             onClick={() => handleRunPreset(false)}
-            className="h-7 px-3 text-xs text-foreground font-medium rounded-full bg-secondary/70 hover:bg-secondary border border-border/60 shadow-2xs"
+            className="h-7 px-3 text-xs text-foreground font-medium rounded-full bg-secondary/70 hover:bg-secondary border border-border/60 shadow-2xs cursor-pointer"
             title="Simulate target site missing WebMCP action tool"
           >
             <span className="w-2 h-2 rounded-full bg-[#ff8527] mr-1.5"></span>
-            Friction Demo
+            <span>Friction Demo</span>
           </Button>
           <Button
             type="button"
             variant="ghost"
             size="sm"
             onClick={() => handleRunPreset(true)}
-            className="h-7 px-3 text-xs text-foreground font-medium rounded-full bg-secondary/70 hover:bg-secondary border border-border/60 shadow-2xs"
+            className="h-7 px-3 text-xs text-foreground font-medium rounded-full bg-secondary/70 hover:bg-secondary border border-border/60 shadow-2xs cursor-pointer"
             title="Simulate target site with WebMCP tool registered"
           >
             <span className="w-2 h-2 rounded-full bg-[#5ae561] mr-1.5"></span>
-            WebMCP Pass
+            <span>WebMCP Pass</span>
           </Button>
 
           <button
             type="button"
             onClick={() => setIsMinimized(true)}
-            className="p-1 rounded-full text-muted-foreground hover:text-foreground hover:bg-secondary/80 ml-1 transition-colors"
-            title="Minimize prompt bar to view total page"
+            className="p-1 rounded-full text-muted-foreground hover:text-foreground hover:bg-secondary/80 ml-1 transition-colors cursor-pointer"
+            title="Minimize prompt bar"
           >
             <ChevronDown className="w-4 h-4" />
           </button>
@@ -159,7 +158,6 @@ export function StartForm(props: StartFormProps) {
 
       {/* Main Spacious Chat Input Row */}
       <div className="flex items-center gap-3 bg-secondary/40 focus-within:bg-secondary/80 focus-within:border-primary/60 focus-within:ring-2 focus-within:ring-primary/10 rounded-2xl px-4 py-2.5 border border-border/80 transition-all shadow-inner">
-        <Sparkles className="w-5 h-5 text-primary shrink-0 opacity-80" />
         <input
           type="text"
           value={task}
@@ -173,7 +171,7 @@ export function StartForm(props: StartFormProps) {
           type="button"
           onClick={handleStart}
           disabled={isLoading || (!task.trim() && !url.trim())}
-          className="font-semibold text-sm h-9 w-9 md:h-10 md:w-10 p-0 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 active:scale-95 shrink-0 shadow-sm flex items-center justify-center disabled:opacity-40 transition-all"
+          className="font-semibold text-sm h-9 w-9 md:h-10 md:w-10 p-0 rounded-full bg-primary text-primary-foreground hover:bg-primary/90 active:scale-95 shrink-0 shadow-sm flex items-center justify-center disabled:opacity-40 transition-all cursor-pointer"
           aria-label="Send test-drive command"
         >
           {isLoading ? (
@@ -188,4 +186,3 @@ export function StartForm(props: StartFormProps) {
 }
 
 export default StartForm;
-

@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Outlet, useLocation } from 'react-router-dom';
 import { useTestDriveContext } from '@/context/TestDriveContext';
 import { Sidebar } from '@/components/Sidebar';
 import { StartForm } from '@/components/StartForm';
-import { Terminal, Copy, Check, Globe, Server } from 'lucide-react';
-import { env } from '@/config/env';
+import { Terminal, Copy, Check } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -15,56 +14,55 @@ import {
 } from '@/components/ui/dialog';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
-import { Badge } from '@/components/ui/badge';
 
 export const RootLayout: React.FC = () => {
   const { isDark, showMcpModal, setShowMcpModal } = useTestDriveContext();
   const [copiedMcp, setCopiedMcp] = useState<boolean>(false);
   const [mcpTab, setMcpTab] = useState<'remote' | 'cli' | 'tools'>('remote');
-  const [dynamicMcpConfig, setDynamicMcpConfig] = useState<any>(null);
   const location = useLocation();
   const isLandingPage = location.pathname === '/';
 
-  useEffect(() => {
-    if (showMcpModal) {
-      fetch(`${env.backendUrl}/api/mcp/config`)
-        .then((res) => res.json())
-        .then((data) => setDynamicMcpConfig(data))
-        .catch(() => {
-          const host = window.location.origin;
-          setDynamicMcpConfig({
-            mcpServers: {
-              'deep-age': {
-                url: `${host}/mcp`,
-                type: 'sse',
-                description: 'Deep Age — AI Agent Website Observability & Chrome WebMCP Diagnostics',
-                toolsEndpoint: `${host}/api/webmcp/tools`,
-              },
-            },
-          });
-        });
-    }
-  }, [showMcpModal]);
+  const host = window.location.origin;
 
-  const activeMcpText = dynamicMcpConfig
-    ? mcpTab === 'remote'
-      ? JSON.stringify(dynamicMcpConfig.mcpServers, null, 2)
-      : mcpTab === 'cli'
-      ? JSON.stringify(dynamicMcpConfig.cliConfig, null, 2)
-      : JSON.stringify(dynamicMcpConfig.endpoints, null, 2)
-    : JSON.stringify(
-        {
-          mcpServers: {
-            'deep-age': {
-              url: `${window.location.origin}/mcp`,
-              description: 'Deep Age — AI Agent Website Observability & Chrome WebMCP Diagnostics',
-            },
+  const mcpConfigs: Record<'remote' | 'cli' | 'tools', string> = {
+    remote: JSON.stringify(
+      {
+        mcpServers: {
+          'deep-age': {
+            url: `${host}/mcp`,
+            type: 'sse',
+            description: 'Deep Age — WebMCP Diagnostics',
           },
         },
-        null,
-        2
-      );
+      },
+      null,
+      2
+    ),
+    cli: JSON.stringify(
+      {
+        mcpServers: {
+          'deep-age': {
+            command: 'npx',
+            args: ['-y', '@deep-age/mcp-server', '--endpoint', `${host}/mcp`],
+          },
+        },
+      },
+      null,
+      2
+    ),
+    tools: JSON.stringify(
+      {
+        sseEndpoint: `${host}/mcp`,
+        toolsEndpoint: `${host}/api/webmcp/tools`,
+        manifest: `${host}/mcp.json`,
+        health: `${host}/health`,
+      },
+      null,
+      2
+    ),
+  };
+
+  const activeMcpText = mcpConfigs[mcpTab] || mcpConfigs.remote;
 
   const handleCopyMcp = () => {
     navigator.clipboard.writeText(activeMcpText);
@@ -94,83 +92,58 @@ export const RootLayout: React.FC = () => {
         )}
       </div>
 
-      {/* MCP Configuration Dialog */}
+      {/* Compact, Zero-Overflow MCP Dialog */}
       <Dialog open={showMcpModal} onOpenChange={setShowMcpModal}>
-        <DialogContent className="max-w-2xl border-border/80 bg-card/95 shadow-2xl backdrop-blur-xl rounded-3xl">
-          <DialogHeader>
-            <div className="flex items-center justify-between">
-              <DialogTitle className="flex items-center gap-2.5 text-sm font-bold">
-                <span className="p-1.5 rounded-full bg-primary text-primary-foreground">
-                  <Terminal className="w-3.5 h-3.5" />
-                </span>
-                Agent MCP Configuration (Model Context Protocol)
-              </DialogTitle>
-              <Badge variant="success" className="font-mono text-[10px] rounded-full">
-                ● SSE & Stdio Ready
-              </Badge>
-            </div>
-            <DialogDescription className="text-xs leading-relaxed text-muted-foreground mt-1">
-              Auto-configured for your deployment environment. Add this block into Claude Desktop, Cursor, Antigravity, or LangChain agents to let them inspect websites via Deep Age.
+        <DialogContent className="w-[92vw] max-w-md border-border/80 bg-card text-foreground shadow-2xl rounded-3xl p-5 font-sans overflow-hidden">
+          <DialogHeader className="space-y-1 text-left">
+            <DialogTitle className="text-sm font-bold flex items-center gap-2 text-foreground">
+              <Terminal className="w-4 h-4 text-[#ff8527]" />
+              <span>Connect MCP Agent</span>
+            </DialogTitle>
+            <DialogDescription className="text-xs text-muted-foreground">
+              Add this block to Cursor, Claude Desktop, or Antigravity.
             </DialogDescription>
           </DialogHeader>
 
-          <Tabs value={mcpTab} onValueChange={(val) => setMcpTab(val as 'remote' | 'cli' | 'tools')} className="w-full">
-            <TabsList className="grid grid-cols-3 w-full h-10 p-1 bg-secondary/80 rounded-full border border-border/70">
-              <TabsTrigger value="remote" className="gap-1.5 text-xs font-mono font-semibold rounded-full">
-                <Globe className="w-3.5 h-3.5" />
-                Remote MCP
+          <Tabs value={mcpTab} onValueChange={(val) => setMcpTab(val as 'remote' | 'cli' | 'tools')} className="w-full min-w-0 space-y-2">
+            <TabsList className="grid grid-cols-3 w-full h-8 p-0.5 bg-secondary/80 rounded-full border border-border/70">
+              <TabsTrigger value="remote" className="text-xs font-semibold rounded-full h-7">
+                Remote SSE
               </TabsTrigger>
-              <TabsTrigger value="cli" className="gap-1.5 text-xs font-mono font-semibold rounded-full">
-                <Server className="w-3.5 h-3.5" />
+              <TabsTrigger value="cli" className="text-xs font-semibold rounded-full h-7">
                 Local Stdio
               </TabsTrigger>
-              <TabsTrigger value="tools" className="gap-1.5 text-xs font-mono font-semibold rounded-full">
-                <Terminal className="w-3.5 h-3.5" />
-                API Endpoints
+              <TabsTrigger value="tools" className="text-xs font-semibold rounded-full h-7">
+                Endpoints
               </TabsTrigger>
             </TabsList>
+
+            <div className="relative w-full min-w-0">
+              <pre className="p-3 bg-secondary/30 text-foreground rounded-2xl text-[11px] font-mono border border-border/70 max-h-40 overflow-y-auto overflow-x-hidden whitespace-pre-wrap break-all leading-relaxed select-all">
+                {activeMcpText}
+              </pre>
+              <Button
+                size="xs"
+                variant="outline"
+                onClick={handleCopyMcp}
+                className="absolute top-2 right-2 h-6 text-[10px] px-2.5 gap-1 font-medium rounded-full bg-card hover:bg-secondary border-border/80 cursor-pointer shadow-xs"
+              >
+                {copiedMcp ? <Check className="w-3 h-3 text-[#5ae561]" /> : <Copy className="w-3 h-3" />}
+                <span>{copiedMcp ? 'Copied' : 'Copy'}</span>
+              </Button>
+            </div>
           </Tabs>
 
-          <div className="relative mt-2">
-            <pre className="p-4 bg-[#121212] text-[#fafafa] rounded-2xl text-xs font-mono overflow-x-auto border border-border/80 leading-relaxed max-h-64">
-              {activeMcpText}
-            </pre>
-            <Button
-              size="sm"
-              variant="secondary"
-              onClick={handleCopyMcp}
-              className="absolute top-3 right-3 h-7 text-xs gap-1.5 shadow-xs font-medium rounded-full bg-secondary/90 hover:bg-secondary"
-            >
-              {copiedMcp ? <Check className="w-3.5 h-3.5 text-[#5ae561]" /> : <Copy className="w-3.5 h-3.5" />}
-              {copiedMcp ? 'Copied' : 'Copy Config'}
-            </Button>
-          </div>
-
-          <div className="grid grid-cols-3 gap-2 pt-1 text-[11px] text-muted-foreground font-mono">
-            <div className="p-2.5 rounded-xl bg-secondary/40 border border-border/70">
-              <span className="font-bold text-foreground block">Claude Desktop</span>
-              <span>claude_desktop_config.json</span>
-            </div>
-            <div className="p-2.5 rounded-xl bg-secondary/40 border border-border/70">
-              <span className="font-bold text-foreground block">Cursor IDE</span>
-              <span>.cursor/mcp.json</span>
-            </div>
-            <div className="p-2.5 rounded-xl bg-secondary/40 border border-border/70">
-              <span className="font-bold text-foreground block">Antigravity</span>
-              <span>agy mcp add</span>
-            </div>
-          </div>
-
-          <Separator className="my-1 border-border/60" />
-
-          <DialogFooter className="flex items-center justify-between sm:justify-between w-full text-xs text-muted-foreground">
-            <span>Direct Discovery URL: <code className="text-primary font-mono font-medium px-1.5 py-0.5 rounded-md bg-secondary/80">/mcp.json</code></span>
+          <DialogFooter className="flex items-center justify-between sm:justify-between w-full pt-1 text-xs text-muted-foreground border-t border-border/60">
+            <span className="text-[11px] font-mono text-muted-foreground">
+              Discovery: <code className="text-foreground font-semibold px-1 py-0.5 rounded bg-secondary/80">/mcp.json</code>
+            </span>
             <Button
               size="sm"
               onClick={() => setShowMcpModal(false)}
-              className="h-8 px-5 text-xs font-semibold rounded-full"
+              className="h-7 px-4 text-xs font-semibold rounded-full bg-primary text-primary-foreground hover:bg-primary/90 cursor-pointer"
             >
-              Close
+              Done
             </Button>
           </DialogFooter>
         </DialogContent>
@@ -180,4 +153,3 @@ export const RootLayout: React.FC = () => {
 };
 
 export default RootLayout;
-

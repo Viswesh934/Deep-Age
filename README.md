@@ -153,11 +153,21 @@ Deep-dream/
 
 ---
 
-## 📋 Phase 0 Deliverables Summary
+## 🗺️ Project Roadmap
 
-- [x] **Monorepo setup**: Clean TypeScript monorepo with `shared`, `backend`, `frontend`, and `demo`.
+- **[Detailed Roadmap & Architecture (Phase 1 & Phase 2)](docs/roadmap.md)**
+- **Phase 1 (Completed)**: WebMCP Exploration State Graphs, AI Intent Pathfinder via OpenRouter, Portable SQLite Exporter, Enterprise 4-Tier Security Matrix, PII Redactor, Indirect Injection Shield, WebAuthn Passkey Hardware Signer, Audit Ledger & Saga Manager.
+- **Phase 2 (In Progress)**: Interactive Demo Store Modernization (`demo/`) with 5-State Journey, Dynamic In-Browser Runtime, Floating Friction & Attack HUD, Review Injection Honeypots, and Portable Manifests.
+
+---
+
+## 📋 Platform Deliverables Summary
+
+- [x] **Monorepo Architecture**: Clean TypeScript monorepo with `shared`, `backend`, `frontend`, and `demo`.
 - [x] **WebMCP Contract & Simulator**: Ingests tool registrations, execution traces, DOM elements, and network events.
 - [x] **Friction Analysis Engine**: Detects missing WebMCP capabilities, tool failures, network issues, and security signals.
 - [x] **Multi-Mode UI**: Unified interface supporting **Explore**, **Debug**, and **Inspect** modes.
+- [x] **Enterprise Security Guardrails**: PII Firewall, Prompt Injection Shield, Biometric Passkeys, Audit Ledger.
+- [x] **AI Intent Planning & Exploration**: FSM state synthesis and OpenRouter-powered one-shot plan generation.
 - [x] **Controlled Demo Site**: Realistic e-commerce store with WebMCP tools and interactive friction toggle.
 - [x] **Automated Verification**: End-to-end test script proving tool discovery, friction detection, and fix verification.
