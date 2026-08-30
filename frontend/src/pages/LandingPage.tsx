@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
-  Sparkles,
   Terminal,
   Check,
   Play,
@@ -189,7 +188,6 @@ tools = client.get_tools() # ['run_test_drive', 'inspect_url', 'generate_patch']
           </div>
 
           <div className="md:col-span-6 flex items-center gap-2 bg-secondary/40 rounded-full px-4 py-2 border border-border/70 focus-within:border-primary/50">
-            <Sparkles className="w-3.5 h-3.5 text-[#ff8527] shrink-0" />
             <input
               type="text"
               value={task}

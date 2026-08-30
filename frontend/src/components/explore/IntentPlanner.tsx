@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Sparkles, CheckCircle2, AlertTriangle, CornerDownLeft } from 'lucide-react';
+import { CheckCircle2, AlertTriangle, CornerDownLeft, Compass } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Badge } from '../ui/badge';
@@ -73,7 +73,7 @@ export const IntentPlanner: React.FC<IntentPlannerProps> = ({ siteUrl }) => {
     <Card className="bg-card border-border/80 shadow-xs rounded-2xl">
       <CardHeader className="px-4 py-3 border-b border-border/60 flex flex-row items-center justify-between space-y-0">
         <CardTitle className="text-xs font-semibold text-foreground flex items-center gap-2">
-          <Sparkles className="w-3.5 h-3.5 text-[#ff8527]" />
+          <Compass className="w-3.5 h-3.5 text-[#ff8527]" />
           <span>Intent & Action Planner</span>
         </CardTitle>
         <Badge variant="outline" className="text-[10px] font-mono text-muted-foreground border-border/80 rounded-full">
@@ -93,7 +93,7 @@ export const IntentPlanner: React.FC<IntentPlannerProps> = ({ siteUrl }) => {
           <Button
             onClick={handlePlanIntent}
             disabled={loading || !goal.trim()}
-            className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-full text-xs font-semibold px-4 h-9 gap-1.5"
+            className="bg-primary text-primary-foreground hover:bg-primary/90 rounded-full text-xs font-semibold px-4 h-9 gap-1.5 cursor-pointer"
           >
             {loading ? 'Planning...' : (
               <>

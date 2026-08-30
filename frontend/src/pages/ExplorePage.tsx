@@ -9,7 +9,6 @@ import {
   ArrowRight,
   Check,
   XCircle,
-  Sparkles
 } from 'lucide-react';
 import { useTestDriveContext } from '@/context/TestDriveContext';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
@@ -248,7 +247,7 @@ export const ExplorePage: React.FC = () => {
       <div className="space-y-4 pt-1">
         <div className="flex items-center justify-between border-b border-border/80 pb-2">
           <div className="flex items-center gap-2">
-            <Sparkles className="w-4 h-4 text-[#ff8527]" />
+            <Compass className="w-4 h-4 text-[#ff8527]" />
             <h2 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
               Site Exploration & Capability Surface
             </h2>

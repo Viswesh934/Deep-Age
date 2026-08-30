@@ -6,7 +6,6 @@ import {
   Copy,
   Code2,
   CheckCircle2,
-  Sparkles,
   Globe,
   MousePointerClick,
 } from 'lucide-react';
@@ -258,7 +257,7 @@ if (window.modelContext) {
                   {/* Recommendation Callout */}
                   <div className="p-4 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-xs space-y-1 shadow-2xs">
                     <div className="flex items-center gap-1.5 text-emerald-700 dark:text-emerald-300 font-bold font-tech text-xs">
-                      <Sparkles className="w-4 h-4 text-emerald-500" />
+                      <CheckCircle2 className="w-4 h-4 text-emerald-500" />
                       <span>Recommended Developer Remediation</span>
                     </div>
                     <p className="text-emerald-800 dark:text-emerald-200/90 leading-relaxed text-xs font-sans">

@@ -8,7 +8,7 @@ import {
   Sun,
   Moon,
   ArrowUpRight,
-  Sparkles,
+  LayoutGrid,
 } from 'lucide-react';
 import { useTestDriveContext } from '@/context/TestDriveContext';
 import { Button } from '@/components/ui/button';
@@ -53,7 +53,7 @@ export const Sidebar: React.FC = () => {
                   variant="ghost"
                   size="icon"
                   onClick={toggleTheme}
-                  className="h-8 w-8 rounded-full text-muted-foreground hover:text-foreground hover:bg-secondary/70"
+                  className="h-8 w-8 rounded-full text-muted-foreground hover:text-foreground hover:bg-secondary/70 cursor-pointer"
                   aria-label={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
                 >
                   {isDark ? (
@@ -89,7 +89,7 @@ export const Sidebar: React.FC = () => {
               {({ isActive }) => (
                 <>
                   <span className={`p-1.5 rounded-lg transition-all ${isActive ? 'bg-[#ff8527] text-white shadow-xs' : 'bg-secondary text-muted-foreground'}`}>
-                    <Sparkles className="w-3.5 h-3.5" />
+                    <LayoutGrid className="w-3.5 h-3.5" />
                   </span>
                   <div>
                     <div className="text-foreground">Home & MCP</div>
@@ -183,12 +183,12 @@ export const Sidebar: React.FC = () => {
         >
           <span className="flex items-center gap-2 font-medium">
             <Terminal className="w-3.5 h-3.5 text-primary" />
-            Connect Agent (MCP)
+            <span>Connect Agent (MCP)</span>
           </span>
           <ArrowUpRight className="w-3 h-3 text-muted-foreground" />
         </Button>
 
-        <div className="px-2 text-[10px] text-muted-foreground flex items-center gap-1.5">
+        <div className="px-2 text-[10px] text-muted-foreground flex items-center gap-1.5 font-mono">
           <span className="inline-block size-1.5 rounded-full bg-[#5ae561]"></span>
           Chrome WebMCP • Chromium Headless
         </div>
@@ -198,4 +198,3 @@ export const Sidebar: React.FC = () => {
 };
 
 export default Sidebar;
-

@@ -12,7 +12,7 @@ import {
   AlertTriangle,
   XCircle,
   Info,
-  Sparkles,
+  Activity,
   Layers,
   Eye,
   Lock,
@@ -46,7 +46,7 @@ export const BrowserViewportWithScrubber: React.FC<BrowserViewportWithScrubberPr
       case 'execution':
         return <Zap className="w-3.5 h-3.5" />;
       case 'diagnosis':
-        return <Sparkles className="w-3.5 h-3.5" />;
+        return <Activity className="w-3.5 h-3.5" />;
       default:
         return <Clock className="w-3.5 h-3.5" />;
     }

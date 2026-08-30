@@ -3,7 +3,7 @@ import { Outlet, useLocation } from 'react-router-dom';
 import { useTestDriveContext } from '@/context/TestDriveContext';
 import { Sidebar } from '@/components/Sidebar';
 import { StartForm } from '@/components/StartForm';
-import { Terminal, Copy, Check, Globe, Server } from 'lucide-react';
+import { Terminal, Copy, Check } from 'lucide-react';
 import { env } from '@/config/env';
 import {
   Dialog,
@@ -15,7 +15,6 @@ import {
 } from '@/components/ui/dialog';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
 import { Badge } from '@/components/ui/badge';
 
 export const RootLayout: React.FC = () => {
@@ -96,79 +95,72 @@ export const RootLayout: React.FC = () => {
 
       {/* MCP Configuration Dialog */}
       <Dialog open={showMcpModal} onOpenChange={setShowMcpModal}>
-        <DialogContent className="max-w-2xl border-border/80 bg-card/95 shadow-2xl backdrop-blur-xl rounded-3xl">
-          <DialogHeader>
+        <DialogContent className="max-w-xl border-border/80 bg-card text-foreground shadow-2xl rounded-3xl p-6 font-sans">
+          <DialogHeader className="space-y-1.5 pb-2">
             <div className="flex items-center justify-between">
-              <DialogTitle className="flex items-center gap-2.5 text-sm font-bold">
-                <span className="p-1.5 rounded-full bg-primary text-primary-foreground">
-                  <Terminal className="w-3.5 h-3.5" />
-                </span>
-                Agent MCP Configuration (Model Context Protocol)
+              <DialogTitle className="text-sm font-bold flex items-center gap-2">
+                <Terminal className="w-4 h-4 text-[#ff8527]" />
+                <span>Connect Agent via MCP</span>
               </DialogTitle>
-              <Badge variant="success" className="font-mono text-[10px] rounded-full">
-                ● SSE & Stdio Ready
+              <Badge variant="outline" className="text-[10px] font-mono border-border/80 text-muted-foreground rounded-full">
+                JSON-RPC 2.0
               </Badge>
             </div>
-            <DialogDescription className="text-xs leading-relaxed text-muted-foreground mt-1">
-              Auto-configured for your deployment environment. Add this block into Claude Desktop, Cursor, Antigravity, or LangChain agents to let them inspect websites via Deep Age.
+            <DialogDescription className="text-xs text-muted-foreground leading-relaxed">
+              Add Deep Age to Claude Desktop, Cursor, Antigravity, or LangChain to test-drive web applications.
             </DialogDescription>
           </DialogHeader>
 
-          <Tabs value={mcpTab} onValueChange={(val) => setMcpTab(val as 'remote' | 'cli' | 'tools')} className="w-full">
-            <TabsList className="grid grid-cols-3 w-full h-10 p-1 bg-secondary/80 rounded-full border border-border/70">
-              <TabsTrigger value="remote" className="gap-1.5 text-xs font-mono font-semibold rounded-full">
-                <Globe className="w-3.5 h-3.5" />
-                Remote MCP
+          <Tabs value={mcpTab} onValueChange={(val) => setMcpTab(val as 'remote' | 'cli' | 'tools')} className="w-full space-y-3">
+            <TabsList className="grid grid-cols-3 w-full h-9 p-1 bg-secondary/80 rounded-full border border-border/70">
+              <TabsTrigger value="remote" className="text-xs font-semibold rounded-full">
+                Remote SSE
               </TabsTrigger>
-              <TabsTrigger value="cli" className="gap-1.5 text-xs font-mono font-semibold rounded-full">
-                <Server className="w-3.5 h-3.5" />
+              <TabsTrigger value="cli" className="text-xs font-semibold rounded-full">
                 Local Stdio
               </TabsTrigger>
-              <TabsTrigger value="tools" className="gap-1.5 text-xs font-mono font-semibold rounded-full">
-                <Terminal className="w-3.5 h-3.5" />
+              <TabsTrigger value="tools" className="text-xs font-semibold rounded-full">
                 API Endpoints
               </TabsTrigger>
             </TabsList>
+
+            <div className="relative">
+              <pre className="p-3.5 bg-secondary/30 text-foreground rounded-2xl text-[11px] font-mono overflow-x-auto border border-border/80 leading-relaxed max-h-56">
+                {activeMcpText}
+              </pre>
+              <Button
+                size="xs"
+                variant="outline"
+                onClick={handleCopyMcp}
+                className="absolute top-2.5 right-2.5 h-7 text-[11px] gap-1 font-medium rounded-full bg-card/90 hover:bg-card border-border/80 cursor-pointer"
+              >
+                {copiedMcp ? <Check className="w-3 h-3 text-[#5ae561]" /> : <Copy className="w-3 h-3" />}
+                <span>{copiedMcp ? 'Copied' : 'Copy'}</span>
+              </Button>
+            </div>
           </Tabs>
 
-          <div className="relative mt-2">
-            <pre className="p-4 bg-[#121212] text-[#fafafa] rounded-2xl text-xs font-mono overflow-x-auto border border-border/80 leading-relaxed max-h-64">
-              {activeMcpText}
-            </pre>
-            <Button
-              size="sm"
-              variant="secondary"
-              onClick={handleCopyMcp}
-              className="absolute top-3 right-3 h-7 text-xs gap-1.5 shadow-xs font-medium rounded-full bg-secondary/90 hover:bg-secondary"
-            >
-              {copiedMcp ? <Check className="w-3.5 h-3.5 text-[#5ae561]" /> : <Copy className="w-3.5 h-3.5" />}
-              {copiedMcp ? 'Copied' : 'Copy Config'}
-            </Button>
-          </div>
-
           <div className="grid grid-cols-3 gap-2 pt-1 text-[11px] text-muted-foreground font-mono">
-            <div className="p-2.5 rounded-xl bg-secondary/40 border border-border/70">
-              <span className="font-bold text-foreground block">Claude Desktop</span>
-              <span>claude_desktop_config.json</span>
+            <div className="p-2.5 rounded-xl bg-secondary/30 border border-border/60">
+              <span className="font-bold text-foreground block text-xs">Cursor IDE</span>
+              <span className="text-[10px]">.cursor/mcp.json</span>
             </div>
-            <div className="p-2.5 rounded-xl bg-secondary/40 border border-border/70">
-              <span className="font-bold text-foreground block">Cursor IDE</span>
-              <span>.cursor/mcp.json</span>
+            <div className="p-2.5 rounded-xl bg-secondary/30 border border-border/60">
+              <span className="font-bold text-foreground block text-xs">Claude</span>
+              <span className="text-[10px]">claude_desktop_config.json</span>
             </div>
-            <div className="p-2.5 rounded-xl bg-secondary/40 border border-border/70">
-              <span className="font-bold text-foreground block">Antigravity</span>
-              <span>agy mcp add</span>
+            <div className="p-2.5 rounded-xl bg-secondary/30 border border-border/60">
+              <span className="font-bold text-foreground block text-xs">Antigravity</span>
+              <span className="text-[10px]">agy mcp add</span>
             </div>
           </div>
 
-          <Separator className="my-1 border-border/60" />
-
-          <DialogFooter className="flex items-center justify-between sm:justify-between w-full text-xs text-muted-foreground">
-            <span>Direct Discovery URL: <code className="text-primary font-mono font-medium px-1.5 py-0.5 rounded-md bg-secondary/80">/mcp.json</code></span>
+          <DialogFooter className="flex items-center justify-between sm:justify-between w-full pt-2 text-xs text-muted-foreground border-t border-border/60">
+            <span className="text-[11px]">Direct manifest: <code className="text-foreground font-mono font-medium px-1.5 py-0.5 rounded bg-secondary/80">/mcp.json</code></span>
             <Button
               size="sm"
               onClick={() => setShowMcpModal(false)}
-              className="h-8 px-5 text-xs font-semibold rounded-full"
+              className="h-8 px-4 text-xs font-semibold rounded-full bg-primary text-primary-foreground hover:bg-primary/90 cursor-pointer"
             >
               Close
             </Button>
@@ -180,4 +172,3 @@ export const RootLayout: React.FC = () => {
 };
 
 export default RootLayout;
-
