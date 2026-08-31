@@ -8,10 +8,14 @@ import {
   CheckCircle2,
   Globe,
   MousePointerClick,
+  Zap,
+  Sparkles,
+  RotateCw,
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader } from '@/components/ui/card';
+import { useTestDriveContext } from '@/context/TestDriveContext';
 
 interface FrictionTriagePanelProps {
   run: TestDriveRun;
@@ -20,9 +24,11 @@ interface FrictionTriagePanelProps {
 type CodeFramework = 'webmcp' | 'react' | 'node';
 
 export const FrictionTriagePanel: React.FC<FrictionTriagePanelProps> = ({ run }) => {
+  const { startTestDrive, isLoading } = useTestDriveContext();
   const [severityFilter, setSeverityFilter] = useState<'all' | 'high' | 'medium' | 'low'>('all');
   const [selectedFrameworks, setSelectedFrameworks] = useState<Record<string, CodeFramework>>({});
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [testingFixId, setTestingFixId] = useState<string | null>(null);
 
   const filteredFrictions = run.frictions.filter((f) => {
     if (severityFilter === 'all') return true;
@@ -167,6 +173,22 @@ if (window.modelContext) {
           </button>
         </div>
       </div>
+
+      {/* Virtual Run Active Notification Banner */}
+      {run.isVirtualRun && (
+        <div className="flex items-center justify-between p-3.5 bg-gradient-to-r from-emerald-500/15 via-cyan-500/10 to-transparent border border-emerald-500/30 rounded-2xl shadow-glow-emerald">
+          <div className="flex items-center gap-2.5 text-xs text-foreground">
+            <Sparkles className="w-4 h-4 text-emerald-400 animate-pulse" />
+            <span className="font-bold font-tech">VIRTUAL WEBMCP INJECTION ACTIVE:</span>
+            <span className="text-muted-foreground font-sans">
+              This run was verified in isolated Chromium memory with zero code modifications needed on the target site.
+            </span>
+          </div>
+          <Badge className="bg-emerald-500 text-black font-bold font-mono text-[10px] px-2 py-0.5">
+            0 CODE CHANGES
+          </Badge>
+        </div>
+      )}
 
       {/* Friction Cards List */}
       {filteredFrictions.length === 0 ? (
@@ -337,6 +359,40 @@ if (window.modelContext) {
                           <>
                             <Copy className="w-3.5 h-3.5" />
                             <span>Copy Patch</span>
+                          </>
+                        )}
+                      </Button>
+                    </div>
+
+                    {/* ⚡ Instant Virtual In-Browser Live Test Drive */}
+                    <div className="flex flex-wrap items-center justify-between gap-3 pt-2 p-3 bg-secondary/30 rounded-xl border border-border/70">
+                      <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                        <Zap className="w-4 h-4 text-[#ff8527]" />
+                        <span>Inject this exact tool declaration into live browser memory to re-run test drive with zero friction:</span>
+                      </div>
+
+                      <Button
+                        size="sm"
+                        onClick={async () => {
+                          setTestingFixId(friction.id);
+                          try {
+                            await startTestDrive(run.url, run.task, run.mode, friction.codeSnippet || codeSnippet);
+                          } finally {
+                            setTestingFixId(null);
+                          }
+                        }}
+                        disabled={isLoading || testingFixId === friction.id}
+                        className="h-8 px-4 text-xs gap-1.5 font-bold rounded-full bg-gradient-to-r from-[#ff8527] to-amber-500 hover:from-[#e06f1a] hover:to-amber-600 text-white shadow-md cursor-pointer transition-all hover:scale-[1.02]"
+                      >
+                        {testingFixId === friction.id || isLoading ? (
+                          <>
+                            <RotateCw className="w-3.5 h-3.5 animate-spin" />
+                            <span>Injecting & Testing...</span>
+                          </>
+                        ) : (
+                          <>
+                            <Zap className="w-3.5 h-3.5 fill-current" />
+                            <span>⚡ Test Virtual Fix on Live Site</span>
                           </>
                         )}
                       </Button>

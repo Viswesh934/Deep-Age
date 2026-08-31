@@ -102,6 +102,9 @@ export interface TestDriveRun {
   securitySignals: SecuritySignal[];
   stateGraph?: StateTransitionGraph;
   auditLedger?: AuditLedgerEntry[];
+  openRouterApiKey?: string;
+  virtualToolCode?: string;
+  isVirtualRun?: boolean;
   extractedData?: Record<string, unknown>;
 }
 
@@ -110,6 +113,8 @@ export interface CreateTestDriveRequest {
   task: string;
   mode?: UserMode;
   openRouterApiKey?: string;
+  virtualToolCode?: string;
+  isVirtualRun?: boolean;
 }
 
 export interface IngestEventsRequest {

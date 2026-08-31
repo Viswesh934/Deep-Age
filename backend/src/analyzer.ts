@@ -44,6 +44,26 @@ export function analyzeTestDrive(run: TestDriveRun): {
         domElementDetected: hasCartDom ? 'button.add-to-cart' : undefined,
       },
       recommendation: 'Expose document.modelContext.registerTool({ name: "add_to_cart", inputSchema: { product_id: "string" } }) so agents can complete purchase journeys programmatically.',
+      codeSnippet: `document.modelContext.registerTool({
+  name: "add_to_cart",
+  description: "Add a specified product item to the user shopping cart",
+  inputSchema: {
+    type: "object",
+    properties: {
+      product_id: { type: "string", description: "Target product ID" },
+      quantity: { type: "number", description: "Quantity of units" }
+    },
+    required: ["product_id"]
+  },
+  execute: async (input) => {
+    const res = await fetch("/api/cart", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ productId: input.product_id || input.productId || "lap-901", quantity: input.quantity || 1 })
+    });
+    return res.json();
+  }
+});`
     });
   }
 

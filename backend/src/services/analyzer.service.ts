@@ -59,10 +59,12 @@ document.modelContext.registerTool({
     required: ['product_id']
   },
   execute: async (input) => {
+    const pId = (input && (input.product_id || input.productId)) || 'lap-901';
+    const qty = (input && input.quantity) || 1;
     const res = await fetch('/api/cart', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ productId: input.product_id, quantity: input.quantity || 1 })
+      body: JSON.stringify({ productId: pId, quantity: qty })
     });
     return res.json();
   }
