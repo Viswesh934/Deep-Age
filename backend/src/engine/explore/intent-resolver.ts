@@ -190,7 +190,20 @@ Respond ONLY with a JSON object matching this schema:
   const rawContent = data.choices?.[0]?.message?.content;
   if (!rawContent) return null;
 
-  // Clean markdown codeblocks if model wraps output
-  const cleaned = rawContent.replace(/^```json\s*/i, '').replace(/^```\s*/i, '').replace(/\s*```$/i, '').trim();
-  return JSON.parse(cleaned) as IntentResolutionResult;
+  try {
+    const firstBrace = rawContent.indexOf('{');
+    const lastBrace = rawContent.lastIndexOf('}');
+    if (firstBrace === -1 || lastBrace === -1) {
+      return null;
+    }
+    let jsonStr = rawContent.slice(firstBrace, lastBrace + 1);
+    // Strip single-line and multi-line comments from LLM json response
+    jsonStr = jsonStr.replace(/\/\/.*$/gm, '');
+    jsonStr = jsonStr.replace(/\/\*[\s\S]*?\*\//g, '');
+    jsonStr = jsonStr.replace(/,\s*([}\]])/g, '$1');
+    return JSON.parse(jsonStr) as IntentResolutionResult;
+  } catch (parseErr) {
+    console.warn('Failed to parse OpenRouter JSON:', parseErr, rawContent);
+    return null;
+  }
 }

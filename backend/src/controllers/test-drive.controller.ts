@@ -42,6 +42,8 @@ export class TestDriveController {
       frictions: [],
       securitySignals: [],
       timeline: [],
+      virtualToolCode: body.virtualToolCode,
+      isVirtualRun: body.isVirtualRun || Boolean(body.virtualToolCode),
     };
 
     await storeService.set(id, newRun);

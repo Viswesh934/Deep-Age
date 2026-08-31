@@ -10,7 +10,12 @@ export interface ITestDriveContext {
   setTask: (task: string) => void;
   isLoading: boolean;
   activeRun: TestDriveRun | null;
-  startTestDrive: (customUrl?: string, customTask?: string, customMode?: UserMode) => Promise<void>;
+  startTestDrive: (
+    customUrl?: string,
+    customTask?: string,
+    customMode?: UserMode,
+    virtualToolCode?: string
+  ) => Promise<void>;
   runDemoScenario: (enableAddToCart: boolean, currentMode?: UserMode) => Promise<void>;
   isDark: boolean;
   toggleTheme: () => void;
@@ -53,11 +58,18 @@ export const TestDriveProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const startTestDrive = async (
     targetUrl: string = url,
     targetTask: string = task,
-    targetMode: UserMode = 'debug'
+    targetMode: UserMode = 'debug',
+    virtualToolCode?: string
   ) => {
     setIsLoading(true);
     try {
-      const createdRun = await ApiService.createTestDrive(targetUrl, targetTask, targetMode);
+      const createdRun = await ApiService.createTestDrive(
+        targetUrl,
+        targetTask,
+        targetMode,
+        virtualToolCode,
+        Boolean(virtualToolCode)
+      );
       const executedRun = await ApiService.executeTestDrive(createdRun.id);
       setActiveRun(executedRun);
     } catch (err) {

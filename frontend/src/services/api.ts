@@ -6,11 +6,17 @@ export class ApiService {
     return env.backendUrl;
   }
 
-  public static async createTestDrive(url: string, task: string, mode: UserMode): Promise<TestDriveRun> {
+  public static async createTestDrive(
+    url: string,
+    task: string,
+    mode: UserMode,
+    virtualToolCode?: string,
+    isVirtualRun?: boolean
+  ): Promise<TestDriveRun> {
     const res = await fetch(`${this.baseUrl}/api/test-drives`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ url, task, mode }),
+      body: JSON.stringify({ url, task, mode, virtualToolCode, isVirtualRun }),
     });
     if (!res.ok) throw new Error(`Failed to create test drive: ${res.statusText}`);
     const data = (await res.json()) as { run: TestDriveRun };
