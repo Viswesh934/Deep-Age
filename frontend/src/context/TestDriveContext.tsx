@@ -27,7 +27,7 @@ const TestDriveContext = createContext<ITestDriveContext | undefined>(undefined)
 
 export const TestDriveProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [url, setUrl] = useState<string>(env.demoUrl);
-  const [task, setTask] = useState<string>('Find a laptop under ₹80,000 with 16GB RAM and add it to the cart');
+  const [task, setTask] = useState<string>('Inspect WebMCP tools and explore state graph transitions');
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [activeRun, setActiveRun] = useState<TestDriveRun | null>(null);
   const [isDark, setIsDark] = useState<boolean>(false);

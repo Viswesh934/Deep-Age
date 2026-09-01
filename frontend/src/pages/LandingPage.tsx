@@ -32,7 +32,7 @@ export const LandingPage: React.FC = () => {
 
   const handleLaunchTestDrive = (customUrl?: string, customTask?: string) => {
     const targetUrl = customUrl || url || 'http://127.0.0.1:3002';
-    const targetTask = customTask || task || 'Find a laptop under ₹80,000 with 16GB RAM and add to cart';
+    const targetTask = customTask || task || 'Inspect WebMCP tools and explore state graph transitions';
     startTestDrive(targetUrl, targetTask, 'explore');
     navigate('/explore');
   };

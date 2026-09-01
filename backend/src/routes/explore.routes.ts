@@ -11,33 +11,22 @@ import { ExploreCatalogEntity, WebMCPTool, TestDriveRun } from '../types/index.j
 
 export const exploreRouter = new Hono();
 
-// Default generic fallback entities for exploration snapshot
-const DEFAULT_EXPLORE_ENTITIES: ExploreCatalogEntity[] = [
-  {
-    id: 'res-01',
-    entityType: 'service',
-    title: 'Application Core Workspace',
-    summary: 'Primary interactive canvas, documentation hub, or application viewport.',
-    tags: ['workspace', 'core', 'interactive'],
-    actionTool: 'explore_workspace',
-  },
-  {
-    id: 'res-02',
-    entityType: 'article',
-    title: 'Technical Documentation & Specifications',
-    summary: 'API references, user manuals, and configuration parameters.',
-    tags: ['docs', 'specifications', 'api'],
-    actionTool: 'query_docs',
-  },
-  {
-    id: 'res-03',
-    entityType: 'service',
-    title: 'Settings & Environment Configuration',
-    summary: 'Preferences, sessions, and environment variables.',
-    tags: ['settings', 'config'],
-    actionTool: 'update_settings',
+function extractDynamicEntitiesFromRun(matchingRun?: TestDriveRun): ExploreCatalogEntity[] {
+  if (matchingRun?.extractedData && Array.isArray((matchingRun.extractedData as any).entities)) {
+    return (matchingRun.extractedData as any).entities;
   }
-];
+  if (matchingRun && matchingRun.tools && matchingRun.tools.length > 0) {
+    return matchingRun.tools.map((t, idx) => ({
+      id: `tool-${idx + 1}`,
+      entityType: 'action',
+      title: t.name,
+      summary: t.description || `Exposed WebMCP tool ${t.name}`,
+      tags: ['webmcp', 'action'],
+      actionTool: t.name,
+    }));
+  }
+  return [];
+}
 
 // GET /api/explore/graph?url=...
 exploreRouter.get('/graph', async (c) => {
@@ -58,18 +47,15 @@ exploreRouter.get('/graph', async (c) => {
 
 // POST /api/explore/resolve-intent
 exploreRouter.post('/resolve-intent', async (c) => {
-  const body = await c.req.json();
-  const siteUrl = body.siteUrl || 'http://127.0.0.1:3002';
-  const userGoal = body.userGoal || 'Find relevant resources and explore features';
-  const openRouterApiKey = body.openRouterApiKey || process.env.OPENROUTER_API_KEY;
+  const { siteUrl, userGoal, openRouterApiKey } = await c.req.json();
+  if (!userGoal) {
+    return c.json({ success: false, error: 'User goal is required' }, 400);
+  }
 
   const runs: TestDriveRun[] = await storeService.list();
-  const matchingRun = runs.find((r: TestDriveRun) => r.url.includes(siteUrl) || siteUrl.includes(r.url)) || runs[0];
+  const matchingRun = runs.find((r: TestDriveRun) => r.url.includes(siteUrl) || (siteUrl && siteUrl.includes(r.url))) || runs[0];
   const tools: WebMCPTool[] = matchingRun ? matchingRun.tools : [];
-
-  const stateGraph = (matchingRun && matchingRun.stateGraph)
-    ? matchingRun.stateGraph
-    : buildSiteStateGraph(siteUrl, tools);
+  const stateGraph = matchingRun?.stateGraph || buildSiteStateGraph(siteUrl || 'http://127.0.0.1:3002', tools);
 
   const result = await resolveUserIntent(
     { siteUrl, userGoal, openRouterApiKey },
@@ -87,7 +73,7 @@ exploreRouter.get('/snapshot', async (c) => {
   const matchingRun = runs.find((r: TestDriveRun) => r.url.includes(url) || url.includes(r.url)) || runs[0];
   const tools: WebMCPTool[] = matchingRun ? matchingRun.tools : [];
 
-  const dynamicCatalog = (matchingRun?.extractedData as any)?.entities || DEFAULT_EXPLORE_ENTITIES;
+  const dynamicCatalog = extractDynamicEntitiesFromRun(matchingRun);
 
   const snapshot = buildExploreSnapshot(url, tools, dynamicCatalog);
   return c.json({ success: true, snapshot });
@@ -100,7 +86,7 @@ exploreRouter.get('/snapshot/sqlite', async (c) => {
   const matchingRun = runs.find((r: TestDriveRun) => r.url.includes(url) || url.includes(r.url)) || runs[0];
   const tools: WebMCPTool[] = matchingRun ? matchingRun.tools : [];
 
-  const dynamicCatalog = (matchingRun?.extractedData as any)?.entities || DEFAULT_EXPLORE_ENTITIES;
+  const dynamicCatalog = extractDynamicEntitiesFromRun(matchingRun);
 
   const sqlScript = generateSqliteExploreScript(url, tools, dynamicCatalog);
   c.header('Content-Type', 'application/sql');

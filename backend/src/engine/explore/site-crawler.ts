@@ -121,8 +121,7 @@ export async function extractLiveSiteStructure(page: Page, siteUrl: string): Pro
       };
     }, siteUrl);
 
-    // Fallback if no entities extracted
-    let entities: ExploreCatalogEntity[] = raw.entities.map(e => ({
+    const entities: ExploreCatalogEntity[] = raw.entities.map(e => ({
       id: e.id,
       entityType: e.entityType,
       title: e.title,
@@ -130,27 +129,6 @@ export async function extractLiveSiteStructure(page: Page, siteUrl: string): Pro
       priceCents: e.priceCents,
       tags: e.tags,
     }));
-
-    if (entities.length === 0) {
-      let hostname = 'target';
-      try { hostname = new URL(siteUrl).hostname; } catch {}
-      entities = [
-        {
-          id: 'item-1',
-          entityType: 'article',
-          title: raw.title || `${hostname} Main Resource`,
-          summary: raw.description || `Primary landing page and resources at ${siteUrl}`,
-          tags: ['web', hostname],
-        },
-        {
-          id: 'item-2',
-          entityType: 'action',
-          title: `Explore ${hostname} Navigation`,
-          summary: `Discovered ${raw.routes.length} navigation paths and interactive DOM controls.`,
-          tags: ['navigation', hostname],
-        }
-      ];
-    }
 
     return {
       siteUrl,
