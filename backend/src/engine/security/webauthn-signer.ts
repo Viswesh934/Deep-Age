@@ -1,5 +1,5 @@
 import { createHash, randomBytes } from 'crypto';
-import { WebAuthnVerificationChallenge, WebAuthnProof, WebMCPSafetyTier } from '@deep-age/shared';
+import { WebAuthnVerificationChallenge, WebAuthnProof, WebMCPSafetyTier } from '../../types/index.js';
 
 export class WebAuthnSecurityManager {
   private activeChallenges: Map<string, WebAuthnVerificationChallenge> = new Map();

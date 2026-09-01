@@ -1,5 +1,5 @@
 import type { Page, HTTPRequest, HTTPResponse } from 'puppeteer';
-import { NetworkEvent } from '@deep-age/shared';
+import { NetworkEvent } from '../types/index.js';
 
 export class NetworkInterceptor {
   private requestTimestamps = new Map<string, number>();

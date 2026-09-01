@@ -1,4 +1,4 @@
-import { CircuitBreakerStatus } from '@deep-age/shared';
+import { CircuitBreakerStatus } from '../../types/index.js';
 
 export class AgentCircuitBreaker {
   private maxDepth: number;

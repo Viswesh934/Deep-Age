@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { DOMTreeNode, TestDriveRun } from '@deep-age/shared';
+import { DOMTreeNode, TestDriveRun } from '@/types';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';

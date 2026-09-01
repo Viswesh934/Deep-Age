@@ -4,7 +4,7 @@ import {
   SecuritySignal,
   TestDriveSummary,
   PlainExplanation,
-} from '@deep-age/shared';
+} from '../types/index.js';
 
 export class AnalyzerService {
   public analyze(run: TestDriveRun): {

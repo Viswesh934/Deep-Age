@@ -4,7 +4,7 @@ import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Badge } from '../ui/badge';
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/card';
-import { IntentResolutionResult } from '@deep-age/shared';
+import { IntentResolutionResult } from '@/types';
 
 interface IntentPlannerProps {
   siteUrl: string;

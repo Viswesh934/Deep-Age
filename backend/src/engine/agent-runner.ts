@@ -5,7 +5,7 @@ import {
   ErrorEvent,
   TimelineStep,
   WebMCPTool,
-} from '@deep-age/shared';
+} from '../types/index.js';
 import { config } from '../config/env.js';
 import { launchBrowser, LaunchBrowserOptions } from './browser.js';
 import { NetworkInterceptor } from './network-interceptor.js';

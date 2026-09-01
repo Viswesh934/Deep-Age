@@ -4,7 +4,7 @@ import {
   ActionPlanStep,
   WebMCPTool,
   StateTransitionGraph
-} from '@deep-age/shared';
+} from '../../types/index.js';
 
 import { config } from '../../config/env.js';
 

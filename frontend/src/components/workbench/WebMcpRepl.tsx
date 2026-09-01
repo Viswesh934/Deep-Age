@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { TestDriveRun, WebMCPTool } from '@deep-age/shared';
+import { TestDriveRun, WebMCPTool } from '@/types';
 import {
   Play,
   RotateCw,

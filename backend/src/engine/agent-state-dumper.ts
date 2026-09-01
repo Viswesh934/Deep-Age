@@ -1,5 +1,5 @@
 import type { Page } from 'puppeteer';
-import { AgentStateDump, SemanticElement, InteractionElement, WebMCPTool } from '@deep-age/shared';
+import { AgentStateDump, SemanticElement, InteractionElement, WebMCPTool } from '../types/index.js';
 
 export class AgentStateDumper {
   public static async captureStateDump(

@@ -1,4 +1,4 @@
-import { StateTransitionGraph, SiteStateNode, WebMCPTool } from '@deep-age/shared';
+import { StateTransitionGraph, SiteStateNode, WebMCPTool } from '../../types/index.js';
 import { ExtractedSiteData } from './site-crawler.js';
 
 export function buildSiteStateGraph(

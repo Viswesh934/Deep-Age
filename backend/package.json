@@ -5,7 +5,7 @@
   "main": "src/index.ts",
   "scripts": {
     "dev": "tsx watch src/index.ts",
-    "build": "npm run --prefix ../shared build --if-present && npm run --prefix ../demo build --if-present && tsc",
+    "build": "npm run --prefix ../demo build --if-present && tsc",
     "start": "tsx src/index.ts",
     "test": "tsx src/test-agent-sim.ts",
     "deploy": "wrangler deploy"
@@ -13,7 +13,6 @@
   "dependencies": {
     "@cloudflare/puppeteer": "^1.4.0",
     "@deep-age/demo": "*",
-    "@deep-age/shared": "*",
     "@hono/node-server": "^1.11.1",
     "dotenv": "^17.4.2",
     "hono": "^4.3.11",

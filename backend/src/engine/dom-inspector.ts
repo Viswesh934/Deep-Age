@@ -1,5 +1,5 @@
 import type { Page } from 'puppeteer';
-import { DOMInteractionEvent, DOMTreeNode } from '@deep-age/shared';
+import { DOMInteractionEvent, DOMTreeNode } from '../types/index.js';
 
 export class DOMInspector {
   public static async inspect(page: Page): Promise<{ controls: DOMInteractionEvent[]; tree: DOMTreeNode }> {

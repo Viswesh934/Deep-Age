@@ -1,5 +1,5 @@
 import { Context } from 'hono';
-import { CreateTestDriveRequest, IngestEventsRequest, TestDriveRun } from '@deep-age/shared';
+import { CreateTestDriveRequest, IngestEventsRequest, TestDriveRun } from '../types/index.js';
 import { storeService } from '../services/store.service.js';
 import { analyzerService } from '../services/analyzer.service.js';
 import { executeRealTestDrive } from '../engine/agent-runner.js';

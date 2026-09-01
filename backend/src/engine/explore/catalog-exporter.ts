@@ -1,4 +1,4 @@
-import { WebMCPTool, ExploreCatalogEntity, SiteExploreSnapshot } from '@deep-age/shared';
+import { WebMCPTool, ExploreCatalogEntity, SiteExploreSnapshot } from '../../types/index.js';
 import { buildSiteStateGraph } from './state-graph.js';
 
 export function generateSqliteExploreScript(

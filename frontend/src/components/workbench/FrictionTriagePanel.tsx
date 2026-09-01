@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { AgentFriction, TestDriveRun } from '@deep-age/shared';
+import { AgentFriction, TestDriveRun } from '@/types';
 import {
   Check,
   Copy,

@@ -1,6 +1,6 @@
 import { resolveUserIntent } from './engine/explore/intent-resolver.js';
 import { buildSiteStateGraph } from './engine/explore/state-graph.js';
-import { WebMCPTool } from '@deep-age/shared';
+import { WebMCPTool } from './types/index.js';
 import dotenv from 'dotenv';
 import path from 'path';
 

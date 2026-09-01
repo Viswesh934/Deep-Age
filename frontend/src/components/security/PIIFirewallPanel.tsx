@@ -4,7 +4,7 @@ import { Button } from '../ui/button';
 import { Textarea } from '../ui/textarea';
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/card';
 import { Badge } from '../ui/badge';
-import { PIIScanResult } from '@deep-age/shared';
+import { PIIScanResult } from '@/types';
 
 export const PIIFirewallPanel: React.FC = () => {
   const [inputText, setInputText] = useState<string>(

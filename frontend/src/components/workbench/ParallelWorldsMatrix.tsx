@@ -1,5 +1,5 @@
 import React from 'react';
-import { TestDriveRun } from '@deep-age/shared';
+import { TestDriveRun } from '@/types';
 import {
   AlertTriangle,
   CheckCircle2,

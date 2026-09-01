@@ -1,5 +1,5 @@
 import type { Page } from 'puppeteer';
-import { BotProtectionAudit, HeaderSecurityAudit, NetworkEvent, SecuritySignal } from '@deep-age/shared';
+import { BotProtectionAudit, HeaderSecurityAudit, NetworkEvent, SecuritySignal } from '../../types/index.js';
 
 export async function auditBotProtectionAndHeaders(
   page: Page,

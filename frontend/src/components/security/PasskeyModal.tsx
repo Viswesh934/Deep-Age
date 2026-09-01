@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Fingerprint, XCircle, CheckCircle2, KeyRound } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '../ui/dialog';
-import { WebAuthnVerificationChallenge } from '@deep-age/shared';
+import { WebAuthnVerificationChallenge } from '@/types';
 
 interface PasskeyModalProps {
   isOpen: boolean;

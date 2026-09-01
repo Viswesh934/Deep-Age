@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import { TestDriveRun, UserMode } from '@deep-age/shared';
+import { TestDriveRun, UserMode } from '@/types';
 import { ApiService } from '@/services/api';
 import { env } from '@/config/env';
 

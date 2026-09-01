@@ -1,5 +1,5 @@
 import React from 'react';
-import { TimelineStep } from '@deep-age/shared';
+import { TimelineStep } from '@/types';
 import {
   Compass,
   Search,

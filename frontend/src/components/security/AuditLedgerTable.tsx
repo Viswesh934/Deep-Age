@@ -3,7 +3,7 @@ import { ScrollText, RotateCcw, Lock } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/card';
-import { AuditLedgerEntry } from '@deep-age/shared';
+import { AuditLedgerEntry } from '@/types';
 
 export const AuditLedgerTable: React.FC = () => {
   const [entries, setEntries] = useState<AuditLedgerEntry[]>([]);

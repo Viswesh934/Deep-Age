@@ -1,5 +1,5 @@
 import type { Page } from 'puppeteer';
-import { UIVibeAudit, DOMInteractionEvent } from '@deep-age/shared';
+import { UIVibeAudit, DOMInteractionEvent } from '../types/index.js';
 
 // Common AI Cliché Purple/Indigo Hexes and Gradients
 const AI_PURPLE_HUES = [

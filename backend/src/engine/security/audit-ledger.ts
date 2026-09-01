@@ -1,4 +1,4 @@
-import { AuditLedgerEntry, WebMCPSafetyTier } from '@deep-age/shared';
+import { AuditLedgerEntry, WebMCPSafetyTier } from '../../types/index.js';
 
 export class AuditLedgerManager {
   private entries: AuditLedgerEntry[] = [];

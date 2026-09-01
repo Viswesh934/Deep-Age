@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { TestDriveRun } from '@deep-age/shared';
+import { TestDriveRun } from '@/types';
 import {
   Search,
   ChevronDown,

@@ -1,5 +1,5 @@
 import type { Page } from 'puppeteer';
-import { WebMCPTool, WebMCPToolCall } from '@deep-age/shared';
+import { WebMCPTool, WebMCPToolCall } from '../types/index.js';
 
 export class WebMCPInspector {
   public static async discoverTools(page: Page, targetUrl: string): Promise<WebMCPTool[]> {

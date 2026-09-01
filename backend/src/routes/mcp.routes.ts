@@ -2,7 +2,7 @@ import { Hono, Context } from 'hono';
 import { storeService } from '../services/store.service.js';
 import { executeRealTestDrive } from '../engine/agent-runner.js';
 import { config } from '../config/env.js';
-import { TestDriveRun } from '@deep-age/shared';
+import { TestDriveRun } from '../types/index.js';
 
 export const mcpRouter = new Hono();
 

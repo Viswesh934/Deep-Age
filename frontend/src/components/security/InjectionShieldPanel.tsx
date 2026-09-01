@@ -4,7 +4,7 @@ import { Button } from '../ui/button';
 import { Textarea } from '../ui/textarea';
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/card';
 import { Badge } from '../ui/badge';
-import { IndirectInjectionScanResult } from '@deep-age/shared';
+import { IndirectInjectionScanResult } from '@/types';
 
 export const InjectionShieldPanel: React.FC = () => {
   const [testContent, setTestContent] = useState<string>(

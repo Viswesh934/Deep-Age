@@ -1,4 +1,4 @@
-import { IndirectInjectionScanResult } from '@deep-age/shared';
+import { IndirectInjectionScanResult } from '../../types/index.js';
 
 const INJECTION_PATTERNS = [
   /ignore\s+(all\s+)?(previous|prior)\s+instructions/i,

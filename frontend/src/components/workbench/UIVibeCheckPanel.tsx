@@ -1,5 +1,5 @@
 import React from 'react';
-import { TestDriveRun } from '@deep-age/shared';
+import { TestDriveRun } from '@/types';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { CheckCircle2, Eye, Check } from 'lucide-react';

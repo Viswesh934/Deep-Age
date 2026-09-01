@@ -25,7 +25,7 @@ import { ParallelWorldsMatrix } from '@/components/workbench/ParallelWorldsMatri
 import { UIVibeCheckPanel } from '@/components/workbench/UIVibeCheckPanel';
 
 import { generateHarFile } from '@/lib/har-export';
-import type { AgentFriction, NetworkEvent, WebMCPTool } from '@deep-age/shared';
+import type { AgentFriction, NetworkEvent, WebMCPTool } from '@/types';
 
 type WorkbenchTab = 'frictions' | 'viewport' | 'vibe' | 'repl' | 'parallel' | 'sandbox' | 'network';
 

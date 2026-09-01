@@ -1,4 +1,4 @@
-import { TestDriveRun } from '@deep-age/shared';
+import { TestDriveRun } from '@/types';
 
 export function generateHarFile(run: TestDriveRun): string {
   const startTime = new Date(run.createdAt).toISOString();

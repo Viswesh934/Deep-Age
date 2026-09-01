@@ -1,4 +1,4 @@
-import { TestDriveRun, UserMode } from '@deep-age/shared';
+import { TestDriveRun, UserMode } from '@/types';
 import { env } from '@/config/env';
 
 export class ApiService {

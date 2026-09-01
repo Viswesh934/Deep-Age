@@ -1,4 +1,4 @@
-import { TestDriveRun } from '@deep-age/shared';
+import { TestDriveRun } from './types/index.js';
 
 class RunStore {
   private runs: Map<string, TestDriveRun> = new Map();

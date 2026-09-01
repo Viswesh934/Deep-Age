@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { StateTransitionGraph } from '@deep-age/shared';
+import { StateTransitionGraph } from '@/types';
 import { ArrowRight, Lock, CheckCircle2 } from 'lucide-react';
 import { Badge } from '../ui/badge';
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/card';

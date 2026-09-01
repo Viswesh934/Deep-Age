@@ -1,5 +1,5 @@
 import { executeRealTestDrive } from './engine/agent-runner.js';
-import { TestDriveRun } from '@deep-age/shared';
+import { TestDriveRun } from './types/index.js';
 
 async function testRealWebsite() {
   const targetUrl = process.argv[2] || 'https://news.ycombinator.com';

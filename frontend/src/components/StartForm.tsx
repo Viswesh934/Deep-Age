@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { useLocation } from 'react-router-dom';
-import { UserMode } from '@deep-age/shared';
+import { UserMode } from '@/types';
 import { ArrowUp, RotateCw, Globe, SlidersHorizontal, Check, ChevronDown, ChevronUp } from 'lucide-react';
 import { useTestDriveContext } from '@/context/TestDriveContext';
 import { Button } from '@/components/ui/button';

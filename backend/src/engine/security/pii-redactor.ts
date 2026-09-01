@@ -1,4 +1,4 @@
-import { PIIScanResult, MaskedDataToken } from '@deep-age/shared';
+import { PIIScanResult, MaskedDataToken } from '../../types/index.js';
 
 // Regular expressions for PII detection
 const EMAIL_REGEX = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g;

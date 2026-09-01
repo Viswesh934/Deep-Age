@@ -3,7 +3,7 @@ import { Database, Download, FileJson, Search } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/card';
-import { ExploreCatalogEntity } from '@deep-age/shared';
+import { ExploreCatalogEntity } from '@/types';
 
 interface CatalogExplorerProps {
   siteUrl: string;

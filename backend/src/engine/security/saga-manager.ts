@@ -1,4 +1,4 @@
-import { SagaCompensatingAction } from '@deep-age/shared';
+import { SagaCompensatingAction } from '../../types/index.js';
 
 export class BrowserSagaManager {
   private compensationStack: SagaCompensatingAction[] = [];

@@ -1,5 +1,5 @@
 import type { Page } from 'puppeteer';
-import { ExploreCatalogEntity } from '@deep-age/shared';
+import { ExploreCatalogEntity } from '../../types/index.js';
 
 export interface ExtractedSiteData {
   siteUrl: string;

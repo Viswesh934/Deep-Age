@@ -7,7 +7,7 @@ import {
   buildExploreSnapshot
 } from '../engine/explore/catalog-exporter.js';
 import { storeService } from '../services/store.service.js';
-import { ExploreCatalogEntity, WebMCPTool, TestDriveRun } from '@deep-age/shared';
+import { ExploreCatalogEntity, WebMCPTool, TestDriveRun } from '../types/index.js';
 
 export const exploreRouter = new Hono();
 
