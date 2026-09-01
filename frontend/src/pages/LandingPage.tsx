@@ -14,6 +14,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { env } from '@/config/env';
 
 export const LandingPage: React.FC = () => {
   const { url, setUrl, task, setTask, isLoading, startTestDrive, runDemoScenario, setShowMcpModal } =
@@ -41,9 +42,11 @@ export const LandingPage: React.FC = () => {
     navigate('/explore');
   };
 
-  const backendHost = window.location.origin.includes('5173')
-    ? window.location.origin.replace('5173', '3001')
-    : window.location.origin;
+  const backendHost =
+    env.backendUrl ||
+    (window.location.origin.includes('5173')
+      ? window.location.origin.replace('5173', '3001')
+      : window.location.origin);
 
   const mcpConfigs = {
     cursor: JSON.stringify(

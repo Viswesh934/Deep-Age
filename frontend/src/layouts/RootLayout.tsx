@@ -14,6 +14,7 @@ import {
 } from '@/components/ui/dialog';
 import { Tabs, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Button } from '@/components/ui/button';
+import { env } from '@/config/env';
 
 export const RootLayout: React.FC = () => {
   const { isDark, showMcpModal, setShowMcpModal } = useTestDriveContext();
@@ -22,7 +23,11 @@ export const RootLayout: React.FC = () => {
   const location = useLocation();
   const isLandingPage = location.pathname === '/';
 
-  const host = window.location.origin;
+  const host =
+    env.backendUrl ||
+    (window.location.origin.includes('5173')
+      ? window.location.origin.replace('5173', '3001')
+      : window.location.origin);
 
   const mcpConfigs: Record<'remote' | 'cli' | 'tools', string> = {
     remote: JSON.stringify(

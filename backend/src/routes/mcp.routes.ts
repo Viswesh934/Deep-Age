@@ -4,6 +4,11 @@ import { executeRealTestDrive } from '../engine/agent-runner.js';
 import { config } from '../config/env.js';
 import { TestDriveRun } from '../types/index.js';
 
+import { generateSqliteExploreScript } from '../engine/explore/catalog-exporter.js';
+import { buildSiteStateGraph } from '../engine/explore/state-graph.js';
+import { scanForPromptInjection } from '../engine/security/injection-firewall.js';
+import { PIIRedactor } from '../engine/security/pii-redactor.js';
+
 export const mcpRouter = new Hono();
 
 // MCP Tool Definitions
@@ -20,6 +25,67 @@ const MCP_TOOLS = [
         mode: { type: 'string', enum: ['explore', 'debug', 'inspect'], description: 'Analysis mode', default: 'debug' },
       },
       required: ['url', 'task'],
+    },
+  },
+  {
+    name: 'deep_age_export_sqlite',
+    description:
+      'Export and download a portable SQLite database script (.sql) containing the website catalog, schema, metadata, and WebMCP knowledge graph for local storage or SQL querying.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        url: { type: 'string', description: 'Target website URL (e.g. http://127.0.0.1:3002)' },
+      },
+      required: ['url'],
+    },
+  },
+  {
+    name: 'deep_age_get_state_graph',
+    description:
+      'Retrieve the interactive state transition graph of reachable website page states, DOM components, and required WebMCP tool transitions.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        url: { type: 'string', description: 'Target website URL' },
+        id: { type: 'string', description: 'Optional specific test-drive run ID' },
+      },
+      required: ['url'],
+    },
+  },
+  {
+    name: 'deep_age_get_dom_tree',
+    description:
+      'Retrieve the hierarchical DOM relation tree and accessibility semantic structure with interactive element selectors, aria-roles, and bound WebMCP actions.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        id: { type: 'string', description: 'Optional test-drive run ID' },
+        url: { type: 'string', description: 'Target website URL' },
+      },
+    },
+  },
+  {
+    name: 'deep_age_get_state_dumps',
+    description:
+      'Retrieve the chronological 5-layer browser state snapshots (Page, UI scroll/focus, Semantic accessibility tree, WebMCP in-memory tools, and Console/Network errors) across execution milestones.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        id: { type: 'string', description: 'Test-drive run ID' },
+      },
+      required: ['id'],
+    },
+  },
+  {
+    name: 'deep_age_scan_security',
+    description:
+      'Scan text, inputs, or website payloads for indirect prompt injection attacks, adversarial instructions, and detect/redact sensitive PII (credit cards, emails, phones, SSNs).',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        text: { type: 'string', description: 'Content, prompt, or user text to scan and redact' },
+      },
+      required: ['text'],
     },
   },
   {
@@ -164,6 +230,155 @@ mcpRouter.post('/', async (c: Context) => {
                   null,
                   2
                 ),
+              },
+            ],
+          },
+        });
+      }
+
+      if (toolName === 'deep_age_export_sqlite') {
+        const targetUrl = args.url || config.demoUrl;
+        const runs = await storeService.list();
+        const matchingRun = runs.find((r) => r.url === targetUrl || r.url.includes(targetUrl));
+        const tools = matchingRun ? matchingRun.tools : [];
+        const extracted = matchingRun?.extractedData as any;
+        const catalog = (extracted?.entities || []).map((e: any) => ({
+          id: e.id,
+          entityType: e.entityType || 'product',
+          title: e.title,
+          summary: e.summary,
+          priceCents: (e.priceCents || 0),
+          tags: e.tags || [],
+          actionTool: e.actionTool || 'add_to_cart',
+          actionParams: e.actionParams || { product_id: e.id },
+        }));
+
+        const sqlScript = generateSqliteExploreScript(targetUrl, tools, catalog);
+
+        return c.json({
+          jsonrpc: '2.0',
+          id,
+          result: {
+            content: [
+              {
+                type: 'text',
+                text: sqlScript,
+              },
+            ],
+          },
+        });
+      }
+
+      if (toolName === 'deep_age_get_state_graph') {
+        const targetUrl = args.url || config.demoUrl;
+        const runs = await storeService.list();
+        const matchingRun = args.id ? runs.find((r) => r.id === args.id) : runs.find((r) => r.url === targetUrl);
+
+        if (matchingRun && matchingRun.stateGraph) {
+          return c.json({
+            jsonrpc: '2.0',
+            id,
+            result: {
+              content: [
+                {
+                  type: 'text',
+                  text: JSON.stringify(matchingRun.stateGraph, null, 2),
+                },
+              ],
+            },
+          });
+        }
+
+        const graph = buildSiteStateGraph(targetUrl, matchingRun ? matchingRun.tools : [], matchingRun?.extractedData as any);
+        return c.json({
+          jsonrpc: '2.0',
+          id,
+          result: {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify(graph, null, 2),
+              },
+            ],
+          },
+        });
+      }
+
+      if (toolName === 'deep_age_scan_security') {
+        const text = args.text || '';
+        const injectionResult = scanForPromptInjection(text);
+        const piiRedactor = new PIIRedactor();
+        const piiResult = piiRedactor.redact(text);
+
+        return c.json({
+          jsonrpc: '2.0',
+          id,
+          result: {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify(
+                  {
+                    isSafe: injectionResult.isSafe && !piiResult.hasPII,
+                    promptInjectionScan: injectionResult,
+                    piiMaskingScan: piiResult,
+                    sanitizedPrompt: piiResult.maskedText,
+                  },
+                  null,
+                  2
+                ),
+              },
+            ],
+          },
+        });
+      }
+
+      if (toolName === 'deep_age_get_dom_tree') {
+        const targetId = args.id;
+        const targetUrl = args.url;
+        const runs = await storeService.list();
+        const matchingRun = targetId ? runs.find((r) => r.id === targetId) : runs.find((r) => r.url === targetUrl);
+
+        return c.json({
+          jsonrpc: '2.0',
+          id,
+          result: {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify(
+                  {
+                    url: targetUrl || matchingRun?.url,
+                    domTree: matchingRun?.domTree || null,
+                    interactiveControls: matchingRun?.domInteractions || [],
+                  },
+                  null,
+                  2
+                ),
+              },
+            ],
+          },
+        });
+      }
+
+      if (toolName === 'deep_age_get_state_dumps') {
+        const targetId = args.id;
+        if (!targetId) {
+          return c.json({ jsonrpc: '2.0', id, error: { code: -32602, message: 'Missing run id' } });
+        }
+        const run = await storeService.get(targetId);
+        if (!run) {
+          return c.json({ jsonrpc: '2.0', id, error: { code: -32602, message: `Run not found: ${targetId}` } });
+        }
+
+        return c.json({
+          jsonrpc: '2.0',
+          id,
+          result: {
+            content: [
+              {
+                type: 'text',
+                text: JSON.stringify(run.stateDumps || [], null, 2),
               },
             ],
           },
