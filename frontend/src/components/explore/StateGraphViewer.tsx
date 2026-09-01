@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { StateTransitionGraph } from '@/types';
-import { ArrowRight, Lock, CheckCircle2 } from 'lucide-react';
+import { ArrowRight, Lock, CheckCircle2, Download } from 'lucide-react';
 import { Badge } from '../ui/badge';
+import { Button } from '../ui/button';
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/card';
 
 interface StateGraphViewerProps {
@@ -22,6 +23,19 @@ export const StateGraphViewer: React.FC<StateGraphViewerProps> = ({ graph }) => 
       }
     }
   }, [graph]);
+
+  const handleDownloadGraph = () => {
+    if (!graph) return;
+    const blob = new Blob([JSON.stringify(graph, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `state_graph_${Date.now()}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  };
 
   if (!graph || !graph.states || Object.keys(graph.states).length === 0) {
     return (
@@ -44,9 +58,20 @@ export const StateGraphViewer: React.FC<StateGraphViewerProps> = ({ graph }) => 
             Finite-state transition model mapping site capabilities and guards
           </p>
         </div>
-        <Badge variant="outline" className="text-[10px] font-mono border-border/80 text-muted-foreground rounded-full">
-          FSM v{graph.version || '2.0'}
-        </Badge>
+        <div className="flex items-center gap-2">
+          <Button
+            size="xs"
+            variant="outline"
+            onClick={handleDownloadGraph}
+            className="text-[11px] font-semibold h-7 rounded-full gap-1 border-border/80 hover:bg-secondary cursor-pointer"
+          >
+            <Download className="w-3 h-3" />
+            <span>Graph (.json)</span>
+          </Button>
+          <Badge variant="outline" className="text-[10px] font-mono border-border/80 text-muted-foreground rounded-full">
+            FSM v{graph.version || '2.0'}
+          </Badge>
+        </div>
       </div>
 
       {/* State Node Pills */}

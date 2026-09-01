@@ -31,6 +31,42 @@ export const CatalogExplorer: React.FC<CatalogExplorerProps> = ({ siteUrl }) => 
     item.tags.some((t) => t.toLowerCase().includes(search.toLowerCase()))
   );
 
+  const handleDownloadSqlite = async () => {
+    try {
+      const res = await fetch(`${env.backendUrl}/api/explore/snapshot/sqlite?url=${encodeURIComponent(siteUrl)}`);
+      const sqlText = await res.text();
+      const blob = new Blob([sqlText], { type: 'application/sql' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `site_explore_${Date.now()}.sql`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error('Failed to download SQLite export:', err);
+    }
+  };
+
+  const handleDownloadManifest = async () => {
+    try {
+      const res = await fetch(`${env.backendUrl}/api/explore/snapshot/manifest?url=${encodeURIComponent(siteUrl)}`);
+      const manifestJson = await res.json();
+      const blob = new Blob([JSON.stringify(manifestJson, null, 2)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `webmcp_manifest_${Date.now()}.json`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (err) {
+      console.error('Failed to download manifest:', err);
+    }
+  };
+
   return (
     <Card className="bg-card border-border/80 rounded-2xl shadow-xs">
       <CardHeader className="px-4 py-3 border-b border-border/60 flex flex-row items-center justify-between space-y-0">
@@ -39,25 +75,24 @@ export const CatalogExplorer: React.FC<CatalogExplorerProps> = ({ siteUrl }) => 
           <span>Portable Knowledge & Catalog</span>
         </CardTitle>
         <div className="flex items-center gap-1.5">
-          <a
-            href={`${env.backendUrl}/api/explore/snapshot/sqlite?url=${encodeURIComponent(siteUrl)}`}
-            download="site_explore.sql"
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={handleDownloadSqlite}
+            className="text-[11px] font-semibold h-7 rounded-full gap-1 border-border/80 hover:bg-secondary cursor-pointer"
           >
-            <Button size="sm" variant="outline" className="text-[11px] font-semibold h-7 rounded-full gap-1 border-border/80 hover:bg-secondary">
-              <Download className="w-3 h-3" />
-              <span>SQLite</span>
-            </Button>
-          </a>
-          <a
-            href={`/api/explore/snapshot/manifest?url=${encodeURIComponent(siteUrl)}`}
-            target="_blank"
-            rel="noreferrer"
+            <Download className="w-3 h-3" />
+            <span>SQLite (.sql)</span>
+          </Button>
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={handleDownloadManifest}
+            className="text-[11px] font-semibold h-7 rounded-full gap-1 border-border/80 hover:bg-secondary cursor-pointer"
           >
-            <Button size="sm" variant="outline" className="text-[11px] font-semibold h-7 rounded-full gap-1 border-border/80 hover:bg-secondary">
-              <FileJson className="w-3 h-3" />
-              <span>Manifest</span>
-            </Button>
-          </a>
+            <FileJson className="w-3 h-3" />
+            <span>Manifest (.json)</span>
+          </Button>
         </div>
       </CardHeader>
 
