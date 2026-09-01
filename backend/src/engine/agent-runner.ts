@@ -110,37 +110,43 @@ export async function executeRealTestDrive(run: TestDriveRun, options?: LaunchBr
       });
     });
 
-    // 3. Virtual WebMCP Live Injection (If requested by user/evaluator)
-    if (run.virtualToolCode) {
-      run.isVirtualRun = true;
-      const injectionScript = `
-        (function() {
-          try {
-            window.modelContext = window.modelContext || {
+    // 3. Always inject standard WebMCP runtime environment (window.modelContext & document.modelContext)
+    const baseWebMcpScript = `
+      (function() {
+        try {
+          if (!window.modelContext) {
+            window.modelContext = {
               tools: [],
               registerTool: function(tool) {
                 this.tools = (this.tools || []).filter(function(t) { return t.name !== tool.name; });
-                this.tools.push(Object.assign({}, tool, { source: 'injected' }));
+                this.tools.push(tool);
+                return tool;
+              },
+              unregisterTool: function(name) {
+                this.tools = (this.tools || []).filter(function(t) { return t.name !== name; });
               }
             };
-            try {
-              Object.defineProperty(document, 'modelContext', {
-                value: window.modelContext,
-                writable: true,
-                configurable: true
-              });
-            } catch (e) {
-              try { document.modelContext = window.modelContext; } catch(err) {}
-            }
-            ${run.virtualToolCode}
-          } catch (err) {
-            console.error('[DeepAge Virtual Injector OnNewDocument Error]:', err);
           }
-        })();
-      `;
+          try {
+            Object.defineProperty(document, 'modelContext', {
+              value: window.modelContext,
+              writable: true,
+              configurable: true
+            });
+          } catch (e) {
+            try { document.modelContext = window.modelContext; } catch(err) {}
+          }
+          ${run.virtualToolCode ? run.virtualToolCode : ''}
+        } catch (err) {
+          console.error('[DeepAge WebMCP Injector Error]:', err);
+        }
+      })();
+    `;
 
-      await page.evaluateOnNewDocument(injectionScript);
+    await page.evaluateOnNewDocument(baseWebMcpScript);
 
+    if (run.virtualToolCode) {
+      run.isVirtualRun = true;
       timeline.push({
         id: 'step-virtual-inject',
         phase: 'spawn',
@@ -298,11 +304,19 @@ export async function executeRealTestDrive(run: TestDriveRun, options?: LaunchBr
 
         // Ensure cart & product parameters have valid entity identifiers
         if (matchingTool.name === 'add_to_cart' || matchingTool.name === 'add_item') {
+          const schemaEnums = (matchingTool.inputSchema as any)?.properties?.product_id?.enum || (matchingTool.inputSchema as any)?.properties?.productId?.enum;
           const targetId = resolvedParams.productId || resolvedParams.product_id;
-          const isKnownId = typeof targetId === 'string' && (toolDiscoveredEntityIds.includes(targetId) || discoveredProductIds.includes(targetId));
-          const validId = isKnownId
-            ? (targetId as string)
-            : (preferredEntityId || (typeof targetId === 'string' && targetId.startsWith('lap-') ? targetId : 'item-1'));
+          let validId = targetId;
+          if (Array.isArray(schemaEnums) && schemaEnums.length > 0) {
+            if (!schemaEnums.includes(validId)) {
+              validId = schemaEnums[0];
+            }
+          } else {
+            const isKnownId = typeof targetId === 'string' && (toolDiscoveredEntityIds.includes(targetId) || discoveredProductIds.includes(targetId));
+            validId = isKnownId
+              ? (targetId as string)
+              : (preferredEntityId || (typeof targetId === 'string' && targetId.startsWith('lap-') ? targetId : 'item-1'));
+          }
           resolvedParams.product_id = validId;
           resolvedParams.productId = validId;
           if (!resolvedParams.quantity) {
