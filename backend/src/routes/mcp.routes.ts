@@ -246,7 +246,36 @@ mcpRouter.post('/', async (c: Context) => {
   }
 });
 
-// MCP SSE Endpoint
+// MCP SSE Stream & Handshake Endpoint (Official MCP 2024-11-05 Specification)
 mcpRouter.get('/', (c: Context) => {
-  return c.text('Deep Age Model Context Protocol (MCP) Endpoint Ready.\nSend JSON-RPC 2.0 requests via POST.\n');
+  const acceptHeader = c.req.header('Accept') || '';
+  if (acceptHeader.includes('text/event-stream') || c.req.query('transport') === 'sse') {
+    const sessionId = `mcp-${Date.now()}-${Math.random().toString(36).substring(2, 8)}`;
+    const postEndpoint = `/mcp?sessionId=${sessionId}`;
+
+    const stream = new ReadableStream({
+      start(controller) {
+        const encoder = new TextEncoder();
+        // Emit initial endpoint event per MCP SSE spec
+        controller.enqueue(encoder.encode(`event: endpoint\ndata: ${postEndpoint}\n\n`));
+      },
+      cancel() {},
+    });
+
+    return new Response(stream, {
+      headers: {
+        'Content-Type': 'text/event-stream',
+        'Cache-Control': 'no-cache, no-transform',
+        'Connection': 'keep-alive',
+        'Access-Control-Allow-Origin': '*',
+      },
+    });
+  }
+
+  return c.text(
+    'Deep Age Model Context Protocol (MCP) Server Active.\n\n' +
+    '• SSE Stream: GET /mcp (with Accept: text/event-stream)\n' +
+    '• JSON-RPC 2.0: POST /mcp\n' +
+    '• Discovery: GET /mcp.json\n'
+  );
 });
