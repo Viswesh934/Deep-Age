@@ -17,7 +17,9 @@
     "noFallthroughCasesInSwitch": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": ["./src/*"],
+      "@deep-age/shared": ["./src/types/index.ts"],
+      "@deep-age/shared/*": ["./src/types/*"]
     }
   },
   "include": ["src"],

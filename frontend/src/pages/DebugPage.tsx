@@ -25,6 +25,7 @@ import { ParallelWorldsMatrix } from '@/components/workbench/ParallelWorldsMatri
 import { UIVibeCheckPanel } from '@/components/workbench/UIVibeCheckPanel';
 
 import { generateHarFile } from '@/lib/har-export';
+import type { AgentFriction, NetworkEvent, WebMCPTool } from '@deep-age/shared';
 
 type WorkbenchTab = 'frictions' | 'viewport' | 'vibe' | 'repl' | 'parallel' | 'sandbox' | 'network';
 
@@ -82,12 +83,12 @@ document.modelContext.registerTool({
       };
     }
     const totalTools = activeRun.tools.length;
-    const highFrictions = activeRun.frictions.filter((f) => f.severity === 'high').length;
-    const mediumFrictions = activeRun.frictions.filter((f) => f.severity === 'medium').length;
-    const errorCount = activeRun.errors.length + activeRun.network.filter((n) => n.status >= 400).length;
+    const highFrictions = activeRun.frictions.filter((f: AgentFriction) => f.severity === 'high').length;
+    const mediumFrictions = activeRun.frictions.filter((f: AgentFriction) => f.severity === 'medium').length;
+    const errorCount = activeRun.errors.length + activeRun.network.filter((n: NetworkEvent) => n.status >= 400).length;
 
     let toolCoverageScore = totalTools >= 4 ? 100 : totalTools === 3 ? 80 : totalTools === 2 ? 55 : totalTools === 1 ? 30 : 5;
-    if (activeRun.frictions.some((f) => f.type === 'missing_capability')) {
+    if (activeRun.frictions.some((f: AgentFriction) => f.type === 'missing_capability')) {
       toolCoverageScore = Math.min(toolCoverageScore, 60);
     }
 
@@ -97,7 +98,7 @@ document.modelContext.registerTool({
     let schemaScore = 90;
     if (totalTools === 0) schemaScore = 0;
     else {
-      activeRun.tools.forEach((t) => {
+      activeRun.tools.forEach((t: WebMCPTool) => {
         if (!t.inputSchema || Object.keys(t.inputSchema).length === 0) schemaScore -= 15;
       });
     }

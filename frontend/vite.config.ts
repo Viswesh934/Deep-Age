@@ -7,6 +7,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
+      '@deep-age/shared': path.resolve(__dirname, './src/types/index.ts'),
     },
   },
   server: {
