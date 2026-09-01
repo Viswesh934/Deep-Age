@@ -1,0 +1,19 @@
+name = "deep-age-backend"
+main = "src/index.ts"
+compatibility_date = "2024-04-05"
+compatibility_flags = ["nodejs_compat"]
+
+# Cloudflare Browser Rendering Binding
+[browser]
+binding = "MYBROWSER"
+
+# Environment Variables
+[vars]
+NODE_ENV = "production"
+PORT = "8787"
+DEMO_URL = "https://deep-age-demo.vercel.app"
+
+# KV Namespace (Optional for multi-region run caching)
+# [[kv_namespaces]]
+# binding = "RUNS_STORE"
+# id = "your-kv-id"

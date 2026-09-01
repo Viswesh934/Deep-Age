@@ -7,7 +7,8 @@
     "dev": "tsx watch src/index.ts",
     "build": "tsc",
     "start": "tsx src/index.ts",
-    "test": "tsx src/test-agent-sim.ts"
+    "test": "tsx src/test-agent-sim.ts",
+    "deploy": "wrangler deploy"
   },
   "dependencies": {
     "@cloudflare/puppeteer": "^1.4.0",

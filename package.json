@@ -13,7 +13,8 @@
     "dev:backend": "npm run dev --workspace=backend",
     "dev:frontend": "npm run dev --workspace=frontend",
     "dev:demo": "npm run dev --workspace=demo",
-    "test": "npm run test --workspace=backend"
+    "test": "npm run test --workspace=backend",
+    "deploy:backend": "npm run deploy --workspace=@deep-age/backend"
   },
   "devDependencies": {
     "typescript": "^5.4.5"
