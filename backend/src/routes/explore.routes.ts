@@ -49,15 +49,15 @@ const DEMO_CATALOG: ExploreCatalogEntity[] = [
 exploreRouter.get('/graph', async (c) => {
   const url = c.req.query('url') || 'http://127.0.0.1:3002';
   
-  // Find tools from latest run or default tools
+  // Find tools and stateGraph from latest run
   const runs: TestDriveRun[] = await storeService.list();
   const matchingRun = runs.find((r: TestDriveRun) => r.url.includes(url) || url.includes(r.url)) || runs[0];
-  const tools: WebMCPTool[] = matchingRun ? matchingRun.tools : [
-    { name: 'search_products', description: 'Search catalog', inputSchema: {}, safetyTier: 'public_read', category: 'search' },
-    { name: 'add_to_cart', description: 'Add item to cart', inputSchema: {}, safetyTier: 'reversible_write', category: 'commerce' },
-    { name: 'complete_checkout', description: 'Authorize payment', inputSchema: {}, safetyTier: 'critical_destructive', category: 'commerce', requiresConfirmation: true }
-  ];
 
+  if (matchingRun && matchingRun.stateGraph) {
+    return c.json({ success: true, graph: matchingRun.stateGraph });
+  }
+
+  const tools: WebMCPTool[] = matchingRun ? matchingRun.tools : [];
   const graph = buildSiteStateGraph(url, tools);
   return c.json({ success: true, graph });
 });
@@ -66,19 +66,16 @@ exploreRouter.get('/graph', async (c) => {
 exploreRouter.post('/resolve-intent', async (c) => {
   const body = await c.req.json();
   const siteUrl = body.siteUrl || 'http://127.0.0.1:3002';
-  const userGoal = body.userGoal || 'Find a laptop with 16GB RAM under 80,000';
+  const userGoal = body.userGoal || 'Find relevant resources and explore features';
   const openRouterApiKey = body.openRouterApiKey || process.env.OPENROUTER_API_KEY;
 
   const runs: TestDriveRun[] = await storeService.list();
   const matchingRun = runs.find((r: TestDriveRun) => r.url.includes(siteUrl) || siteUrl.includes(r.url)) || runs[0];
-  const tools: WebMCPTool[] = matchingRun ? matchingRun.tools : [
-    { name: 'search_products', description: 'Search catalog products', inputSchema: {}, safetyTier: 'public_read', category: 'search' },
-    { name: 'filter_products', description: 'Filter by price and RAM', inputSchema: {}, safetyTier: 'public_read', category: 'search' },
-    { name: 'get_product_details', description: 'Get item specs', inputSchema: {}, safetyTier: 'public_read', category: 'commerce' },
-    { name: 'add_to_cart', description: 'Add product to cart', inputSchema: {}, safetyTier: 'reversible_write', category: 'commerce' }
-  ];
+  const tools: WebMCPTool[] = matchingRun ? matchingRun.tools : [];
 
-  const stateGraph = buildSiteStateGraph(siteUrl, tools);
+  const stateGraph = (matchingRun && matchingRun.stateGraph)
+    ? matchingRun.stateGraph
+    : buildSiteStateGraph(siteUrl, tools);
 
   const result = await resolveUserIntent(
     { siteUrl, userGoal, openRouterApiKey },
@@ -94,12 +91,19 @@ exploreRouter.get('/snapshot', async (c) => {
   const url = c.req.query('url') || 'http://127.0.0.1:3002';
   const runs: TestDriveRun[] = await storeService.list();
   const matchingRun = runs.find((r: TestDriveRun) => r.url.includes(url) || url.includes(r.url)) || runs[0];
-  const tools: WebMCPTool[] = matchingRun ? matchingRun.tools : [
-    { name: 'search_products', description: 'Search catalog', inputSchema: {}, safetyTier: 'public_read' },
-    { name: 'add_to_cart', description: 'Add to cart', inputSchema: {}, safetyTier: 'reversible_write' }
-  ];
+  const tools: WebMCPTool[] = matchingRun ? matchingRun.tools : [];
 
-  const snapshot = buildExploreSnapshot(url, tools, DEMO_CATALOG);
+  const dynamicCatalog = (matchingRun?.extractedData as any)?.entities || (url.includes('3002') ? DEMO_CATALOG : [
+    {
+      id: 'ent-1',
+      entityType: 'article' as const,
+      title: `${new URL(url.startsWith('http') ? url : `https://${url}`).hostname} Core Resource`,
+      summary: `Discovered live web endpoint with ${tools.length} WebMCP tool(s) and full DOM controls.`,
+      tags: ['web', 'explored']
+    }
+  ]);
+
+  const snapshot = buildExploreSnapshot(url, tools, dynamicCatalog);
   return c.json({ success: true, snapshot });
 });
 
@@ -110,7 +114,17 @@ exploreRouter.get('/snapshot/sqlite', async (c) => {
   const matchingRun = runs.find((r: TestDriveRun) => r.url.includes(url) || url.includes(r.url)) || runs[0];
   const tools: WebMCPTool[] = matchingRun ? matchingRun.tools : [];
 
-  const sqlScript = generateSqliteExploreScript(url, tools, DEMO_CATALOG);
+  const dynamicCatalog = (matchingRun?.extractedData as any)?.entities || (url.includes('3002') ? DEMO_CATALOG : [
+    {
+      id: 'ent-1',
+      entityType: 'article' as const,
+      title: `${new URL(url.startsWith('http') ? url : `https://${url}`).hostname} Core Resource`,
+      summary: `Discovered live web endpoint with ${tools.length} WebMCP tool(s).`,
+      tags: ['web', 'explored']
+    }
+  ]);
+
+  const sqlScript = generateSqliteExploreScript(url, tools, dynamicCatalog);
   c.header('Content-Type', 'application/sql');
   c.header('Content-Disposition', `attachment; filename="site_explore_${Date.now()}.sql"`);
   return c.text(sqlScript);

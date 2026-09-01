@@ -3,7 +3,6 @@ import { TestDriveRun, WebMCPTool } from '@deep-age/shared';
 import {
   Play,
   RotateCw,
-  Terminal,
   AlertCircle,
   Copy,
   Check,
@@ -99,22 +98,20 @@ export const WebMcpRepl: React.FC<WebMcpReplProps> = ({ run }) => {
   return (
     <div className="flex flex-col gap-5 font-sans animate-fade-in">
       {/* Header Info */}
-      <div className="flex flex-wrap items-center justify-between gap-4 bg-muted/40 p-4 md:p-5 rounded-2xl border border-border/80 shadow-2xs backdrop-blur-md">
-        <div className="flex items-center gap-3.5">
-          <div className="p-3 rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 border border-indigo-500/20 shadow-glow-primary">
-            <Terminal className="w-5 h-5" />
-          </div>
-          <div>
-            <h3 className="text-sm font-extrabold text-foreground font-tech flex items-center gap-2">
-              <span>Interactive WebMCP Capability Playground</span>
-              <Badge variant="outline" className="font-mono text-[10px] text-primary border-primary/30 rounded-md">
-                {run.tools.length} Registered Tools
-              </Badge>
-            </h3>
-            <p className="text-xs text-muted-foreground mt-0.5 font-sans">
-              Test-drive any discovered <code className="font-mono text-primary font-semibold">document.modelContext</code> tool with live JSON parameter validation in the browser session.
-            </p>
-          </div>
+      <div className="flex flex-wrap items-center justify-between gap-3 p-4 bg-muted/20 border border-border/60 rounded-2xl text-left">
+        <div>
+          <h3 className="text-sm font-semibold text-foreground text-left">
+            WebMCP Playground
+          </h3>
+          <p className="text-xs text-muted-foreground mt-0.5 font-sans text-left">
+            Test and execute registered document.modelContext tools against the target site
+          </p>
+        </div>
+
+        <div className="flex items-center gap-2">
+          <Badge variant="outline" className="font-mono text-xs font-bold rounded-full">
+            {run.tools.length} Tools Discovered
+          </Badge>
         </div>
       </div>
 

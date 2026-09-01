@@ -79,3 +79,38 @@ export interface SiteExploreSnapshot {
   stateGraph: StateTransitionGraph;
   catalog: ExploreCatalogEntity[];
 }
+
+export interface SeoAudit {
+  score: number; // 0 - 100
+  title?: string;
+  titleLength: number;
+  description?: string;
+  descriptionLength: number;
+  hasOpenGraph: boolean;
+  hasTwitterCard: boolean;
+  hasJsonLd: boolean;
+  hasCanonical: boolean;
+  hasRobotsTxt: boolean;
+  hasSitemap: boolean;
+  issues: string[];
+  recommendations: string[];
+}
+
+export interface ReadabilityAudit {
+  score: number; // 0 - 100
+  readingGradeLevel: string;
+  fleschKincaidReadingEase: number;
+  estimatedReadTimeMinutes: number;
+  wordCount: number;
+  sentenceCount: number;
+  jargonDensity: 'low' | 'moderate' | 'high';
+  clarityAssessment: string;
+}
+
+export interface FeedDiscoveryAudit {
+  rssFeeds: Array<{ title: string; url: string; type: 'rss' | 'atom' | 'json' }>;
+  hasRss: boolean;
+  hasChangelog: boolean;
+  hasSitemap: boolean;
+}
+

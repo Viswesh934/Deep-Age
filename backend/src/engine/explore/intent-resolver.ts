@@ -6,18 +6,21 @@ import {
   StateTransitionGraph
 } from '@deep-age/shared';
 
+import { config } from '../../config/env.js';
+
 export async function resolveUserIntent(
   request: IntentResolutionRequest,
   tools: WebMCPTool[],
   stateGraph: StateTransitionGraph
 ): Promise<IntentResolutionResult> {
   const goalLower = request.userGoal.toLowerCase();
+  const apiKey = request.openRouterApiKey || config.openRouterApiKey;
 
-  // If user provided an OpenRouter key, try one-shot planning via OpenRouter API
-  if (request.openRouterApiKey) {
+  // If an OpenRouter key is available (from request or env), try one-shot planning via OpenRouter API
+  if (apiKey) {
     try {
       console.log('🤖 Querying OpenRouter for one-shot WebMCP intent resolution...');
-      const openRouterResult = await queryOpenRouterPlanner(request, tools, stateGraph);
+      const openRouterResult = await queryOpenRouterPlanner({ ...request, openRouterApiKey: apiKey }, tools, stateGraph);
       if (openRouterResult) {
         console.log('✅ OpenRouter returned valid action plan:', openRouterResult.intent);
         return openRouterResult;

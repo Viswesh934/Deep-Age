@@ -3,9 +3,6 @@ import { TestDriveRun } from '@deep-age/shared';
 import {
   AlertTriangle,
   CheckCircle2,
-  RotateCw,
-  Play,
-  Split,
 } from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -23,42 +20,27 @@ export const ParallelWorldsMatrix: React.FC<ParallelWorldsMatrixProps> = ({ run 
   return (
     <div className="flex flex-col gap-6 font-sans animate-fade-in">
       {/* Header Banner */}
-      <div className="flex flex-wrap items-center justify-between gap-4 bg-muted/40 p-4 md:p-5 rounded-2xl border border-border/80 shadow-2xs backdrop-blur-md">
-        <div className="flex items-center gap-3.5">
-          <div className="p-3 rounded-xl bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 shadow-glow-emerald">
-            <Split className="w-5 h-5" />
-          </div>
-          <div>
-            <h3 className="text-sm font-extrabold text-foreground font-tech flex items-center gap-2">
-              <span>Parallel Worlds Evaluation Matrix</span>
-              <Badge variant="outline" className="font-mono text-[10px] text-emerald-500 border-emerald-500/30 rounded-md">
-                COMPARATIVE BENCHMARK
-              </Badge>
-            </h3>
-            <p className="text-xs text-muted-foreground mt-0.5 font-sans">
-              Side-by-side simulation proving how WebMCP transforms a broken agent journey into an instantaneous 0-friction flow.
-            </p>
-          </div>
+      <div className="flex flex-wrap items-center justify-between gap-3 p-4 bg-muted/20 border border-border/60 rounded-2xl text-left">
+        <div>
+          <h3 className="text-sm font-semibold text-foreground text-left">
+            Parallel Benchmark Matrix
+          </h3>
+          <p className="text-xs text-muted-foreground mt-0.5 font-sans text-left">
+            Side-by-side benchmark comparing baseline friction vs zero-friction WebMCP execution
+          </p>
         </div>
 
         {/* Quick Action Button to Toggle Demo State */}
         <Button
           size="sm"
-          variant="glow"
           onClick={() => runDemoScenario(!isCurrentRunFixed)}
           disabled={isLoading}
-          className="gap-2 text-xs font-bold h-9 px-4 font-tech shadow-glow-primary rounded-xl cursor-pointer"
+          className="text-xs font-mono rounded-full h-8 px-4 cursor-pointer bg-[#ff8527] text-white font-bold hover:bg-[#ff8527]/90"
         >
           {isLoading ? (
-            <>
-              <RotateCw className="w-3.5 h-3.5 animate-spin" />
-              <span>Simulating Alternative...</span>
-            </>
+            <span>Simulating Alternative...</span>
           ) : (
-            <>
-              <Play className="w-3.5 h-3.5 fill-current" />
-              <span>Switch to {isCurrentRunFixed ? 'Friction Baseline' : 'WebMCP Fixed'} World</span>
-            </>
+            <span>Switch to {isCurrentRunFixed ? 'Friction Baseline' : 'WebMCP Fixed'} Mode</span>
           )}
         </Button>
       </div>

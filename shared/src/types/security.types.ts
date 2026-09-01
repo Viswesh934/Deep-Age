@@ -3,10 +3,41 @@ import { WebMCPSafetyTier } from './webmcp.types.js';
 export interface SecuritySignal {
   id: string;
   severity: 'info' | 'warning' | 'alert';
-  category: 'third_party_leak' | 'unencrypted_transmission' | 'cross_origin_redirect' | 'excessive_data_collection' | 'unknown_origin' | 'prompt_injection' | 'pii_leak';
+  category:
+    | 'third_party_leak'
+    | 'unencrypted_transmission'
+    | 'cross_origin_redirect'
+    | 'excessive_data_collection'
+    | 'unknown_origin'
+    | 'prompt_injection'
+    | 'pii_leak'
+    | 'bot_protection'
+    | 'captcha_challenge'
+    | 'exposed_headers'
+    | 'missing_security_headers';
   title: string;
   observation: string;
   evidence: Record<string, unknown>;
+}
+
+export interface BotProtectionAudit {
+  botProtectionDetected: boolean;
+  provider: 'Cloudflare Turnstile' | 'Google reCAPTCHA' | 'hCaptcha' | 'DataDome' | 'AWS WAF / Shield' | 'Akamai' | 'Custom WAF' | 'None';
+  challengeType: 'interactive_captcha' | 'invisible_turnstile' | 'js_fingerprint' | 'rate_limit_429' | 'none';
+  agentPassable: boolean;
+  bypassRecommendation?: string;
+  fingerprintsDetected: string[];
+}
+
+export interface HeaderSecurityAudit {
+  score: number; // 0 - 100
+  exposedHeaders: Array<{ header: string; value: string; risk: 'high' | 'medium' | 'low'; description: string }>;
+  missingHeaders: Array<{ header: string; importance: 'high' | 'medium' | 'low'; fixSnippet: string }>;
+  corsStatus: {
+    isWildcard: boolean;
+    allowCredentials: boolean;
+    risk: 'safe' | 'permissive' | 'vulnerable';
+  };
 }
 
 export interface IndirectInjectionScanResult {

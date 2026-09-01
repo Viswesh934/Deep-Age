@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { TestDriveRun } from '@deep-age/shared';
 import {
-  Globe,
   Search,
   ChevronDown,
   ChevronRight,
@@ -36,22 +35,14 @@ export const NetworkWaterfall: React.FC<NetworkWaterfallProps> = ({ run }) => {
   return (
     <div className="flex flex-col gap-5 font-sans animate-fade-in">
       {/* Network Header with Filters */}
-      <div className="flex flex-wrap items-center justify-between gap-4 bg-muted/40 p-4 md:p-5 rounded-2xl border border-border/80 shadow-2xs backdrop-blur-md">
-        <div className="flex items-center gap-3.5">
-          <div className="p-3 rounded-xl bg-cyan-500/10 text-cyan-600 dark:text-cyan-400 border border-cyan-500/20 shadow-glow-cyan">
-            <Globe className="w-5 h-5" />
-          </div>
-          <div>
-            <h3 className="text-sm font-extrabold text-foreground font-tech flex items-center gap-2">
-              <span>Network Traffic & Waterfall</span>
-              <Badge variant="outline" className="font-mono text-[10px] text-cyan-500 border-cyan-500/30 rounded-md">
-                {run.network.length} Captured Requests
-              </Badge>
-            </h3>
-            <p className="text-xs text-muted-foreground mt-0.5 font-sans">
-              Real-time HAR network stream captured directly via Chrome DevTools Protocol (CDP).
-            </p>
-          </div>
+      <div className="flex flex-wrap items-center justify-between gap-3 p-4 bg-muted/20 border-b border-border/60 text-left">
+        <div>
+          <h3 className="text-sm font-semibold text-foreground text-left">
+            Network Waterfall
+          </h3>
+          <p className="text-xs text-muted-foreground mt-0.5 font-sans text-left">
+            HTTP requests and latency timeline captured during test-drive execution
+          </p>
         </div>
 
         {/* Filter Controls */}

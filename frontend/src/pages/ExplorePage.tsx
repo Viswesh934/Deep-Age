@@ -17,6 +17,7 @@ import { Button } from '@/components/ui/button';
 import { StateGraphViewer } from '@/components/explore/StateGraphViewer';
 import { IntentPlanner } from '@/components/explore/IntentPlanner';
 import { CatalogExplorer } from '@/components/explore/CatalogExplorer';
+import { SeoReadabilityFeedsPanel } from '@/components/explore/SeoReadabilityFeedsPanel';
 
 export const ExplorePage: React.FC = () => {
   const { activeRun, startTestDrive, isLoading } = useTestDriveContext();
@@ -129,7 +130,7 @@ export const ExplorePage: React.FC = () => {
               </div>
             </div>
             <Badge variant="outline" className="text-[10px] font-mono text-muted-foreground border-border/80 rounded-full">
-              Chromium Live
+              Live Sandbox
             </Badge>
           </CardHeader>
 
@@ -137,7 +138,7 @@ export const ExplorePage: React.FC = () => {
             {activeRun.screenshot ? (
               <img
                 src={`data:image/jpeg;base64,${activeRun.screenshot}`}
-                alt="Headless browser capture"
+                alt="Browser capture"
                 className="w-full h-auto max-h-[440px] object-contain rounded-xl border border-border/70 shadow-xs"
               />
             ) : (
@@ -243,7 +244,10 @@ export const ExplorePage: React.FC = () => {
         </div>
       </div>
 
-      {/* 3. Deep Explore Layer (State Machine, Intent Resolver & Catalog) */}
+      {/* 3. SEO, Readability & Feed Discovery Layer */}
+      <SeoReadabilityFeedsPanel run={activeRun} />
+
+      {/* 4. Deep Explore Layer (State Machine, Intent Resolver & Catalog) */}
       <div className="space-y-4 pt-1">
         <div className="flex items-center justify-between border-b border-border/80 pb-2">
           <div className="flex items-center gap-2">

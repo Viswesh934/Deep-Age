@@ -187,11 +187,6 @@ export const Sidebar: React.FC = () => {
           </span>
           <ArrowUpRight className="w-3 h-3 text-muted-foreground" />
         </Button>
-
-        <div className="px-2 text-[10px] text-muted-foreground flex items-center gap-1.5 font-mono">
-          <span className="inline-block size-1.5 rounded-full bg-[#5ae561]"></span>
-          Chrome WebMCP • Chromium Headless
-        </div>
       </div>
     </aside>
   );

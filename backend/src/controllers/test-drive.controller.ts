@@ -73,7 +73,8 @@ export class TestDriveController {
     run.status = 'running';
     await storeService.set(id, run);
 
-    const executedRun = await executeRealTestDrive(run);
+    const browserBinding = (c.env as any)?.MYBROWSER;
+    const executedRun = await executeRealTestDrive(run, { browserBinding });
     await storeService.set(id, executedRun);
 
     return c.json({ message: 'Real test drive executed successfully', run: executedRun });

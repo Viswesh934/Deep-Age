@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { AgentFriction, TestDriveRun } from '@deep-age/shared';
 import {
-  AlertTriangle,
   Check,
   Copy,
   Code2,
@@ -117,34 +116,27 @@ if (window.modelContext) {
   return (
     <div className="flex flex-col gap-5 font-sans animate-fade-in">
       {/* Triage Header Summary */}
-      <div className="flex flex-wrap items-center justify-between gap-3 bg-muted/40 p-4 md:p-5 rounded-2xl border border-border/80 shadow-2xs backdrop-blur-md">
-        <div className="flex items-center gap-3.5">
-          <div className={`p-3 rounded-xl ${run.frictions.length > 0 ? 'bg-amber-500/10 text-amber-600 dark:text-amber-400 border border-amber-500/20 shadow-glow-amber' : 'bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 border border-emerald-500/20 shadow-glow-emerald'}`}>
-            {run.frictions.length > 0 ? <AlertTriangle className="w-5 h-5" /> : <CheckCircle2 className="w-5 h-5" />}
-          </div>
-          <div>
-            <h3 className="text-sm font-extrabold text-foreground font-tech tracking-tight">
-              {run.frictions.length > 0
-                ? `${run.frictions.length} Agent Friction Point${run.frictions.length > 1 ? 's' : ''} Diagnosed`
-                : 'Zero Friction Points Diagnosed'}
-            </h3>
-            <p className="text-xs text-muted-foreground mt-0.5 font-sans">
-              {run.frictions.length > 0
-                ? 'Heuristic discovery detected missing WebMCP tools between your backend APIs, DOM elements, and agent expectations.'
-                : 'Target website is fully structured with complete WebMCP schemas for autonomous agent execution.'}
-            </p>
-          </div>
+      <div className="flex flex-wrap items-center justify-between gap-3 p-4 bg-muted/20 border border-border/60 rounded-2xl text-left">
+        <div>
+          <h3 className="text-sm font-semibold text-foreground text-left">
+            Agent Friction Triage
+          </h3>
+          <p className="text-xs text-muted-foreground mt-0.5 font-sans text-left">
+            {run.frictions.length > 0
+              ? `${run.frictions.length} capability gaps and interaction obstacles diagnosed`
+              : 'Zero agent friction points diagnosed on target website'}
+          </p>
         </div>
 
         {/* Severity Filter Pills */}
-        <div className="flex items-center gap-1 bg-background/90 p-1.5 rounded-full border border-border/80 text-xs shadow-inner">
+        <div className="flex items-center gap-1 bg-background p-1 rounded-xl border border-border/70 text-xs font-mono">
           <button
             type="button"
             onClick={() => setSeverityFilter('all')}
-            className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
+            className={`px-3 py-1 rounded-lg text-xs transition-all cursor-pointer ${
               severityFilter === 'all'
-                ? 'bg-[#ff8527] text-white shadow-xs font-bold'
-                : 'text-muted-foreground hover:text-foreground hover:bg-secondary/60'
+                ? 'bg-[#ff8527] text-white font-bold shadow-xs'
+                : 'text-muted-foreground hover:text-foreground'
             }`}
           >
             All ({run.frictions.length})
@@ -152,10 +144,10 @@ if (window.modelContext) {
           <button
             type="button"
             onClick={() => setSeverityFilter('high')}
-            className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
+            className={`px-3 py-1 rounded-lg text-xs transition-all cursor-pointer ${
               severityFilter === 'high'
-                ? 'bg-[#ff8527] text-white shadow-xs font-bold'
-                : 'text-muted-foreground hover:text-foreground hover:bg-secondary/60'
+                ? 'bg-[#ff8527] text-white font-bold shadow-xs'
+                : 'text-muted-foreground hover:text-foreground'
             }`}
           >
             High ({run.frictions.filter((f) => f.severity === 'high').length})
@@ -163,10 +155,10 @@ if (window.modelContext) {
           <button
             type="button"
             onClick={() => setSeverityFilter('medium')}
-            className={`px-3.5 py-1.5 rounded-full text-xs font-semibold transition-all cursor-pointer ${
+            className={`px-3 py-1 rounded-lg text-xs transition-all cursor-pointer ${
               severityFilter === 'medium'
-                ? 'bg-[#ff8527] text-white shadow-xs font-bold'
-                : 'text-muted-foreground hover:text-foreground hover:bg-secondary/60'
+                ? 'bg-[#ff8527] text-white font-bold shadow-xs'
+                : 'text-muted-foreground hover:text-foreground'
             }`}
           >
             Medium ({run.frictions.filter((f) => f.severity === 'medium').length})

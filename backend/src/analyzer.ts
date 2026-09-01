@@ -19,9 +19,9 @@ export function analyzeTestDrive(run: TestDriveRun): {
   const taskLower = run.task.toLowerCase();
 
   // 1. Friction Detection: Missing Capabilities
-  const wantsCart = taskLower.includes('cart') || taskLower.includes('buy') || taskLower.includes('add');
-  const hasCartTool = toolNames.some((name) =>
-    name.includes('cart') || name.includes('add_item') || name.includes('checkout')
+  const wantsAdd = (taskLower.includes('add') && taskLower.includes('cart')) || taskLower.includes('add to cart');
+  const hasAddToCartTool = toolNames.some((name) =>
+    name === 'add_to_cart' || name === 'add_item' || name === 'add_product' || name === 'add_to_bag'
   );
   const hasCartApi = run.network.some((n) =>
     n.url.toLowerCase().includes('/cart') || n.url.toLowerCase().includes('/api/cart')
@@ -30,7 +30,7 @@ export function analyzeTestDrive(run: TestDriveRun): {
     d.selector.toLowerCase().includes('cart') || (d.text && d.text.toLowerCase().includes('add to cart'))
   );
 
-  if (wantsCart && !hasCartTool && (hasCartApi || hasCartDom || true)) {
+  if (wantsAdd && !hasAddToCartTool) {
     frictions.push({
       id: `fric-${Date.now()}-1`,
       type: 'missing_capability',
