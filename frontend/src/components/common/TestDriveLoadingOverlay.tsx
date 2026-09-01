@@ -32,7 +32,6 @@ const PHASES = [
 export const TestDriveLoadingOverlay: React.FC<TestDriveLoadingOverlayProps> = ({
   isLoading,
   targetUrl,
-  targetTask,
 }) => {
   const [phaseIndex, setPhaseIndex] = useState<number>(0);
   const [elapsedSeconds, setElapsedSeconds] = useState<number>(0);
@@ -148,16 +147,33 @@ export const TestDriveLoadingOverlay: React.FC<TestDriveLoadingOverlayProps> = (
 
       {/* MAIN RAIN CASCADE SCULPTURE */}
       <div className="relative z-10 flex flex-col items-center">
-        {/* Top Status Capsule */}
-        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-secondary/80 border border-border/80 text-[11px] font-mono text-muted-foreground backdrop-blur-md shadow-sm mb-8">
-          <span className="w-2 h-2 rounded-full bg-[#ff8527] animate-pulse" />
-          <span className="tracking-wider uppercase font-semibold text-foreground">Autonomous Runtime Engine</span>
-          <span className="text-muted-foreground/40">•</span>
-          <span className="text-[#ff8527] font-bold">{elapsedSeconds}s</span>
+        {/* Deep Age Brand & Motto Header */}
+        <div className="flex flex-col items-center text-center space-y-2 mb-7">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-xl bg-primary text-primary-foreground flex items-center justify-center font-bold text-xs shadow-md">
+              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4">
+                <rect x="2" y="3" width="4" height="18" rx="1"></rect>
+                <rect x="8" y="8" width="4" height="13" rx="1"></rect>
+                <rect x="14" y="13" width="4" height="8" rx="1"></rect>
+                <rect x="20" y="3" width="4" height="18" rx="1"></rect>
+              </svg>
+            </div>
+            <span className="text-base font-bold text-foreground tracking-tight">
+              Deep Age
+            </span>
+            <span className="text-xs font-mono text-muted-foreground/60">•</span>
+            <span className="text-xs font-mono font-semibold text-[#ff8527] bg-[#ff8527]/10 border border-[#ff8527]/20 px-2 py-0.5 rounded-full">
+              {elapsedSeconds}s
+            </span>
+          </div>
+
+          <p className="text-xs text-muted-foreground font-medium max-w-xs leading-relaxed">
+            Test-drive any website with autonomous AI agents.
+          </p>
         </div>
 
         {/* 4-TIER RAIN CASCADE TRACK */}
-        <div className="relative flex flex-col items-center h-48 justify-between my-2">
+        <div className="relative flex flex-col items-center h-44 justify-between my-1">
           {/* Central Vertical Falling Stream Glass Column */}
           <div className="absolute top-2 bottom-2 w-1 rounded-full bg-gradient-to-b from-[#ff8527]/20 via-[#f3c83d]/30 to-[#5ae561]/20 overflow-hidden">
             {/* Cascading Falling Beads */}
@@ -204,31 +220,24 @@ export const TestDriveLoadingOverlay: React.FC<TestDriveLoadingOverlayProps> = (
           })}
         </div>
 
-        {/* CRISP TYPOGRAPHY & HINTS */}
-        <div className="text-center space-y-2 max-w-sm mt-8">
-          <div className="inline-block px-2.5 py-0.5 rounded-full bg-[#ff8527]/10 border border-[#ff8527]/25 text-[10px] font-mono font-bold tracking-widest text-[#ff8527] uppercase mb-1">
+        {/* CRISP TYPOGRAPHY & CURRENT PHASE */}
+        <div className="text-center space-y-1.5 max-w-sm mt-7">
+          <div className="inline-block px-2.5 py-0.5 rounded-full bg-[#ff8527]/10 border border-[#ff8527]/25 text-[10px] font-mono font-bold tracking-widest text-[#ff8527] uppercase">
             {currentPhase.step}
           </div>
-          <h2 className="text-lg md:text-xl font-bold text-foreground tracking-tight animate-fade-in transition-all">
+          <h2 className="text-base sm:text-lg font-bold text-foreground tracking-tight animate-fade-in transition-all">
             {currentPhase.title}
           </h2>
           <p className="text-xs text-muted-foreground font-normal leading-relaxed">
             {currentPhase.hint}
           </p>
 
-          {/* Target URL & Task Pill */}
-          {(targetUrl || targetTask) && (
-            <div className="pt-2 flex flex-col items-center gap-1">
-              {targetUrl && (
-                <span className="inline-block max-w-[280px] truncate text-[11px] font-mono px-3 py-1 rounded-full bg-secondary/70 border border-border/70 text-foreground font-medium">
-                  📍 {targetUrl}
-                </span>
-              )}
-              {targetTask && (
-                <span className="inline-block max-w-[320px] truncate text-[10px] font-sans px-3 py-0.5 text-muted-foreground">
-                  🎯 {targetTask}
-                </span>
-              )}
+          {/* Target URL Pill */}
+          {targetUrl && (
+            <div className="pt-2">
+              <span className="inline-block max-w-[280px] truncate text-[11px] font-mono px-3 py-1 rounded-full bg-secondary/70 border border-border/70 text-foreground font-medium">
+                📍 {targetUrl}
+              </span>
             </div>
           )}
         </div>
