@@ -20,9 +20,9 @@ export class AnalyzerService {
     const taskLower = run.task.toLowerCase();
 
     // 1. Friction Detection: Missing Cart / Action Capabilities
-    const wantsCart = taskLower.includes('cart') || taskLower.includes('buy') || taskLower.includes('add');
-    const hasCartTool = toolNames.some((name) =>
-      name.includes('cart') || name.includes('add_item') || name.includes('checkout')
+    const wantsAdd = (taskLower.includes('add') && taskLower.includes('cart')) || taskLower.includes('add to cart');
+    const hasAddToCartTool = toolNames.some((name) =>
+      name === 'add_to_cart' || name === 'add_item' || name === 'add_product' || name === 'add_to_bag'
     );
     const hasCartApi = run.network.some((n) =>
       n.url.toLowerCase().includes('/cart') || n.url.toLowerCase().includes('/api/cart')
@@ -31,7 +31,7 @@ export class AnalyzerService {
       d.selector.toLowerCase().includes('cart') || (d.text && d.text.toLowerCase().includes('add to cart'))
     );
 
-    if (wantsCart && !hasCartTool && (hasCartApi || hasCartDom || true)) {
+    if (wantsAdd && !hasAddToCartTool) {
       frictions.push({
         id: `fric-${Date.now()}-1`,
         type: 'missing_capability',
@@ -73,7 +73,7 @@ document.modelContext.registerTool({
     }
 
     // 2. Friction Detection: Generic Zero WebMCP Tools for external sites
-    if (run.tools.length === 0 && !wantsCart) {
+    if (run.tools.length === 0 && !wantsAdd) {
       let hostname = 'target';
       try {
         hostname = new URL(run.url).hostname;

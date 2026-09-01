@@ -1,33 +1,54 @@
 # Deep Age
 
 > **Test-drive any website as an AI agent.**
-> Observability, Friction Diagnostics, and WebMCP Inspection Layer for Web Agents.
+> Observability, Friction Diagnostics, and WebMCP Inspection Layer for Autonomous Web Agents.
+
+[![Deep-Age WebMCP Ready](https://img.shields.io/badge/Deep_Age-Agent_Ready_(100%25)-emerald?style=flat-square&logo=googlechrome)](https://github.com/Viswesh934/Deep-Age)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![TypeScript](https://img.shields.io/badge/TypeScript-5.4-blue?logo=typescript)](https://www.typescriptlang.org/)
+[![Model Context Protocol](https://img.shields.io/badge/MCP-2024--11--05-orange)](https://modelcontextprotocol.io/)
 
 ---
 
 ## 🌟 What is Deep Age?
 
-The goal is **not** to build another browser or another chatbot.
+The goal is **not** to build another browser or another chatbot.  
 The goal is: **Understand what actually happens when an AI agent tries to use a website.**
 
 When an AI agent interacts with a web page, things frequently break in subtle ways:
-- The website has an API (e.g. `POST /api/cart`) and a DOM button, but **never registered a WebMCP tool** for agents to programmatically add items to cart.
-- Input schemas might be ambiguous or invalid.
-- Critical actions fail silently or leak private data across third-party trackers.
+- The website has an API (e.g. `POST /api/cart`) and a DOM button, but **never registered a WebMCP tool** (`document.modelContext.registerTool`) for agents to programmatically complete actions.
+- Input schemas are missing, ambiguous, or fail validation.
+- Critical actions fail silently, throw invisible runtime exceptions, or leak private data across third-party trackers.
+- UI elements lack stable semantic element references (`ref: e1`, `ref: e17`) needed for reliable agent action planning.
 
 **Deep Age** sits between the agent and the target website, capturing multi-modal evidence across:
-- **WebMCP capabilities & schemas** (`window.modelContext` / `document.modelContext`)
-- **Tool calls, inputs, outputs, and errors**
-- **Network requests, responses, status codes, and latency**
-- **DOM elements, visible controls, and interactions**
-- **Console & runtime errors**
-- **Agent friction points & security observations**
+- **WebMCP Capabilities & Schemas** (`window.modelContext` / `document.modelContext`)
+- **5-Layer Browser State Machine** (Page, UI State, Semantic Tree, Interaction State with Element Refs, Environment)
+- **DOM Component Tree & Interactive Controls**
+- **Autonomous Tool Execution & Intent Resolution**
+- **Network Requests, Status Codes, and Latency**
+- **Friction Diagnostics & Instant Drop-in Remediation Patches**
+- **Security Signals, Bot Defense Triggers, and Honeypot Telemetry**
+
+---
+
+## 📸 Interface Preview
+
+<div align="center">
+  <img src="docs/assets/01-landing-hero.png" alt="Deep Age Landing & Agent Bench" width="850" />
+  <p><em>Deep Age Interactive Agent Test-Drive Bench & MCP Gateway</em></p>
+</div>
+
+<div align="center">
+  <img src="docs/assets/02-browser-state-scrubber.png" alt="5-Layer Browser State Scrubber" width="850" />
+  <p><em>5-Layer Browser State Scrubber & Actionable Element Refs (e1–e39)</em></p>
+</div>
 
 ---
 
 ## 🎭 Three User Modes
 
-Deep Age provides three distinct views over the same underlying evidence:
+Deep Age provides three distinct views over the same underlying execution evidence:
 
 ```
                           ┌──────────────────────────┐
@@ -47,33 +68,99 @@ Deep Age provides three distinct views over the same underlying evidence:
    └───────────────────┘      └───────────────────┘      └───────────────────┘
 ```
 
-1. **Explore (Normal User)**:
+1. **Explore (Plain English)**:
    * *“Why did checkout fail?”* / *“Where did this price come from?”*
-   * Delivers a plain-English explanation first, with optional drill-downs.
+   * Delivers a plain-English explanation with execution milestones, metadata feeds, and readability analysis.
 2. **Debug (Product Owner / Developer)**:
    * *“Why couldn't the agent add the laptop to the cart?”*
-   * Pinpoints exact technical evidence: `POST /api/cart` exists, but no `add_to_cart` WebMCP tool was discovered.
-   * Delivers concrete recommendations: `document.modelContext.registerTool({ name: "add_to_cart", ... })`.
-3. **Inspect (Security User)**:
-   * *“What information does this website send externally?”*
-   * Reports factual observations: 3rd-party domains contacted, redirects, unencrypted HTTP transmissions, and payload data flows.
+   * Pinpoints exact evidence: `POST /api/cart` exists, but no `add_to_cart` WebMCP tool was registered.
+   * Delivers instant copyable patches: `document.modelContext.registerTool({ name: "add_to_cart", ... })`.
+3. **Inspect (Security & Telemetry)**:
+   * *“What external endpoints and third-party trackers are contacted during agent execution?”*
+   * Reports factual observations: 3rd-party domains contacted, redirects, unencrypted transmissions, and prompt injection honeypot defenses.
 
 ---
 
-## 🏗️ Architecture
+## 🧠 5-Layer Browser State Machine
 
-```mermaid
-graph TD
-    A[React + Vite Frontend\nHosted on Vercel] <-->|REST / SSE| B[Hono API Backend\nCloudflare Workers / Node]
-    B <--> C[Run Store & Metadata\nIn-Memory / Workers KV]
-    B <--> D[Friction & Evidence Analyzer]
-    E[Browser / WebMCP Target Site] <-->|Discovery & Event Capture| B
+Deep Age moves beyond raw HTML dumps into an **AI-optimized 5-layer browser state model**:
+
+```json
+{
+  "page": {
+    "url": "http://127.0.0.1:3002",
+    "title": "ElectroVault Storefront",
+    "viewport": { "width": 1440, "height": 900 }
+  },
+  "uiState": {
+    "scroll": { "x": 0, "y": 0 },
+    "focusedRef": "e13",
+    "dialogs": [],
+    "loading": false
+  },
+  "semanticTree": [
+    { "ref": "e1", "role": "banner", "name": "Header Navigation", "visible": true },
+    { "ref": "e2", "role": "main", "name": "Product Grid", "visible": true }
+  ],
+  "interactionState": [
+    {
+      "ref": "e13",
+      "role": "button",
+      "name": "Add to Cart",
+      "visible": true,
+      "enabled": true,
+      "actions": ["click"]
+    }
+  ],
+  "environment": {
+    "online": true,
+    "discoveredTools": ["search_products", "filter_products", "view_cart"]
+  }
+}
 ```
 
-- **Headless Browser Execution Engine (`backend/src/engine/agent-runner.ts`)**: Uses real Chromium instances (via Puppeteer) to navigate live target URLs, intercept actual network traffic, inspect live DOM controls, and discover/execute tools registered in `window.modelContext` / `document.modelContext`.
-- **Frontend (`frontend/`)**: React 18, Vite, Tailwind CSS, Lucide icons. Provides interactive start screen and detailed real-time evidence viewer.
-- **Backend (`backend/`)**: Hono API framework. Manages test-drive lifecycle, real browser orchestration, and heuristic friction analysis.
-- **Target Demo Store (`demo/`)**: Controlled real e-commerce store with live WebMCP tools and interactive friction toggle.
+---
+
+## 🔌 Model Context Protocol (MCP) Integration
+
+Deep Age exposes a compliant MCP server (protocol version `2024-11-05`), allowing Cursor, Claude Desktop, Antigravity, and autonomous agents to test-drive websites directly.
+
+### Connecting to Coding Agents
+
+Add Deep Age to your agent configuration:
+
+#### Cursor / Windsurf (`~/.cursor/mcp.json`):
+```json
+{
+  "mcpServers": {
+    "deep-age": {
+      "url": "http://127.0.0.1:3001/mcp",
+      "type": "sse",
+      "description": "Deep Age AI Agent Observability & WebMCP Diagnostics Engine"
+    }
+  }
+}
+```
+
+#### Claude Desktop (`claude_desktop_config.json`):
+```json
+{
+  "mcpServers": {
+    "deep-age": {
+      "command": "npx",
+      "args": ["-y", "@deep-age/mcp-server", "--endpoint", "http://127.0.0.1:3001/mcp"]
+    }
+  }
+}
+```
+
+### Available MCP Tools
+
+| MCP Tool | Description |
+| :--- | :--- |
+| `deep_age_test_drive` | Autonomously test-drives any target URL, discovers WebMCP tools, captures 5-layer state dump, and diagnoses friction. |
+| `deep_age_get_run` | Fetches complete execution evidence, DOM trees, network waterfall, and remediation patches for a run ID. |
+| `deep_age_inspect_webmcp` | Discovers registered WebMCP tools and JSON schemas from `window.modelContext` or `document.modelContext`. |
 
 ---
 
@@ -93,81 +180,39 @@ npm install
 npm run build
 ```
 
-### 3. Run Real Live Browser Verification Test (Zero Mock Data)
+### 3. Run Live Verification Tests
 ```bash
 npm test
 ```
 
-This performs a 100% live test:
-1. Boots the real e-commerce store HTTP server.
-2. Launches headless Chromium to visit the live store.
-3. Live DOM inspection discovers registered WebMCP tools (`search_products`, `filter_products`, `get_product_details`).
-4. Intercepts live network requests and detects that `add_to_cart` WebMCP tool is missing despite `POST /api/cart` existing.
-5. Flags real agent friction and generates fix recommendations.
-6. Toggles the live site to expose `add_to_cart` and re-runs the real browser test.
-7. Discovers `add_to_cart`, executes the live tool inside the page context, executes `POST /api/cart`, and confirms task completion with 0 friction!
-
----
-
-## 💻 Running the Services Locally
-
-You can launch each service in separate terminals:
-
-### Start Backend API (Port 3001)
+### 4. Start the Application
 ```bash
-npm run dev:backend
-```
+# Start Backend API & MCP Server (Port 3001)
+npm run dev --workspace=@deep-age/backend
 
-### Start Frontend UI (Port 5173)
-```bash
-npm run dev:frontend
-```
+# Start Target Demo Store (Port 3002)
+npm run dev --workspace=@deep-age/demo
 
-### Start Demo E-Commerce Target (Port 3002)
-```bash
-npm run dev:demo
-```
-
-Open [http://localhost:5173](http://localhost:5173) in your browser to launch Deep Age!
-
----
-
-## 📂 Project Structure
-
-```
-Deep-dream/
-├── shared/                 # Shared TypeScript interfaces & models
-│   └── src/index.ts        # WebMCP, Run, Friction, & Security types
-├── backend/                # Hono API & Analysis Engine
-│   ├── src/app.ts          # REST endpoints (runs, events, simulation)
-│   ├── src/analyzer.ts     # Multi-mode evidence analyzer & friction heuristics
-│   ├── src/store.ts        # In-memory / Cloudflare KV run store
-│   └── src/test-agent-sim.ts # Verification test suite
-├── frontend/               # React + Vite + Tailwind UI
-│   ├── src/App.tsx         # Start screen & multi-mode result explorer
-│   └── src/main.tsx
-├── demo/                   # Controlled WebMCP target store
-│   └── src/index.ts        # Mock store with WebMCP registration & toggle
-└── docs/                   # Architecture & specifications
+# Start Frontend Workbench (Port 5173)
+npm run dev --workspace=@deep-age/frontend
 ```
 
 ---
 
-## 🗺️ Project Roadmap
+## 📁 Repository Structure
 
-- **[Detailed Roadmap & Architecture (Phase 1 & Phase 2)](docs/roadmap.md)**
-- **Phase 1 (Completed)**: WebMCP Exploration State Graphs, AI Intent Pathfinder via OpenRouter, Portable SQLite Exporter, Enterprise 4-Tier Security Matrix, PII Redactor, Indirect Injection Shield, WebAuthn Passkey Hardware Signer, Audit Ledger & Saga Manager.
-- **Phase 2 (In Progress)**: Interactive Demo Store Modernization (`demo/`) with 5-State Journey, Dynamic In-Browser Runtime, Floating Friction & Attack HUD, Review Injection Honeypots, and Portable Manifests.
+```
+Deep-Age/
+├── backend/          # Hono API, Agent Engine, MCP Server, Friction Analyzer
+├── frontend/         # React 18, Vite, Tailwind CSS, Developer Workbench
+├── shared/           # Universal TypeScript types and schemas
+├── demo/             # Controlled reference e-commerce storefront
+├── docs/             # Architecture documentation and screenshot assets
+└── package.json      # Monorepo workspace configuration
+```
 
 ---
 
-## 📋 Platform Deliverables Summary
+## 📄 License
 
-- [x] **Monorepo Architecture**: Clean TypeScript monorepo with `shared`, `backend`, `frontend`, and `demo`.
-- [x] **WebMCP Contract & Simulator**: Ingests tool registrations, execution traces, DOM elements, and network events.
-- [x] **Friction Analysis Engine**: Detects missing WebMCP capabilities, tool failures, network issues, and security signals.
-- [x] **Multi-Mode UI**: Unified interface supporting **Explore**, **Debug**, and **Inspect** modes.
-- [x] **Enterprise Security Guardrails**: PII Firewall, Prompt Injection Shield, Biometric Passkeys, Audit Ledger.
-- [x] **AI Intent Planning & Exploration**: FSM state synthesis and OpenRouter-powered one-shot plan generation.
-- [x] **Controlled Demo Site**: Realistic e-commerce store with WebMCP tools and interactive friction toggle.
-- [x] **Automated Verification**: End-to-end test script proving tool discovery, friction detection, and fix verification.
+MIT License. Built for the autonomous web agent ecosystem.

@@ -1,7 +1,30 @@
 import puppeteer, { Browser } from 'puppeteer';
 import { config } from '../config/env.js';
 
-export async function launchBrowser(): Promise<Browser> {
+export interface LaunchBrowserOptions {
+  browserBinding?: any; // Cloudflare Worker env.MYBROWSER binding
+  wsEndpoint?: string;
+}
+
+export async function launchBrowser(options?: LaunchBrowserOptions): Promise<Browser | any> {
+  // 1. Cloudflare Browser Rendering binding (for Cloudflare Workers runtime)
+  const cfBinding = options?.browserBinding || (typeof globalThis !== 'undefined' && (globalThis as any).MYBROWSER);
+  if (cfBinding) {
+    try {
+      const cfPuppeteer = await import('@cloudflare/puppeteer');
+      return await cfPuppeteer.default.launch(cfBinding);
+    } catch (err) {
+      console.warn('[BrowserLauncher] Cloudflare browser binding launch failed, falling back:', err);
+    }
+  }
+
+  // 2. Remote WebSocket endpoint (e.g. Browserless, remote Cloudflare browser endpoint)
+  const wsEndpoint = options?.wsEndpoint || process.env.BROWSER_WS_ENDPOINT;
+  if (wsEndpoint) {
+    return await puppeteer.connect({ browserWSEndpoint: wsEndpoint });
+  }
+
+  // 3. Local Node / Docker Chromium fallback
   return await puppeteer.launch({
     headless: config.browser.headless,
     args: [
@@ -12,3 +35,4 @@ export async function launchBrowser(): Promise<Browser> {
     ],
   });
 }
+

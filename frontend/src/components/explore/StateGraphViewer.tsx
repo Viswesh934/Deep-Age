@@ -1,6 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { StateTransitionGraph } from '@deep-age/shared';
-import { Network, ArrowRight, Lock, CheckCircle2 } from 'lucide-react';
+import { ArrowRight, Lock, CheckCircle2 } from 'lucide-react';
 import { Badge } from '../ui/badge';
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/card';
 
@@ -9,9 +9,21 @@ interface StateGraphViewerProps {
 }
 
 export const StateGraphViewer: React.FC<StateGraphViewerProps> = ({ graph }) => {
-  const [selectedState, setSelectedState] = useState<string>('ANONYMOUS_BROWSING');
+  const initialKey = graph?.initialState || (graph?.states ? Object.keys(graph.states)[0] : 'ANONYMOUS_BROWSING');
+  const [selectedState, setSelectedState] = useState<string>(initialKey);
 
-  if (!graph || !graph.states) {
+  useEffect(() => {
+    if (graph?.states) {
+      const keys = Object.keys(graph.states);
+      if (graph.initialState && graph.states[graph.initialState]) {
+        setSelectedState(graph.initialState);
+      } else if (keys.length > 0 && !graph.states[selectedState]) {
+        setSelectedState(keys[0]);
+      }
+    }
+  }, [graph]);
+
+  if (!graph || !graph.states || Object.keys(graph.states).length === 0) {
     return (
       <Card className="bg-card border-border/80 text-muted-foreground p-6 text-center rounded-2xl text-xs">
         No state transition graph generated for this site.
@@ -24,11 +36,13 @@ export const StateGraphViewer: React.FC<StateGraphViewerProps> = ({ graph }) => 
   return (
     <div className="space-y-3 font-sans text-xs">
       <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <Network className="w-4 h-4 text-[#ff8527]" />
-          <h3 className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
-            Site State-Transition Radar
+        <div>
+          <h3 className="text-sm font-semibold text-foreground">
+            State Transition Graph
           </h3>
+          <p className="text-xs text-muted-foreground font-sans mt-0.5">
+            Finite-state transition model mapping site capabilities and guards
+          </p>
         </div>
         <Badge variant="outline" className="text-[10px] font-mono border-border/80 text-muted-foreground rounded-full">
           FSM v{graph.version || '2.0'}

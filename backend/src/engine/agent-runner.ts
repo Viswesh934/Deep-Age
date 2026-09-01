@@ -7,15 +7,49 @@ import {
   WebMCPTool,
 } from '@deep-age/shared';
 import { config } from '../config/env.js';
-import { launchBrowser } from './browser.js';
+import { launchBrowser, LaunchBrowserOptions } from './browser.js';
 import { NetworkInterceptor } from './network-interceptor.js';
 import { DOMInspector } from './dom-inspector.js';
 import { WebMCPInspector } from './webmcp-inspector.js';
 import { analyzerService } from '../services/analyzer.service.js';
 import { resolveUserIntent } from './explore/intent-resolver.js';
 import { buildSiteStateGraph } from './explore/state-graph.js';
+import { extractLiveSiteStructure } from './explore/site-crawler.js';
+import { AgentStateDumper } from './agent-state-dumper.js';
+import { auditUIVibe } from './ui-vibe-auditor.js';
+import { auditBotProtectionAndHeaders } from './security/security-hygiene-auditor.js';
+import { auditSeoReadabilityAndFeeds } from './explore/seo-readability-auditor.js';
 
-export async function executeRealTestDrive(run: TestDriveRun): Promise<TestDriveRun> {
+function humanizeToolName(name: string): string {
+  return name
+    .replace(/_/g, ' ')
+    .replace(/([a-z])([A-Z])/g, '$1 $2')
+    .replace(/\b\w/g, (c) => c.toUpperCase());
+}
+
+function summarizeToolOutput(toolName: string, output: any): string {
+  if (!output) return 'Completed step with no output data.';
+  if (typeof output === 'string') return output;
+  if (output.message) return output.message;
+  if (output.error) return `Error: ${output.error}`;
+  if (Array.isArray(output.products)) {
+    const pNames = output.products.slice(0, 2).map((p: any) => p.name || p.title || p.id).join(', ');
+    return `Found ${output.products.length} product(s)${pNames ? `: ${pNames}` : ''}`;
+  }
+  if (output.product) {
+    return `Loaded specifications for "${output.product.name || output.product.title || output.product.id}"`;
+  }
+  if (output.cart) {
+    return `Cart updated: ${output.cart.count || 0} item(s), total: ₹${(output.cart.finalTotal || output.cart.subtotal || 0).toLocaleString()}`;
+  }
+  if (Array.isArray(output)) {
+    return `Retrieved list with ${output.length} item(s)`;
+  }
+  const keys = Object.keys(output).slice(0, 4).join(', ');
+  return `Retrieved response payload with properties: ${keys}`;
+}
+
+export async function executeRealTestDrive(run: TestDriveRun, options?: LaunchBrowserOptions): Promise<TestDriveRun> {
   const startTime = Date.now();
   let browser: Browser | null = null;
   const capturedErrors: ErrorEvent[] = [];
@@ -26,14 +60,17 @@ export async function executeRealTestDrive(run: TestDriveRun): Promise<TestDrive
   timeline.push({
     id: 'step-spawn',
     phase: 'spawn',
-    label: 'SPAWN_CHROMIUM_SANDBOX',
-    detail: 'Launched isolated headless browser session with WebMCP capabilities',
+    label: 'Launch Headless Sandbox',
+    detail: 'Initialized isolated Chromium browser instance with Chrome WebMCP hooks',
     timestamp: Date.now(),
     status: 'info',
   });
 
   try {
-    browser = await launchBrowser();
+    browser = await launchBrowser(options);
+    if (!browser) {
+      throw new Error('Failed to instantiate browser instance.');
+    }
     const page: Page = await browser.newPage();
     await page.setViewport({ width: 1280, height: 800 });
 
@@ -152,32 +189,51 @@ export async function executeRealTestDrive(run: TestDriveRun): Promise<TestDrive
     timeline.push({
       id: 'step-nav',
       phase: 'navigation',
-      label: 'HTTP_PAGE_LOADED',
-      detail: `Successfully navigated to ${run.url} in ${navDuration}ms`,
+      label: 'Page Loaded Successfully',
+      detail: `Successfully navigated to ${run.url} and loaded DOM tree in ${navDuration}ms`,
       timestamp: Date.now(),
       durationMs: navDuration,
       status: 'success',
     });
 
-    // 5. Discover WebMCP tools & DOM controls
+    // 5. Discover WebMCP tools & DOM controls & Dynamic Site Structure
     const discStart = Date.now();
     const discoveredTools = await WebMCPInspector.discoverTools(page, run.url);
-    const domControls = await DOMInspector.inspect(page);
+    const domResult = await DOMInspector.inspect(page);
+    const domControls = domResult.controls;
+    const domTree = domResult.tree;
+    run.domTree = domTree;
+    const liveSiteData = await extractLiveSiteStructure(page, run.url);
     const discDuration = Date.now() - discStart;
+
+    run.extractedData = {
+      entities: liveSiteData.entities,
+      routes: liveSiteData.routes,
+      archetype: liveSiteData.archetype,
+    };
 
     timeline.push({
       id: 'step-disc',
       phase: 'discovery',
-      label: 'WEBMCP_TOOLS_DISCOVERED',
-      detail: `Identified ${discoveredTools.length} WebMCP tool(s) and ${domControls.length} DOM interactive control(s)`,
+      label: 'Discovered Tools & Elements',
+      detail: `Identified ${discoveredTools.length} WebMCP tool(s), ${domControls.length} interactive control(s), and ${liveSiteData.routes.length} navigation route(s)`,
       timestamp: Date.now(),
       durationMs: discDuration,
       status: discoveredTools.length > 0 ? 'success' : 'warning',
     });
 
+    // 5.1 Capture Initial 5-Layer Agent State Dump (STATE_001)
+    const stateDumps: any[] = [];
+    try {
+      const initialDump = await AgentStateDumper.captureStateDump(page, 1, 'Initial Page Loaded', discoveredTools);
+      stateDumps.push(initialDump);
+    } catch (dumpErr) {
+      console.warn('[StateDump Capture Error]:', dumpErr);
+    }
+
     // 6. Dynamic LLM Planning & Autonomous Tool Execution Loop
     const apiKey = run.openRouterApiKey || config.openRouterApiKey || process.env.OPENROUTER_API_KEY;
-    const stateGraph = buildSiteStateGraph(run.url, discoveredTools);
+    const stateGraph = buildSiteStateGraph(run.url, discoveredTools, liveSiteData);
     run.stateGraph = stateGraph;
 
     const intentResult = await resolveUserIntent(
@@ -193,14 +249,22 @@ export async function executeRealTestDrive(run: TestDriveRun): Promise<TestDrive
     timeline.push({
       id: 'step-reason-llm',
       phase: 'reasoning',
-      label: apiKey ? 'OPENROUTER_AI_PATHFINDER' : 'GRAPH_INTENT_PLANNER',
-      detail: intentResult.reasoning || `Synthesized ${intentResult.plan.length} action steps for goal "${run.task}"`,
+      label: 'AI Action Plan',
+      detail: intentResult.reasoning || `Synthesized ${intentResult.plan.length}-step action plan for goal: "${run.task}"`,
       timestamp: Date.now(),
       status: intentResult.feasible ? 'success' : 'warning',
     });
 
     let lastOutput: any = null;
+    const toolDiscoveredEntityIds: string[] = [];
     const discoveredProductIds: string[] = [];
+    if (liveSiteData.entities && liveSiteData.entities.length > 0) {
+      for (const ent of liveSiteData.entities) {
+        if (ent.id && !discoveredProductIds.includes(ent.id)) {
+          discoveredProductIds.push(ent.id);
+        }
+      }
+    }
 
     // Execute each resolved step inside live Chromium
     for (const step of intentResult.plan) {
@@ -212,6 +276,7 @@ export async function executeRealTestDrive(run: TestDriveRun): Promise<TestDrive
 
       if (matchingTool) {
         // Resolve dynamic parameter dependencies from previous steps
+        const preferredEntityId = toolDiscoveredEntityIds[0] || discoveredProductIds[0];
         const resolvedParams = { ...step.parameters };
         for (const [k, v] of Object.entries(resolvedParams)) {
           if (typeof v === 'string') {
@@ -224,8 +289,8 @@ export async function executeRealTestDrive(run: TestDriveRun): Promise<TestDrive
               vLower.includes('selected') ||
               vLower.includes('actual')
             ) {
-              if (k.toLowerCase().includes('product') || k.toLowerCase().includes('id')) {
-                resolvedParams[k] = discoveredProductIds[0] || 'lap-901';
+              if (k.toLowerCase().includes('product') || k.toLowerCase().includes('id') || k.toLowerCase().includes('item')) {
+                resolvedParams[k] = preferredEntityId || 'item-1';
               }
             }
           }
@@ -234,9 +299,10 @@ export async function executeRealTestDrive(run: TestDriveRun): Promise<TestDrive
         // Ensure cart & product parameters have valid entity identifiers
         if (matchingTool.name === 'add_to_cart' || matchingTool.name === 'add_item') {
           const targetId = resolvedParams.productId || resolvedParams.product_id;
-          const validId = targetId && typeof targetId === 'string' && targetId.startsWith('lap-')
-            ? targetId
-            : (discoveredProductIds[0] || 'lap-901');
+          const isKnownId = typeof targetId === 'string' && (toolDiscoveredEntityIds.includes(targetId) || discoveredProductIds.includes(targetId));
+          const validId = isKnownId
+            ? (targetId as string)
+            : (preferredEntityId || (typeof targetId === 'string' && targetId.startsWith('lap-') ? targetId : 'item-1'));
           resolvedParams.product_id = validId;
           resolvedParams.productId = validId;
           if (!resolvedParams.quantity) {
@@ -244,11 +310,12 @@ export async function executeRealTestDrive(run: TestDriveRun): Promise<TestDrive
           }
         }
 
-        if (matchingTool.name === 'get_product_details') {
+        if (matchingTool.name === 'get_product_details' || matchingTool.name === 'get_product_reviews') {
           const targetId = resolvedParams.productId || resolvedParams.product_id;
-          const validId = targetId && typeof targetId === 'string' && targetId.startsWith('lap-')
-            ? targetId
-            : (discoveredProductIds[0] || 'lap-901');
+          const isKnownId = typeof targetId === 'string' && (toolDiscoveredEntityIds.includes(targetId) || discoveredProductIds.includes(targetId));
+          const validId = isKnownId
+            ? (targetId as string)
+            : (preferredEntityId || (typeof targetId === 'string' && targetId.startsWith('lap-') ? targetId : 'item-1'));
           resolvedParams.product_id = validId;
           resolvedParams.productId = validId;
         }
@@ -256,8 +323,8 @@ export async function executeRealTestDrive(run: TestDriveRun): Promise<TestDrive
         timeline.push({
           id: `step-reason-${step.step}`,
           phase: 'reasoning',
-          label: `AGENT_INTENT_${matchingTool.name.toUpperCase()}`,
-          detail: `Dispatching [${step.safetyTier.toUpperCase()}] tool "${matchingTool.name}" with params ${JSON.stringify(resolvedParams)}`,
+          label: `Plan Step ${step.step}: ${humanizeToolName(matchingTool.name)}`,
+          detail: `${step.explanation || 'Dispatching WebMCP tool'} [${step.safetyTier.replace(/_/g, ' ').toUpperCase()}]`,
           timestamp: Date.now(),
           status: 'info',
         });
@@ -266,13 +333,18 @@ export async function executeRealTestDrive(run: TestDriveRun): Promise<TestDrive
         capturedToolCalls.push(call);
         lastOutput = call.output;
 
-        // Collect newly discovered product entity IDs from output
+        // Collect newly discovered entity IDs from actual tool execution output
         if (call.output && typeof call.output === 'object') {
           if (Array.isArray((call.output as any).products)) {
             for (const p of (call.output as any).products) {
-              if (p && p.id && !discoveredProductIds.includes(p.id)) {
-                discoveredProductIds.push(p.id);
+              if (p && p.id && !toolDiscoveredEntityIds.includes(p.id)) {
+                toolDiscoveredEntityIds.push(p.id);
               }
+            }
+          }
+          if ((call.output as any).product && (call.output as any).product.id) {
+            if (!toolDiscoveredEntityIds.includes((call.output as any).product.id)) {
+              toolDiscoveredEntityIds.push((call.output as any).product.id);
             }
           }
         }
@@ -280,22 +352,46 @@ export async function executeRealTestDrive(run: TestDriveRun): Promise<TestDrive
         timeline.push({
           id: `step-exec-${step.step}`,
           phase: 'execution',
-          label: `CALL_${matchingTool.name.toUpperCase()}`,
+          label: `Executed ${humanizeToolName(matchingTool.name)}`,
           detail: call.error
             ? `Execution error: ${call.error}`
-            : `Retrieved data in ${call.durationMs}ms: ${JSON.stringify(call.output || {})}`,
+            : `${summarizeToolOutput(matchingTool.name, call.output)} (${call.durationMs}ms)`,
           timestamp: Date.now(),
           durationMs: call.durationMs,
           status: call.error ? 'error' : 'success',
         });
-      } else {
+
+        // Capture State Dump Transition (STATE_00N)
+        try {
+          const prevDump = stateDumps[stateDumps.length - 1];
+          const nextDump = await AgentStateDumper.captureStateDump(
+            page,
+            stateDumps.length + 1,
+            `After ${humanizeToolName(matchingTool.name)}`,
+            discoveredTools,
+            prevDump
+          );
+          stateDumps.push(nextDump);
+        } catch (e) {
+          // state dump capture optional
+        }
+      } else if (step.toolName && step.toolName !== 'N/A' && step.toolName.toLowerCase() !== 'none') {
         timeline.push({
           id: `step-fric-${step.step}`,
           phase: 'diagnosis',
-          label: 'FRICTION_INTERCEPT',
-          detail: `Task required WebMCP tool "${step.toolName}" (${step.explanation}), but target site omitted document.modelContext.registerTool("${step.toolName}")`,
+          label: `Friction: Missing "${step.toolName}" Tool`,
+          detail: `Goal required tool "${step.toolName}" (${step.explanation}), but target website omitted document.modelContext.registerTool("${step.toolName}")`,
           timestamp: Date.now(),
           status: 'warning',
+        });
+      } else {
+        timeline.push({
+          id: `step-nav-${step.step}`,
+          phase: 'reasoning',
+          label: `Planning Step ${step.step}`,
+          detail: step.explanation || 'Navigating site state graph towards target state',
+          timestamp: Date.now(),
+          status: 'info',
         });
       }
     }
@@ -311,11 +407,43 @@ export async function executeRealTestDrive(run: TestDriveRun): Promise<TestDrive
       // screenshot optional
     }
 
-    // 7. Assign captured evidence to run
+    // 7. Perform Automated UI Vibe Check & Flaw Scan
+    try {
+      const uiVibeAudit = await auditUIVibe(page, domControls);
+      run.uiVibeAudit = uiVibeAudit;
+    } catch (e) {
+      console.warn('[UI Vibe Audit Error]:', e);
+    }
+
+    // 8. Perform Bot Protection & Exposed Header Audit
+    try {
+      const secAudits = await auditBotProtectionAndHeaders(page, networkInterceptor.getEvents());
+      run.botProtection = secAudits.botProtection;
+      run.headerSecurity = secAudits.headerSecurity;
+      if (secAudits.signals.length > 0) {
+        run.securitySignals.push(...secAudits.signals);
+      }
+    } catch (e) {
+      console.warn('[Bot/Header Security Audit Error]:', e);
+    }
+
+    // 9. Perform SEO, Readability, and Machine Feed Discovery Audit
+    try {
+      const expAudits = await auditSeoReadabilityAndFeeds(page);
+      run.seoAudit = expAudits.seoAudit;
+      run.readabilityAudit = expAudits.readabilityAudit;
+      run.feedDiscovery = expAudits.feedDiscovery;
+    } catch (e) {
+      console.warn('[SEO/Readability Audit Error]:', e);
+    }
+
+    // 10. Assign captured evidence to run
     run.tools = discoveredTools;
     run.toolCalls = capturedToolCalls;
     run.network = networkInterceptor.getEvents();
     run.domInteractions = domControls;
+    run.stateDumps = stateDumps;
+    run.latestStateDump = stateDumps[stateDumps.length - 1];
     run.errors = capturedErrors;
     run.screenshot = screenshot;
     run.timeline = timeline;

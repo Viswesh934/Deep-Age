@@ -22,10 +22,11 @@ import { FrictionTriagePanel } from '@/components/workbench/FrictionTriagePanel'
 import { WebMcpRepl } from '@/components/workbench/WebMcpRepl';
 import { NetworkWaterfall } from '@/components/workbench/NetworkWaterfall';
 import { ParallelWorldsMatrix } from '@/components/workbench/ParallelWorldsMatrix';
+import { UIVibeCheckPanel } from '@/components/workbench/UIVibeCheckPanel';
 
 import { generateHarFile } from '@/lib/har-export';
 
-type WorkbenchTab = 'frictions' | 'viewport' | 'repl' | 'parallel' | 'sandbox' | 'network';
+type WorkbenchTab = 'frictions' | 'viewport' | 'vibe' | 'repl' | 'parallel' | 'sandbox' | 'network';
 
 export const DebugPage: React.FC = () => {
   const { activeRun, startTestDrive, isLoading } = useTestDriveContext();
@@ -373,6 +374,9 @@ document.modelContext.registerTool({
           <TabsTrigger value="viewport" className="text-xs font-medium font-mono shrink-0 rounded-full h-8 px-3.5">
             <span>Browser Scrubber</span>
           </TabsTrigger>
+          <TabsTrigger value="vibe" className="text-xs font-medium font-mono shrink-0 rounded-full h-8 px-3.5">
+            <span>UI Vibe ({activeRun.uiVibeAudit?.vibeScore || 88}/100)</span>
+          </TabsTrigger>
           <TabsTrigger value="repl" className="text-xs font-medium font-mono shrink-0 rounded-full h-8 px-3.5">
             <span>WebMCP REPL ({activeRun.tools.length})</span>
           </TabsTrigger>
@@ -397,7 +401,12 @@ document.modelContext.registerTool({
           <BrowserViewportWithScrubber run={activeRun} />
         </TabsContent>
 
-        {/* TAB 3: WEBMCP REPL */}
+        {/* TAB 3: UI VIBE & POLISH AUDITOR */}
+        <TabsContent value="vibe" className="pt-2">
+          <UIVibeCheckPanel run={activeRun} />
+        </TabsContent>
+
+        {/* TAB 4: WEBMCP REPL */}
         <TabsContent value="repl" className="pt-2">
           <WebMcpRepl run={activeRun} />
         </TabsContent>
@@ -416,7 +425,7 @@ document.modelContext.registerTool({
                   Virtual WebMCP Tool Injection Sandbox
                 </CardTitle>
                 <CardDescription className="font-sans text-xs text-muted-foreground mt-0.5">
-                  Prototype and validate Chrome WebMCP tools on your target site without redeploying code.
+                  Prototype and validate WebMCP tools on your target site without redeploying code.
                 </CardDescription>
               </div>
 

@@ -91,8 +91,6 @@ tools = client.get_tools() # ['run_test_drive', 'inspect_url', 'generate_patch']
       <section className="text-center space-y-6 pt-4 md:pt-8">
         <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-secondary/80 border border-border/80 text-xs font-mono shadow-2xs">
           <span className="w-2 h-2 rounded-full bg-[#5ae561] animate-pulse"></span>
-          <span className="font-semibold text-foreground">Chrome WebMCP</span>
-          <span className="text-muted-foreground">•</span>
           <span className="text-muted-foreground">Universal Coding Agent Gateway</span>
         </div>
 
@@ -101,7 +99,7 @@ tools = client.get_tools() # ['run_test_drive', 'inspect_url', 'generate_patch']
             Test-Drive Any Website with <span className="text-primary underline decoration-border/80">AI Agents</span>.
           </h1>
           <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto font-normal leading-relaxed">
-            Run real headless Chromium test-drives to diagnose friction, generate Chrome WebMCP patches, and connect{' '}
+            Run autonomous browser test-drives to diagnose friction, generate WebMCP patches, and connect{' '}
             <strong className="text-foreground font-semibold">Cursor, Claude Desktop, & Antigravity</strong> directly to any web interface.
           </p>
         </div>
@@ -145,7 +143,7 @@ tools = client.get_tools() # ['run_test_drive', 'inspect_url', 'generate_patch']
         <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-border/60">
           <div>
             <h2 className="text-sm font-bold text-foreground">Interactive Browser Test-Drive Bench</h2>
-            <p className="text-[11px] text-muted-foreground font-mono">Real Headless Chromium • DOM Interception • WebMCP Evaluation</p>
+            <p className="text-[11px] text-muted-foreground font-mono">Autonomous Execution • DOM Interception • WebMCP Evaluation</p>
           </div>
 
           <div className="flex items-center gap-2">
@@ -260,7 +258,7 @@ tools = client.get_tools() # ['run_test_drive', 'inspect_url', 'generate_patch']
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-1">
             <div className="p-3 bg-secondary/30 rounded-2xl border border-border/60 text-xs">
               <span className="font-mono font-bold text-foreground block mb-0.5">run_test_drive</span>
-              <p className="text-muted-foreground text-[11px]">Launches headless Chromium on any target URL and returns live diagnostics.</p>
+              <p className="text-muted-foreground text-[11px]">Launches browser sandbox on any target URL and returns live diagnostics.</p>
             </div>
             <div className="p-3 bg-secondary/30 rounded-2xl border border-border/60 text-xs">
               <span className="font-mono font-bold text-foreground block mb-0.5">inspect_url</span>
@@ -268,7 +266,7 @@ tools = client.get_tools() # ['run_test_drive', 'inspect_url', 'generate_patch']
             </div>
             <div className="p-3 bg-secondary/30 rounded-2xl border border-border/60 text-xs">
               <span className="font-mono font-bold text-foreground block mb-0.5">generate_patch</span>
-              <p className="text-muted-foreground text-[11px]">Outputs drop-in Chrome WebMCP JavaScript fixes for diagnosed friction.</p>
+              <p className="text-muted-foreground text-[11px]">Outputs drop-in WebMCP JavaScript fixes for diagnosed friction.</p>
             </div>
           </div>
         </Card>
@@ -292,7 +290,7 @@ tools = client.get_tools() # ['run_test_drive', 'inspect_url', 'generate_patch']
             </div>
             <h3 className="text-sm font-bold text-foreground">Point & Simulate</h3>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              Enter any URL or staging environment. Deep Age launches an isolated headless Chromium sandbox with DOM and network interception.
+              Enter any URL or staging environment. Deep Age launches an isolated browser sandbox with DOM and network interception.
             </p>
           </Card>
 
