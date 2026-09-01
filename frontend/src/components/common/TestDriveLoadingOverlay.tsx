@@ -1,6 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import { Loader2, Sparkles, Globe, Bot, Cpu, CheckCircle2 } from 'lucide-react';
-import { Card } from '@/components/ui/card';
 
 interface TestDriveLoadingOverlayProps {
   isLoading: boolean;
@@ -8,11 +6,11 @@ interface TestDriveLoadingOverlayProps {
   targetTask?: string;
 }
 
-const STEPS = [
-  { label: 'Launching isolated Chromium browser...', icon: Globe },
-  { label: 'Intercepting network, DOM tree, and interactive elements...', icon: Cpu },
-  { label: 'Autonomous AI agent reasoning through task goals...', icon: Bot },
-  { label: 'OpenRouter AI generating friction diagnosis & audit...', icon: Sparkles },
+const PHASES = [
+  { title: 'Catching the first raindrops...', hint: 'Landing on the website and scanning the layout' },
+  { title: 'Trickling through interactive currents...', hint: 'Finding buttons, menus, and conversion paths' },
+  { title: 'Navigating the goal stream...', hint: 'Testing clicks, inputs, and autonomous workflows' },
+  { title: 'Distilling the final report...', hint: 'Synthesizing SEO, readability, and instant code fixes' },
 ];
 
 export const TestDriveLoadingOverlay: React.FC<TestDriveLoadingOverlayProps> = ({
@@ -20,12 +18,12 @@ export const TestDriveLoadingOverlay: React.FC<TestDriveLoadingOverlayProps> = (
   targetUrl,
   targetTask,
 }) => {
-  const [currentStepIndex, setCurrentStepIndex] = useState<number>(0);
+  const [phaseIndex, setPhaseIndex] = useState<number>(0);
   const [elapsedSeconds, setElapsedSeconds] = useState<number>(0);
 
   useEffect(() => {
     if (!isLoading) {
-      setCurrentStepIndex(0);
+      setPhaseIndex(0);
       setElapsedSeconds(0);
       return;
     }
@@ -34,92 +32,188 @@ export const TestDriveLoadingOverlay: React.FC<TestDriveLoadingOverlayProps> = (
       setElapsedSeconds((prev) => prev + 1);
     }, 1000);
 
-    const stepInterval = setInterval(() => {
-      setCurrentStepIndex((prev) => (prev < STEPS.length - 1 ? prev + 1 : prev));
-    }, 2500);
+    const phaseTimer = setInterval(() => {
+      setPhaseIndex((prev) => (prev < PHASES.length - 1 ? prev + 1 : 0));
+    }, 2800);
 
     return () => {
       clearInterval(timer);
-      clearInterval(stepInterval);
+      clearInterval(phaseTimer);
     };
   }, [isLoading]);
 
   if (!isLoading) return null;
 
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 backdrop-blur-md animate-fade-in p-4">
-      <Card className="max-w-md w-full p-6 border-border/90 bg-card shadow-2xl rounded-3xl space-y-6 text-foreground font-sans relative overflow-hidden">
-        {/* Top Glow Bar */}
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#ff8527] via-primary to-[#5ae561] animate-pulse" />
+  const currentPhase = PHASES[phaseIndex] || PHASES[0];
 
-        {/* Header Icon & Title */}
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary shrink-0">
-            <Loader2 className="w-5 h-5 animate-spin" />
-          </div>
-          <div className="space-y-0.5">
-            <h3 className="text-sm font-bold text-foreground">Running Agent Test-Drive</h3>
-            <p className="text-xs text-muted-foreground font-mono">
-              Live Browser Emulation • {elapsedSeconds}s elapsed
-            </p>
-          </div>
+  return (
+    <div className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-black/85 backdrop-blur-xl animate-fade-in p-6 select-none overflow-hidden font-sans">
+      <style>{`
+        @keyframes rainDropFall {
+          0% {
+            top: 0%;
+            transform: scale(0.7, 1.4) translateY(-10px);
+            opacity: 0;
+          }
+          10% {
+            opacity: 1;
+          }
+          85% {
+            opacity: 1;
+            transform: scale(0.9, 1.2) translateY(0);
+          }
+          100% {
+            top: 100%;
+            transform: scale(1.6, 0.4) translateY(6px);
+            opacity: 0;
+          }
+        }
+
+        @keyframes rainRippleWave {
+          0% {
+            transform: scale(0.8);
+            opacity: 0.9;
+            border-width: 2px;
+          }
+          100% {
+            transform: scale(2.8);
+            opacity: 0;
+            border-width: 1px;
+          }
+        }
+
+        @keyframes ambientRain {
+          0% { transform: translateY(-40px) scaleY(1); opacity: 0; }
+          20% { opacity: 0.4; }
+          80% { opacity: 0.4; }
+          100% { transform: translateY(120px) scaleY(1.3); opacity: 0; }
+        }
+
+        @keyframes pulseGlow {
+          0%, 100% { transform: scale(1); opacity: 0.7; filter: blur(20px); }
+          50% { transform: scale(1.25); opacity: 1; filter: blur(28px); }
+        }
+
+        .drop-1 {
+          animation: rainDropFall 2s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+        }
+        .drop-2 {
+          animation: rainDropFall 2s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+          animation-delay: 0.65s;
+        }
+        .drop-3 {
+          animation: rainDropFall 2s cubic-bezier(0.45, 0.05, 0.55, 0.95) infinite;
+          animation-delay: 1.3s;
+        }
+
+        .ambient-drip-1 { animation: ambientRain 1.4s linear infinite; animation-delay: 0.1s; }
+        .ambient-drip-2 { animation: ambientRain 1.8s linear infinite; animation-delay: 0.7s; }
+        .ambient-drip-3 { animation: ambientRain 1.2s linear infinite; animation-delay: 0.4s; }
+        .ambient-drip-4 { animation: ambientRain 1.6s linear infinite; animation-delay: 1.1s; }
+
+        .ripple-active {
+          animation: rainRippleWave 1.6s cubic-bezier(0.1, 0.8, 0.3, 1) infinite;
+        }
+      `}</style>
+
+      {/* Ambient background rain streaks */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden opacity-30">
+        <div className="absolute left-[15%] top-1/4 w-0.5 h-10 bg-gradient-to-b from-sky-400 to-transparent ambient-drip-1" />
+        <div className="absolute left-[28%] top-1/3 w-0.5 h-14 bg-gradient-to-b from-cyan-400 to-transparent ambient-drip-2" />
+        <div className="absolute right-[22%] top-1/4 w-0.5 h-12 bg-gradient-to-b from-teal-400 to-transparent ambient-drip-3" />
+        <div className="absolute right-[12%] top-1/3 w-0.5 h-16 bg-gradient-to-b from-emerald-400 to-transparent ambient-drip-4" />
+      </div>
+
+      {/* Center Soft Aurora Glow */}
+      <div
+        className="absolute w-72 h-72 rounded-full bg-gradient-to-tr from-sky-500/20 via-cyan-400/20 to-emerald-400/20 pointer-events-none"
+        style={{ animation: 'pulseGlow 4s ease-in-out infinite' }}
+      />
+
+      {/* MAIN RAIN CASCADE SCULPTURE */}
+      <div className="relative z-10 flex flex-col items-center">
+        {/* Top Status Capsule */}
+        <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/5 border border-white/10 text-[11px] font-mono text-white/80 backdrop-blur-md shadow-2xl mb-8">
+          <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
+          <span>AUTONOMOUS AGENT PATROL</span>
+          <span className="text-white/30">•</span>
+          <span className="text-cyan-400 font-bold">{elapsedSeconds}s</span>
         </div>
 
-        {/* Target Info */}
-        {(targetUrl || targetTask) && (
-          <div className="p-3 rounded-2xl bg-secondary/30 border border-border/70 space-y-1.5 text-xs font-mono">
-            {targetUrl && (
-              <div className="truncate">
-                <span className="text-[10px] text-muted-foreground uppercase font-bold mr-1.5">Target:</span>
-                <span className="text-foreground">{targetUrl}</span>
-              </div>
-            )}
-            {targetTask && (
-              <div className="truncate text-muted-foreground text-[11px] font-sans">
-                <span className="text-[10px] font-mono text-muted-foreground uppercase font-bold mr-1.5">Goal:</span>
-                <span>{targetTask}</span>
-              </div>
-            )}
+        {/* 4-TIER RAIN CASCADE TRACK */}
+        <div className="relative flex flex-col items-center h-48 justify-between my-2">
+          {/* Central Vertical Falling Stream Glass Column */}
+          <div className="absolute top-2 bottom-2 w-1 rounded-full bg-gradient-to-b from-sky-400/10 via-cyan-400/25 to-emerald-400/10 overflow-hidden">
+            {/* Cascading Falling Beads */}
+            <div className="absolute left-0 w-full h-8 bg-gradient-to-b from-transparent via-cyan-300 to-white rounded-full drop-1 shadow-[0_0_12px_#38bdf8]" />
+            <div className="absolute left-0 w-full h-8 bg-gradient-to-b from-transparent via-sky-400 to-white rounded-full drop-2 shadow-[0_0_12px_#38bdf8]" />
+            <div className="absolute left-0 w-full h-8 bg-gradient-to-b from-transparent via-emerald-300 to-white rounded-full drop-3 shadow-[0_0_12px_#34d399]" />
           </div>
-        )}
 
-        {/* Step Progression */}
-        <div className="space-y-2.5">
-          {STEPS.map((step, idx) => {
-            const isDone = idx < currentStepIndex;
-            const isCurrent = idx === currentStepIndex;
-            const StepIcon = step.icon;
+          {/* 4 Cascading Glass Rings */}
+          {[0, 1, 2, 3].map((idx) => {
+            const isCurrent = idx === phaseIndex;
+            const isPassed = idx < phaseIndex;
 
             return (
-              <div
-                key={idx}
-                className={`flex items-center gap-3 p-2.5 rounded-xl transition-all ${
-                  isCurrent
-                    ? 'bg-primary/10 border border-primary/30 text-foreground font-medium shadow-xs'
-                    : isDone
-                    ? 'text-muted-foreground opacity-80'
-                    : 'text-muted-foreground/40 opacity-40'
-                }`}
-              >
-                <div className="shrink-0">
-                  {isDone ? (
-                    <CheckCircle2 className="w-4 h-4 text-[#5ae561]" />
-                  ) : isCurrent ? (
-                    <Loader2 className="w-4 h-4 text-primary animate-spin" />
-                  ) : (
-                    <StepIcon className="w-4 h-4" />
-                  )}
+              <div key={idx} className="relative flex items-center justify-center">
+                {/* Outer Ripple Effect */}
+                {isCurrent && (
+                  <>
+                    <div className="absolute w-8 h-8 rounded-full border border-cyan-400/60 ripple-active pointer-events-none" />
+                    <div className="absolute w-8 h-8 rounded-full border border-sky-400/40 ripple-active pointer-events-none" style={{ animationDelay: '0.8s' }} />
+                  </>
+                )}
+
+                {/* Glass Droplet Core */}
+                <div
+                  className={`w-7 h-7 rounded-full flex items-center justify-center transition-all duration-500 backdrop-blur-md ${
+                    isCurrent
+                      ? 'bg-cyan-400 text-black scale-125 shadow-[0_0_24px_rgba(34,211,238,0.9)] ring-2 ring-white'
+                      : isPassed
+                      ? 'bg-emerald-400/80 text-black scale-100 shadow-[0_0_14px_rgba(52,211,153,0.6)]'
+                      : 'bg-white/10 text-white/40 border border-white/10 scale-90'
+                  }`}
+                >
+                  <svg
+                    className={`w-3.5 h-3.5 transition-transform ${isCurrent ? 'animate-bounce' : ''}`}
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                  >
+                    <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
+                  </svg>
                 </div>
-                <span className="text-xs leading-tight">{step.label}</span>
               </div>
             );
           })}
         </div>
 
-        <p className="text-[11px] text-center text-muted-foreground font-mono">
-          Headless Chromium stream is active in the background.
-        </p>
-      </Card>
+        {/* ELEGANT TYPOGRAPHY & HINTS */}
+        <div className="text-center space-y-2 max-w-sm mt-8">
+          <h2 className="text-lg md:text-xl font-bold text-white tracking-tight animate-fade-in transition-all">
+            {currentPhase.title}
+          </h2>
+          <p className="text-xs text-white/60 font-normal leading-relaxed">
+            {currentPhase.hint}
+          </p>
+
+          {/* Target URL & Task Pill */}
+          {(targetUrl || targetTask) && (
+            <div className="pt-2 flex flex-col items-center gap-1">
+              {targetUrl && (
+                <span className="inline-block max-w-[280px] truncate text-[11px] font-mono px-3 py-1 rounded-full bg-white/5 border border-white/10 text-cyan-300/80">
+                  📍 {targetUrl}
+                </span>
+              )}
+              {targetTask && (
+                <span className="inline-block max-w-[320px] truncate text-[10px] font-sans px-3 py-0.5 text-white/40">
+                  🎯 {targetTask}
+                </span>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
     </div>
   );
 };
