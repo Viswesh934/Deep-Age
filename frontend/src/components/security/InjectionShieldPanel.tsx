@@ -5,6 +5,7 @@ import { Textarea } from '../ui/textarea';
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/card';
 import { Badge } from '../ui/badge';
 import { IndirectInjectionScanResult } from '@/types';
+import { env } from '@/config/env';
 
 export const InjectionShieldPanel: React.FC = () => {
   const [testContent, setTestContent] = useState<string>(
@@ -16,7 +17,7 @@ export const InjectionShieldPanel: React.FC = () => {
   const handleScan = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/security/scan-injection', {
+      const res = await fetch(`${env.backendUrl}/api/security/scan-injection`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ content: testContent })

@@ -4,13 +4,14 @@ import { Button } from '../ui/button';
 import { Badge } from '../ui/badge';
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/card';
 import { AuditLedgerEntry } from '@/types';
+import { env } from '@/config/env';
 
 export const AuditLedgerTable: React.FC = () => {
   const [entries, setEntries] = useState<AuditLedgerEntry[]>([]);
   const [loading, setLoading] = useState<boolean>(false);
 
   const fetchLedger = () => {
-    fetch('/api/security/audit-ledger')
+    fetch(`${env.backendUrl}/api/security/audit-ledger`)
       .then((res) => res.json())
       .then((data) => {
         if (data.success && data.entries) {
@@ -29,7 +30,7 @@ export const AuditLedgerTable: React.FC = () => {
   const handleRollback = async (actionId: string) => {
     setLoading(true);
     try {
-      const res = await fetch('/api/security/rollback', {
+      const res = await fetch(`${env.backendUrl}/api/security/rollback`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ actionId })

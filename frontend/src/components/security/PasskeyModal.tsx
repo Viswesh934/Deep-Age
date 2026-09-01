@@ -3,6 +3,7 @@ import { Fingerprint, XCircle, CheckCircle2, KeyRound } from 'lucide-react';
 import { Button } from '../ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '../ui/dialog';
 import { WebAuthnVerificationChallenge } from '@/types';
+import { env } from '@/config/env';
 
 interface PasskeyModalProps {
   isOpen: boolean;
@@ -25,7 +26,7 @@ export const PasskeyModal: React.FC<PasskeyModalProps> = ({
     try {
       const mockSignature = `sig_${Date.now()}_sha256_${Math.random().toString(36).substring(2, 10)}`;
       
-      const res = await fetch('/api/security/webauthn/verify', {
+      const res = await fetch(`${env.backendUrl}/api/security/webauthn/verify`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

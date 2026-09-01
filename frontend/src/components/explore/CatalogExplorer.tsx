@@ -4,6 +4,7 @@ import { Button } from '../ui/button';
 import { Input } from '../ui/input';
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/card';
 import { ExploreCatalogEntity } from '@/types';
+import { env } from '@/config/env';
 
 interface CatalogExplorerProps {
   siteUrl: string;
@@ -14,7 +15,7 @@ export const CatalogExplorer: React.FC<CatalogExplorerProps> = ({ siteUrl }) => 
   const [search, setSearch] = useState<string>('');
 
   useEffect(() => {
-    fetch(`/api/explore/snapshot?url=${encodeURIComponent(siteUrl)}`)
+    fetch(`${env.backendUrl}/api/explore/snapshot?url=${encodeURIComponent(siteUrl)}`)
       .then((res) => res.json())
       .then((data) => {
         if (data.success && data.snapshot?.catalog) {
@@ -39,7 +40,7 @@ export const CatalogExplorer: React.FC<CatalogExplorerProps> = ({ siteUrl }) => 
         </CardTitle>
         <div className="flex items-center gap-1.5">
           <a
-            href={`/api/explore/snapshot/sqlite?url=${encodeURIComponent(siteUrl)}`}
+            href={`${env.backendUrl}/api/explore/snapshot/sqlite?url=${encodeURIComponent(siteUrl)}`}
             download="site_explore.sql"
           >
             <Button size="sm" variant="outline" className="text-[11px] font-semibold h-7 rounded-full gap-1 border-border/80 hover:bg-secondary">

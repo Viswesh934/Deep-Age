@@ -5,6 +5,7 @@ import { Input } from '../ui/input';
 import { Badge } from '../ui/badge';
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/card';
 import { IntentResolutionResult } from '@/types';
+import { env } from '@/config/env';
 
 interface IntentPlannerProps {
   siteUrl: string;
@@ -19,7 +20,7 @@ export const IntentPlanner: React.FC<IntentPlannerProps> = ({ siteUrl }) => {
     if (!goal.trim()) return;
     setLoading(true);
     try {
-      const res = await fetch('/api/explore/resolve-intent', {
+      const res = await fetch(`${env.backendUrl}/api/explore/resolve-intent`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

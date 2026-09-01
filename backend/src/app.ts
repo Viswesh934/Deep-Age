@@ -14,6 +14,18 @@ app.use('*', cors({
   allowHeaders: ['Content-Type', 'Authorization'],
 }));
 
+const FAVICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32"><rect width="32" height="32" rx="8" fill="#111113" /><path d="M10 8h6a8 8 0 0 1 0 16h-6z" fill="none" stroke="#ff8527" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" /><circle cx="15.5" cy="16" r="2" fill="#5ae561" /></svg>`;
+
+// Favicon handlers
+app.get('/favicon.svg', (c) => {
+  c.header('Content-Type', 'image/svg+xml');
+  return c.body(FAVICON_SVG);
+});
+app.get('/favicon.ico', (c) => {
+  c.header('Content-Type', 'image/svg+xml');
+  return c.body(FAVICON_SVG);
+});
+
 // Root MCP Discovery & Protocol Handler
 app.get('/mcp.json', WebMCPController.getMcpConfig);
 app.route('/mcp', mcpRouter);

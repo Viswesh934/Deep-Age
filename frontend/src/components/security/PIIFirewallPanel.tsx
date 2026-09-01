@@ -5,6 +5,7 @@ import { Textarea } from '../ui/textarea';
 import { Card, CardHeader, CardTitle, CardContent } from '../ui/card';
 import { Badge } from '../ui/badge';
 import { PIIScanResult } from '@/types';
+import { env } from '@/config/env';
 
 export const PIIFirewallPanel: React.FC = () => {
   const [inputText, setInputText] = useState<string>(
@@ -16,7 +17,7 @@ export const PIIFirewallPanel: React.FC = () => {
   const handleScanAndRedact = async () => {
     setLoading(true);
     try {
-      const res = await fetch('/api/security/redact-pii', {
+      const res = await fetch(`${env.backendUrl}/api/security/redact-pii`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text: inputText })
