@@ -2,7 +2,6 @@ import React from 'react';
 import { TestDriveRun, SeoAudit, ReadabilityAudit, MonetizationAudit } from '@/types';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
-import { DollarSign } from 'lucide-react';
 
 interface SeoReadabilityFeedsPanelProps {
   run: TestDriveRun;
@@ -177,7 +176,6 @@ export const SeoReadabilityFeedsPanel: React.FC<SeoReadabilityFeedsPanelProps> =
         <div className="space-y-2.5">
           <div className="flex items-center justify-between border-b border-border/60 pb-2">
             <span className="text-sm font-semibold text-foreground flex items-center gap-1.5">
-              <DollarSign className="w-4 h-4 text-[#5ae561]" />
               <span>Ad & Monetization Signals</span>
             </span>
             <Badge
