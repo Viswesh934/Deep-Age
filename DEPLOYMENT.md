@@ -1,13 +1,12 @@
 # Deep Age — Production Deployment Guide
 
-This document provides a comprehensive, step-by-step guide for deploying the **Deep Age** monorepo to production:
-- **Backend & MCP Server**: [Cloudflare Workers](https://workers.cloudflare.com/) (Hono + Cloudflare Browser Rendering / Puppeteer)
-- **Frontend Workbench**: [Vercel](https://vercel.com/) (Vite + React SPA)
-- **Reference Demo Store**: [Vercel](https://vercel.com/) (Hono Serverless API & Storefront)
+This document provides a comprehensive, step-by-step guide for deploying **Deep Age** to production using a **Single Unified Cloudflare Worker** architecture:
+- **Backend, MCP Server & Demo Storefront**: [Cloudflare Workers](https://workers.cloudflare.com/) (Hono + Cloudflare Browser Rendering + WebMCP Storefront in a single edge deployment)
+- **Frontend Workbench**: [Cloudflare Pages](https://pages.cloudflare.com/) or [Vercel](https://vercel.com/) (Vite + React SPA)
 
 ---
 
-## 🗺️ Deployment Topology
+## 🗺️ Deployment Topology (Single Unified Worker)
 
 ```
                                   ┌───────────────────────────────┐
@@ -15,132 +14,94 @@ This document provides a comprehensive, step-by-step guide for deploying the **D
                                   │ (Browser, Cursor, Claude MCP) │
                                   └───────────────┬───────────────┘
                                                   │
-                  ┌───────────────────────────────┼──────────────────────────────┐
-                  ▼                               ▼                              ▼
-     ┌────────────────────────┐      ┌────────────────────────┐     ┌────────────────────────┐
-     │   Frontend Workbench   │      │    Backend API & MCP   │     │    Demo Storefront     │
-     │        (Vercel)        │      │  (Cloudflare Workers)  │     │        (Vercel)        │
-     │ https://deep-age.vercel│      │ https://deep-age.worker│     │ https://deep-age-demo. │
-     │          .app          │      │          .dev          │     │       vercel.app       │
-     └────────────┬───────────┘      └────────────┬───────────┘     └────────────┬───────────┘
-                  │                               │                              │
-                  │       HTTP / REST API         │      Cloudflare Browser      │
-                  └──────────────────────────────►│      Rendering Binding       │
-                                                  │ ────────────────────────────►│
-                                                  │      (Evaluates WebMCP)      │
-                                                  └──────────────────────────────┘
+                                  ┌───────────────┴───────────────┐
+                                  ▼                               ▼
+                     ┌────────────────────────┐      ┌────────────────────────┐
+                     │   Frontend Workbench   │      │ Single Unified Worker  │
+                     │  (Vercel / CF Pages)   │      │  (Cloudflare Workers)  │
+                     │ https://deep-age.vercel│      │ https://deep-age-      │
+                     │          .app          │      │   backend.workers.dev  │
+                     └────────────┬───────────┘      └────────────┬───────────┘
+                                  │                               │
+                                  │       HTTP / REST API         │  ┌─────────────────────────┐
+                                  └──────────────────────────────►│  │ • /mcp & /mcp.json      │
+                                                                  │  │ • /health               │
+                                                                  │  │ • /api/test-drives      │
+                                                                  │  │ • /.well-known/webmcp   │
+                                                                  │  │ • /api/products, /cart  │
+                                                                  │  │ • /store, /demo, / (UI) │
+                                                                  │  └────────────┬────────────┘
+                                                                  │               │
+                                                                  │   Cloudflare Browser
+                                                                  │   Rendering (Internal)
+                                                                  └───────────────┘
 ```
 
 ---
 
 ## 📋 Pre-Deployment Checklist
 
-Before deploying, verify that the monorepo builds and tests pass cleanly:
+Before deploying, verify that the monorepo builds cleanly:
 
 ```bash
 # 1. Install all dependencies across workspaces
 npm install
 
-# 2. Build all packages (shared, backend, frontend, demo)
+# 2. Build all packages (shared, demo, backend, frontend)
 npm run build
-
-# 3. Execute the automated verification test suite
-npm test
 ```
 
 ---
 
-## 🚀 Phase 1: Deploy Reference Demo Store (Vercel)
+## ⚡ Phase 1: Deploy Unified Worker in One Shot (Cloudflare Workers)
 
-The demo store provides the reference e-commerce target with registered WebMCP tools (`.well-known/webmcp.json`).
+The single unified worker serves:
+1. **Deep Age Backend API & Agent Runner** (`/health`, `/api/test-drives`, `/api/explore`, `/api/security`)
+2. **MCP Server** (`/mcp`, `/mcp.json`, JSON-RPC & SSE)
+3. **Reference ElectroVault Storefront & WebMCP 2.0 Feeds** (`/.well-known/webmcp.json`, `/api/products`, `/api/cart`, `/store`, `/demo`, `/`)
 
-### Step 1.1: Import Project in Vercel
-1. Log in to [Vercel](https://vercel.com) and click **Add New Project**.
-2. Select your `Deep-Age` repository.
-3. In **Project Settings**:
-   * **Root Directory**: `demo`
-   * **Framework Preset**: `Other`
-   * **Build Command**: `npm run build`
-   * **Output Directory**: `.`
-4. Click **Deploy**.
-
-### Step 1.2: Verify Demo Deployment
-Once deployed, verify the WebMCP manifest endpoint:
-```bash
-curl -s https://<your-demo-subdomain>.vercel.app/.well-known/webmcp.json
-```
-*Expected output*: JSON object containing `schema_version`, `capabilities`, and list of 8 reference tools.
-
-> 📝 **Note**: Save your deployed Demo Store URL (e.g., `https://deep-age-demo.vercel.app`). You will need it for the Backend and Frontend configurations.
-
----
-
-## ⚡ Phase 2: Deploy Backend & MCP Server (Cloudflare Workers)
-
-The backend runs on Cloudflare Workers using the Hono framework and leverages Cloudflare's native **Browser Rendering** binding to execute browser agent sessions.
-
-### Step 2.1: Enable Cloudflare Browser Rendering
+### Step 1.1: Enable Cloudflare Browser Rendering
 1. In your [Cloudflare Dashboard](https://dash.cloudflare.com/), go to **Workers & Pages** > **Browser Rendering**.
 2. Click **Enable Browser Rendering** for your account.
 
-### Step 2.2: Configure `wrangler.toml`
-Ensure `backend/wrangler.toml` is configured:
-
-```toml
-name = "deep-age-backend"
-main = "src/index.ts"
-compatibility_date = "2024-04-05"
-compatibility_flags = ["nodejs_compat"]
-
-# Cloudflare Browser Rendering Binding
-[browser]
-binding = "MYBROWSER"
-
-# Environment Variables
-[vars]
-NODE_ENV = "production"
-PORT = "8787"
-DEMO_URL = "https://<your-demo-subdomain>.vercel.app"
-```
-
-### Step 2.3: Set Cloudflare Secrets
-Store required API keys securely in Cloudflare:
+### Step 1.2: Set Cloudflare Secrets
+Store your OpenRouter LLM API key securely in Cloudflare:
 
 ```bash
-cd backend
-
 # Login to Cloudflare Wrangler
 npx wrangler login
 
 # Set LLM API Key Secret
-npx wrangler secret put OPENROUTER_API_KEY
-# Enter your API key when prompted
+cd backend && npx wrangler secret put OPENROUTER_API_KEY
 ```
 
-### Step 2.4: Deploy to Cloudflare Workers
+### Step 1.3: One-Shot Deploy to Cloudflare Workers
+From the repository root, run:
+
 ```bash
-# Run Wrangler deploy from the backend workspace
-npm run deploy --workspace=@deep-age/backend
-# Or directly inside backend/
-cd backend && npx wrangler deploy
+npm run deploy
 ```
+*(or `npx wrangler deploy --config backend/wrangler.toml`)*
 
-### Step 2.5: Verify Backend & MCP Server
+### Step 1.4: Verify Unified Worker Deployment
 ```bash
 # 1. Health Check
 curl -s https://deep-age-backend.<your-subdomain>.workers.dev/health
 
-# 2. MCP Server Protocol Handshake
+# 2. WebMCP Storefront Manifest
+curl -s https://deep-age-backend.<your-subdomain>.workers.dev/.well-known/webmcp.json
+
+# 3. MCP Server Protocol Handshake
 curl -s -X POST https://deep-age-backend.<your-subdomain>.workers.dev/mcp \
   -H "Content-Type: application/json" \
   -d '{"jsonrpc":"2.0","id":1,"method":"initialize","params":{"protocolVersion":"2024-11-05","capabilities":{},"clientInfo":{"name":"test-client","version":"1.0.0"}}}'
 ```
 
-> 📝 **Note**: Save your deployed Worker URL (e.g., `https://deep-age-backend.<your-subdomain>.workers.dev`).
+> 📝 **Note**: Save your deployed Worker URL (e.g. `https://deep-age-backend.<your-subdomain>.workers.dev`). You will use this single URL for both `VITE_BACKEND_URL` and `VITE_DEMO_URL` in the frontend!
 
 ---
 
-## 💻 Phase 3: Deploy Frontend Workbench (Vercel)
+## 💻 Phase 2: Deploy Frontend Workbench (Cloudflare Pages / Vercel)
 
 The frontend is a Vite + React application providing the Developer Workbench, Browser State Scrubber, and MCP connection settings.
 

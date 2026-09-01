@@ -5,6 +5,7 @@ import { fileURLToPath } from 'url';
 
 export { demoApp } from './app.js';
 export { setAddToCartCapability, getAddToCartCapability } from './data/products.js';
+export default demoApp;
 
 export function startDemoServer(port = config.port, hostname = '127.0.0.1'): Promise<{ close: () => void; port: number }> {
   return new Promise((resolve, reject) => {

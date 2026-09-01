@@ -1,5 +1,5 @@
 import { app } from './app.js';
-import { startDemoServer, setAddToCartCapability } from '../../demo/src/index.js';
+import { startDemoServer, setAddToCartCapability } from '@deep-age/demo';
 
 async function runRealVerification() {
   console.log('🚀 Starting 100% Real Live Browser & WebMCP Test Drive...\n');

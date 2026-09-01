@@ -1,5 +1,5 @@
 import { app } from './app.js';
-import { startDemoServer, setAddToCartCapability } from '../../demo/src/index.js';
+import { startDemoServer, setAddToCartCapability } from '@deep-age/demo';
 import dotenv from 'dotenv';
 import path from 'path';
 

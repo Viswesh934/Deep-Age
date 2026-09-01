@@ -4,9 +4,9 @@
   "private": true,
   "workspaces": [
     "shared",
+    "demo",
     "backend",
-    "frontend",
-    "demo"
+    "frontend"
   ],
   "scripts": {
     "build": "npm run build --workspaces",
@@ -14,6 +14,7 @@
     "dev:frontend": "npm run dev --workspace=frontend",
     "dev:demo": "npm run dev --workspace=demo",
     "test": "npm run test --workspace=backend",
+    "deploy": "npm run deploy --workspace=@deep-age/backend",
     "deploy:backend": "npm run deploy --workspace=@deep-age/backend"
   },
   "devDependencies": {

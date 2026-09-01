@@ -15,7 +15,7 @@ export const config = {
   port,
   nodeEnv: process.env.NODE_ENV || 'development',
   serverUrl: process.env.PUBLIC_URL || process.env.SERVER_URL || process.env.DEEP_AGE_URL || defaultPublicUrl,
-  demoUrl: process.env.VITE_DEMO_URL || `http://127.0.0.1:${process.env.DEMO_PORT || 3002}`,
+  demoUrl: process.env.DEMO_URL || process.env.VITE_DEMO_URL || process.env.PUBLIC_URL || defaultPublicUrl,
   openRouterApiKey: process.env.OPENROUTER_API_KEY,
   browser: {
     headless: process.env.HEADLESS_BROWSER !== 'false',

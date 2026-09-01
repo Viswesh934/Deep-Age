@@ -41,10 +41,22 @@ apiRouter.get('/api/mcp/config', (c) => {
   });
 });
 
-// Demo store control proxy
+// Demo store control proxy & in-process handler
 apiRouter.post('/api/demo/toggle', async (c) => {
   try {
-    const body = await c.req.json().catch(() => ({}));
+    const body = (await c.req.json().catch(() => ({}))) as { enabled?: boolean };
+    
+    // Direct in-process invocation when running as unified worker
+    try {
+      const { setAddToCartCapability } = await import('@deep-age/demo');
+      if (typeof body.enabled === 'boolean') {
+        setAddToCartCapability(body.enabled);
+        return c.json({ success: true, enableAddToCart: body.enabled, inProcess: true });
+      }
+    } catch {
+      // Fallback to HTTP fetch if @deep-age/demo is not in-memory
+    }
+
     const res = await fetch(`${config.demoUrl}/api/admin/toggle-add-to-cart`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

@@ -11,7 +11,8 @@ binding = "MYBROWSER"
 [vars]
 NODE_ENV = "production"
 PORT = "8787"
-DEMO_URL = "https://deep-age-demo.vercel.app"
+# DEMO_URL is optional when running as unified worker (defaults to worker origin)
+# DEMO_URL = "http://127.0.0.1:8787"
 
 # KV Namespace (Optional for multi-region run caching)
 # [[kv_namespaces]]
