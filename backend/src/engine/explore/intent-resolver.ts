@@ -46,117 +46,114 @@ export async function resolveUserIntent(
   const goalLower = request.userGoal.toLowerCase();
   const apiKey = request.openRouterApiKey || config.openRouterApiKey;
 
-  // If an OpenRouter key is available (from request or env), try one-shot planning via OpenRouter API
+  // 1. OpenRouter AI Dynamic LLM Intent Planner (Universal for ANY Web Application & Domain)
   if (apiKey) {
     try {
-      console.log('🤖 Querying OpenRouter for one-shot WebMCP intent resolution...');
+      console.log('🤖 Querying OpenRouter AI planner for universal WebMCP intent resolution...');
       const openRouterResult = await queryOpenRouterPlanner({ ...request, openRouterApiKey: apiKey }, tools, stateGraph);
-      if (openRouterResult) {
-        console.log('✅ OpenRouter returned valid action plan:', openRouterResult.intent);
+      if (openRouterResult && openRouterResult.plan && openRouterResult.plan.length > 0) {
+        console.log(`✅ OpenRouter synthesized ${openRouterResult.plan.length}-step action plan for: "${request.userGoal}"`);
         return openRouterResult;
       }
     } catch (err) {
-      console.warn('⚠️ OpenRouter planner call failed, falling back to local resolver:', err);
+      console.warn('⚠️ OpenRouter planner call failed, falling back to schema-driven planner:', err);
     }
   }
 
-  // Local Deterministic Graph & Intent Resolver Engine
+  // 2. Schema-Driven Universal Fallback Planner (Zero Hardcoded Domain Rules)
   const plan: ActionPlanStep[] = [];
   let estimatedRisk: 'public_read' | 'context_read' | 'reversible_write' | 'critical_destructive' = 'public_read';
   const missingPrerequisites: string[] = [];
 
-  const wantsSearch = goalLower.includes('find') || goalLower.includes('search') || goalLower.includes('laptop') || goalLower.includes('product');
-  const wantsCart = goalLower.includes('cart') || goalLower.includes('add') || goalLower.includes('buy');
-  const wantsCheckout = goalLower.includes('checkout') || goalLower.includes('pay') || goalLower.includes('order');
-  const wantsReturn = goalLower.includes('return') || goalLower.includes('refund');
+  const goalTokens = goalLower.replace(/[^a-z0-9\s]/g, ' ').split(/\s+/).filter((t) => t.length > 1);
 
-  const searchTool = tools.find((t) => t.name.includes('search') || t.name.includes('filter'));
-  const cartTool = tools.find((t) => t.name.includes('cart') || t.name.includes('add'));
-  const detailsTool = tools.find((t) => t.name.includes('detail') || t.name.includes('get_'));
-  const checkoutTool = tools.find((t) => t.name.includes('checkout') || t.name.includes('payment'));
+  // Score every discovered WebMCP tool by semantic relevance to the user's goal
+  const scoredTools = tools.map((tool) => {
+    let score = 0;
+    const tName = tool.name.toLowerCase();
+    const tDesc = (tool.description || '').toLowerCase();
+    const nameWords = tName.split(/[_\-]/);
+
+    for (const token of goalTokens) {
+      if (tName.includes(token)) score += 5;
+      if (nameWords.includes(token)) score += 8;
+      if (tDesc.includes(token)) score += 2;
+    }
+
+    const schemaProps = Object.keys((tool.inputSchema as any)?.properties || {});
+    for (const prop of schemaProps) {
+      if (goalTokens.includes(prop.toLowerCase())) score += 3;
+    }
+
+    return { tool, score };
+  });
+
+  scoredTools.sort((a, b) => b.score - a.score);
+
+  // Select matching tools (or all tools if site exposes 1-3 focused tools)
+  const relevantTools = scoredTools.filter((s) => s.score > 0).map((s) => s.tool);
+  const candidateTools = relevantTools.length > 0 ? relevantTools : (tools.length <= 3 ? tools : []);
 
   let stepNum = 1;
 
-  if (wantsSearch) {
-    if (searchTool) {
-      plan.push({
-        step: stepNum++,
-        toolName: searchTool.name,
-        parameters: { query: request.userGoal, maxPrice: 80000, ram: 16 },
-        safetyTier: 'public_read',
-        explanation: `Query site catalog using ${searchTool.name} to identify matching entities.`,
-        requiresConfirmation: false
-      });
-    } else {
-      missingPrerequisites.push('No search or filter tool exposed on site.');
-    }
-  }
+  for (const tool of candidateTools) {
+    const toolParams: Record<string, any> = {};
+    const schemaProps = (tool.inputSchema as any)?.properties || {};
+    const requiredProps = (tool.inputSchema as any)?.required || [];
 
-  if (detailsTool && wantsSearch) {
+    for (const [propName, propDef] of Object.entries(schemaProps)) {
+      const pDef = propDef as any;
+      const pNameLower = propName.toLowerCase();
+
+      if (pDef?.enum && Array.isArray(pDef.enum) && pDef.enum.length > 0) {
+        const matchingEnum = pDef.enum.find((e: string) => goalLower.includes(String(e).toLowerCase()));
+        toolParams[propName] = matchingEnum || pDef.enum[0];
+      } else if (pNameLower.includes('query') || pNameLower.includes('search') || pNameLower.includes('prompt') || pNameLower.includes('topic') || pNameLower.includes('text') || pNameLower === 'q') {
+        toolParams[propName] = request.userGoal;
+      } else if (pNameLower.includes('quantity') || pNameLower.includes('count') || pNameLower.includes('amount') || pNameLower.includes('num')) {
+        toolParams[propName] = extractRequestedQuantity(request.userGoal);
+      } else if (pNameLower.includes('id') || pNameLower.includes('ref') || pNameLower.includes('target') || pNameLower.includes('model')) {
+        toolParams[propName] = stepNum > 1 ? '$step1.results[0].id' : (pDef.default || 'default-item');
+      } else if (pDef?.type === 'boolean') {
+        toolParams[propName] = !(goalLower.includes('no ') || goalLower.includes('without') || goalLower.includes('disable'));
+      } else if (pDef?.type === 'number') {
+        toolParams[propName] = pDef.default ?? 1;
+      } else {
+        toolParams[propName] = pDef?.default || request.userGoal;
+      }
+    }
+
+    const isDestructive = tool.safetyTier === 'critical_destructive' || tool.name.includes('delete') || tool.name.includes('drop') || tool.name.includes('terminate');
+    if (isDestructive) {
+      estimatedRisk = 'critical_destructive';
+    } else if (tool.safetyTier === 'reversible_write' || tool.name.includes('add') || tool.name.includes('create') || tool.name.includes('update') || tool.name.includes('set')) {
+      if (estimatedRisk !== 'critical_destructive') estimatedRisk = 'reversible_write';
+    }
+
     plan.push({
       step: stepNum++,
-      toolName: detailsTool.name,
-      parameters: { productId: '$step1.results[0].id' },
-      safetyTier: 'public_read',
-      explanation: 'Fetch full item specifications and stock availability.',
-      requiresConfirmation: false
+      toolName: tool.name,
+      parameters: toolParams,
+      safetyTier: tool.safetyTier || (isDestructive ? 'critical_destructive' : 'public_read'),
+      explanation: `Execute ${tool.name} (${tool.description || 'WebMCP tool action'}) to satisfy: "${request.userGoal}".`,
+      requiresConfirmation: isDestructive
     });
   }
 
-  if (wantsCart) {
-    if (cartTool) {
-      estimatedRisk = 'reversible_write';
-      const requestedQty = extractRequestedQuantity(request.userGoal);
-      plan.push({
-        step: stepNum++,
-        toolName: cartTool.name,
-        parameters: { productId: '$step1.results[0].id', quantity: requestedQty },
-        safetyTier: 'reversible_write',
-        explanation: `Add ${requestedQty} matching item(s) to cart session with 10-second rollback window.`,
-        requiresConfirmation: false
-      });
-    } else {
-      missingPrerequisites.push('Missing add_to_cart capability on site.');
-    }
+  if (plan.length === 0) {
+    missingPrerequisites.push(`No matching WebMCP tools registered on site for goal: "${request.userGoal}".`);
   }
 
-  if (wantsCheckout) {
-    estimatedRisk = 'critical_destructive';
-    if (checkoutTool) {
-      plan.push({
-        step: stepNum++,
-        toolName: checkoutTool.name,
-        parameters: { paymentMethod: 'saved_card' },
-        safetyTier: 'critical_destructive',
-        explanation: 'Authorize payment. Requires explicit biometric passkey confirmation.',
-        requiresConfirmation: true
-      });
-    } else {
-      missingPrerequisites.push('Missing payment/checkout WebMCP tool.');
-    }
-  }
-
-  if (wantsReturn) {
-    plan.push({
-      step: stepNum++,
-      toolName: 'fetchOrderHistory',
-      parameters: { status: 'delivered' },
-      safetyTier: 'context_read',
-      explanation: 'Retrieve past delivered orders to find eligible return items.',
-      requiresConfirmation: false
-    });
-  }
-
-  const isFeasible = missingPrerequisites.length === 0 && plan.length > 0;
+  const isFeasible = plan.length > 0;
 
   return {
     feasible: isFeasible,
     intent: request.userGoal,
     currentState: request.currentState || 'ANONYMOUS_BROWSING',
-    targetState: wantsCheckout ? 'ORDER_COMPLETED' : wantsCart ? 'CART_ACTIVE' : 'PRODUCT_DETAILS',
+    targetState: isFeasible ? 'ACTION_COMPLETED' : 'BLOCKED',
     plan,
     reasoning: isFeasible
-      ? `Generated ${plan.length}-step execution path across site capability graph.`
+      ? `Generated ${plan.length}-step schema-driven WebMCP execution path.`
       : `Cannot satisfy intent: ${missingPrerequisites.join(', ')}`,
     estimatedRiskTier: estimatedRisk,
     missingPrerequisites: missingPrerequisites.length > 0 ? missingPrerequisites : undefined
@@ -168,16 +165,25 @@ async function queryOpenRouterPlanner(
   tools: WebMCPTool[],
   stateGraph: StateTransitionGraph
 ): Promise<IntentResolutionResult | null> {
-  const prompt = `You are a WebMCP Intent Planning Engine.
-Site: ${request.siteUrl}
+  const prompt = `You are a Universal WebMCP Autonomous Intent Planning Engine.
+You plan actions for ANY web application archetype: 3D modeling tools (Three.js/Spline/Blender), documentation & knowledge portals, developer consoles, creative canvas tools, audio/video editors, productivity suites, and commerce.
+
+Site URL: ${request.siteUrl}
 Current State: ${request.currentState || 'ANONYMOUS_BROWSING'}
-Available WebMCP Tools: ${JSON.stringify(tools)}
-State Graph: ${JSON.stringify(stateGraph.states)}
+Available WebMCP Tools & Schemas:
+${JSON.stringify(tools, null, 2)}
+
+State Graph:
+${JSON.stringify(stateGraph.states, null, 2)}
+
 User Goal: "${request.userGoal}"
 
-Analyze the state transition graph and available tools to create an optimal, secure multi-step action plan for an autonomous web agent.
-Assign each step a safetyTier ("public_read", "context_read", "reversible_write", or "critical_destructive").
-Set requiresConfirmation=true if the action has financial or destructive impact (Tier 3).
+Instructions:
+1. Analyze the user's goal and map it to the optimal sequence of available WebMCP tools.
+2. Carefully inspect each tool's JSON Schema (property types, enums, required fields) and construct valid, exact input parameters matching the user's intent.
+3. Extract precise parameters from the prompt (e.g. 3D coordinates, query strings, quantities, angles, file formats, options).
+4. Assign each step a safetyTier ("public_read", "context_read", "reversible_write", or "critical_destructive").
+5. Set requiresConfirmation=true ONLY if the action has financial or irreversible destructive impact.
 
 Respond ONLY with a JSON object matching this schema:
 {
