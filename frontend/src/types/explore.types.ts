@@ -114,3 +114,13 @@ export interface FeedDiscoveryAudit {
   hasSitemap: boolean;
 }
 
+export interface MonetizationAudit {
+  score: number; // 0 - 100 Ad Readiness & Monetization Score
+  adNetworksDetected: string[];
+  hasAdsTxt: boolean;
+  ctaDensity: number;
+  commercialIntent: 'high' | 'moderate' | 'informational';
+  viewabilityEstimate: string;
+  adSpaceRecommendation: string;
+}
+

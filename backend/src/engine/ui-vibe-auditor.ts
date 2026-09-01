@@ -219,22 +219,18 @@ export async function auditUIVibe(page: Page, domControls: DOMInteractionEvent[]
       overallVerdict: verdict,
     };
   } catch (err) {
-    console.warn('[auditUIVibe] Fallback audit:', err);
+    console.warn('[auditUIVibe] DOM evaluation error:', err);
     return {
-      vibeScore: 85,
+      vibeScore: 50,
       aestheticProfile: {
-        primaryTone: 'Modern Dark Minimalist',
-        colorPalette: [
-          { hex: '#0f0f0f', role: 'Background', usageCount: 20, isAiCliche: false },
-          { hex: '#ff8527', role: 'Primary Accent', usageCount: 8, isAiCliche: false },
-          { hex: '#5ae561', role: 'Success Status', usageCount: 6, isAiCliche: false },
-        ],
-        fontFamilies: ['Inter', 'Geist Mono'],
+        primaryTone: 'Undetermined',
+        colorPalette: [],
+        fontFamilies: [],
         aiClicheRisk: 'low',
       },
       aiClichesDetected: [],
       uiFlaws: [],
-      overallVerdict: 'UI design demonstrates clean contrast and cohesive layout hierarchy.',
+      overallVerdict: 'DOM evaluation failed during UI styling audit.',
     };
   }
 }

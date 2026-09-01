@@ -1,10 +1,11 @@
 import type { Page } from 'puppeteer';
-import { SeoAudit, ReadabilityAudit, FeedDiscoveryAudit } from '../../types/index.js';
+import { SeoAudit, ReadabilityAudit, FeedDiscoveryAudit, MonetizationAudit } from '../../types/index.js';
 
 export async function auditSeoReadabilityAndFeeds(page: Page): Promise<{
   seoAudit: SeoAudit;
   readabilityAudit: ReadabilityAudit;
   feedDiscovery: FeedDiscoveryAudit;
+  monetizationAudit: MonetizationAudit;
 }> {
   try {
     const rawData = await page.evaluate(() => {
@@ -40,7 +41,27 @@ export async function auditSeoReadabilityAndFeeds(page: Page): Promise<{
         feeds.push({ title: 'WebMCP Manifest Feed', url: '/.well-known/webmcp.json', type: 'json' });
       }
 
-      // 3. Body Text & Readability Metrics
+      // 3. Monetization & Ad Network Detection
+      const htmlContent = document.documentElement.outerHTML.toLowerCase();
+      const detectedNetworks: string[] = [];
+      if (htmlContent.includes('adsbygoogle') || htmlContent.includes('pagead2.googlesyndication')) detectedNetworks.push('Google AdSense');
+      if (htmlContent.includes('googletagmanager.com') || htmlContent.includes('gtag(')) detectedNetworks.push('Google Tag Manager');
+      if (htmlContent.includes('connect.facebook.net') || htmlContent.includes('fbq(')) detectedNetworks.push('Meta Pixel');
+      if (htmlContent.includes('prebid') || htmlContent.includes('pbjs')) detectedNetworks.push('Prebid.js Header Bidding');
+      if (htmlContent.includes('amazon-adsystem') || htmlContent.includes('aax.amazon-adsystem')) detectedNetworks.push('Amazon Publisher Services');
+      if (htmlContent.includes('criteo') || htmlContent.includes('taboola') || htmlContent.includes('outbrain')) detectedNetworks.push('Native Retargeting');
+
+      // 4. CTA Conversion Density
+      const ctaElements = document.querySelectorAll('button, a.btn, a.cta, input[type="submit"], [role="button"]');
+      let ctaCount = 0;
+      ctaElements.forEach(el => {
+        const text = (el.textContent || '').toLowerCase();
+        if (text.includes('buy') || text.includes('order') || text.includes('get') || text.includes('start') || text.includes('subscribe') || text.includes('sign') || text.includes('add') || text.includes('try') || text.includes('download')) {
+          ctaCount++;
+        }
+      });
+
+      // 5. Body Text & Readability Metrics
       const bodyText = (document.body?.innerText || '')
         .replace(/\s+/g, ' ')
         .trim();
@@ -70,6 +91,8 @@ export async function auditSeoReadabilityAndFeeds(page: Page): Promise<{
         hasJsonLd,
         h1Count,
         feeds,
+        detectedNetworks,
+        ctaCount,
         wordCount: words.length,
         sentenceCount: Math.max(1, sentences.length),
         sampleSyllables: totalSyllables,
@@ -100,19 +123,24 @@ export async function auditSeoReadabilityAndFeeds(page: Page): Promise<{
 
     if (!rawData.hasOpenGraph) {
       seoScore -= 10;
-      seoRecs.push('Include og:title and og:image tags for rich social media cards.');
+      seoIssues.push('Missing OpenGraph (og:title, og:image) tags.');
+      seoRecs.push('Add OpenGraph metadata to improve social and agent unfurl previews.');
+    }
+
+    if (!rawData.hasJsonLd) {
+      seoScore -= 10;
+      seoIssues.push('Missing Schema.org JSON-LD structured data.');
+      seoRecs.push('Inject JSON-LD structured data (Product, Organization, WebPage) for rich search snippets.');
     }
 
     if (rawData.h1Count === 0) {
       seoScore -= 10;
-      seoIssues.push('No <h1> heading tag found.');
-      seoRecs.push('Include a single semantic <h1> heading.');
+      seoIssues.push('No <h1> tag discovered.');
+      seoRecs.push('Ensure exactly one descriptive <h1> tag is present on the page.');
     }
 
-    seoScore = Math.max(20, Math.min(100, seoScore));
-
     const seoAudit: SeoAudit = {
-      score: seoScore,
+      score: Math.max(20, Math.min(100, seoScore)),
       title: rawData.title,
       titleLength: rawData.titleLength,
       description: rawData.description,
@@ -124,18 +152,18 @@ export async function auditSeoReadabilityAndFeeds(page: Page): Promise<{
       hasRobotsTxt: true,
       hasSitemap: true,
       issues: seoIssues,
-      recommendations: seoRecs,
+      recommendations: seoRecs.length > 0 ? seoRecs : ['Metadata is fully optimized for search crawlers.'],
     };
 
     // Compute Readability Score
-    // Flesch Reading Ease = 206.835 - (1.015 * ASL) - (84.6 * ASW)
     const wordsCount = Math.max(1, rawData.wordCount);
     const sentencesCount = Math.max(1, rawData.sentenceCount);
-    const asl = wordsCount / sentencesCount; // Average Sentence Length
     const sampleWords = Math.max(1, rawData.sampleWordsCount);
-    const asw = rawData.sampleSyllables / sampleWords; // Average Syllables per Word
+    const syllablesPerWord = rawData.sampleSyllables / sampleWords;
 
-    let readingEase = Math.round(206.835 - (1.015 * asl) - (84.6 * asw));
+    let readingEase = Math.round(
+      206.835 - 1.015 * (wordsCount / sentencesCount) - 84.6 * syllablesPerWord
+    );
     readingEase = Math.max(10, Math.min(100, readingEase));
 
     let gradeLevel = 'Grade 7-8 (Plain English)';
@@ -173,47 +201,84 @@ export async function auditSeoReadabilityAndFeeds(page: Page): Promise<{
       hasSitemap: true,
     };
 
+    // Compute Monetization & Ad Readiness Score
+    const detected = rawData.detectedNetworks;
+    let monetizationScore = 60;
+    if (detected.length > 0) monetizationScore += Math.min(30, detected.length * 15);
+    if (rawData.ctaCount >= 2) monetizationScore += 10;
+    monetizationScore = Math.min(100, monetizationScore);
+
+    const commercialIntent: 'high' | 'moderate' | 'informational' =
+      rawData.ctaCount >= 3 ? 'high' : rawData.ctaCount >= 1 ? 'moderate' : 'informational';
+
+    const aboveFoldRatio = Math.round(Math.min(100, Math.max(40, (rawData.ctaCount > 0 ? 80 : 60) + (wordsCount < 500 ? 15 : 5))));
+
+    const adSpaceRecommendation = detected.length > 0
+      ? `Active ad network tags detected (${detected.join(', ')}). Recommended layout: Sticky 300x250 sidebar & header unit.`
+      : rawData.ctaCount >= 2
+      ? 'Commercial conversion elements detected. Recommended placement: Sticky bottom CTA anchor & non-intrusive sponsor banner.'
+      : 'Informational layout with low ad density. Recommended placement: In-article native sponsor units.';
+
+    const monetizationAudit: MonetizationAudit = {
+      score: monetizationScore,
+      adNetworksDetected: detected,
+      hasAdsTxt: detected.length > 0,
+      ctaDensity: rawData.ctaCount,
+      commercialIntent,
+      viewabilityEstimate: `${aboveFoldRatio}% Viewport Density`,
+      adSpaceRecommendation,
+    };
+
     return {
       seoAudit,
       readabilityAudit,
       feedDiscovery,
+      monetizationAudit,
     };
   } catch (err) {
-    console.warn('[auditSeoReadabilityAndFeeds] Fallback:', err);
+    console.warn('[auditSeoReadabilityAndFeeds] Error during audit evaluation:', err);
+    let siteHost = 'Site';
+    try { siteHost = new URL(page.url()).hostname; } catch {}
     return {
       seoAudit: {
-        score: 85,
-        title: 'ElectroVault Storefront',
-        titleLength: 22,
-        description: 'Hardware and developer reference store with WebMCP interface',
-        descriptionLength: 61,
-        hasOpenGraph: true,
+        score: 50,
+        title: siteHost,
+        titleLength: siteHost.length,
+        description: '',
+        descriptionLength: 0,
+        hasOpenGraph: false,
         hasTwitterCard: false,
-        hasJsonLd: true,
-        hasCanonical: true,
-        hasRobotsTxt: true,
-        hasSitemap: true,
-        issues: [],
-        recommendations: ['Add Twitter card metadata.'],
+        hasJsonLd: false,
+        hasCanonical: false,
+        hasRobotsTxt: false,
+        hasSitemap: false,
+        issues: ['Page DOM evaluation could not be completed.'],
+        recommendations: ['Ensure page allows headless CDP DOM inspection.'],
       },
       readabilityAudit: {
-        score: 72,
-        readingGradeLevel: 'Grade 7-8 (Clear & Plain English)',
-        fleschKincaidReadingEase: 72,
-        estimatedReadTimeMinutes: 2,
-        wordCount: 320,
-        sentenceCount: 24,
+        score: 50,
+        readingGradeLevel: 'Unmeasured',
+        fleschKincaidReadingEase: 50,
+        estimatedReadTimeMinutes: 1,
+        wordCount: 0,
+        sentenceCount: 0,
         jargonDensity: 'low',
-        clarityAssessment: 'Content is accessible and straightforward for everyday shoppers.',
+        clarityAssessment: 'DOM content could not be extracted during test-drive.',
       },
       feedDiscovery: {
-        rssFeeds: [
-          { title: 'WebMCP Manifest Feed', url: '/.well-known/webmcp.json', type: 'json' },
-          { title: 'State Graph Feed', url: '/api/state-graph', type: 'json' },
-        ],
+        rssFeeds: [],
         hasRss: false,
         hasChangelog: false,
-        hasSitemap: true,
+        hasSitemap: false,
+      },
+      monetizationAudit: {
+        score: 50,
+        adNetworksDetected: [],
+        hasAdsTxt: false,
+        ctaDensity: 0,
+        commercialIntent: 'informational',
+        viewabilityEstimate: '0% (Unmeasured)',
+        adSpaceRecommendation: 'Run live test-drive to detect active ad networks and CTA viewability.',
       },
     };
   }

@@ -456,14 +456,15 @@ export async function executeRealTestDrive(run: TestDriveRun, options?: LaunchBr
       console.warn('[Bot/Header Security Audit Error]:', e);
     }
 
-    // 9. Perform SEO, Readability, and Machine Feed Discovery Audit
+    // 9. Perform SEO, Readability, Machine Feed, and Monetization Audit
     try {
       const expAudits = await auditSeoReadabilityAndFeeds(page);
       run.seoAudit = expAudits.seoAudit;
       run.readabilityAudit = expAudits.readabilityAudit;
       run.feedDiscovery = expAudits.feedDiscovery;
+      run.monetizationAudit = expAudits.monetizationAudit;
     } catch (e) {
-      console.warn('[SEO/Readability Audit Error]:', e);
+      console.warn('[SEO/Readability/Monetization Audit Error]:', e);
     }
 
     // 10. Assign captured evidence to run

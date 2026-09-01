@@ -1,6 +1,6 @@
 import { WebMCPTool, WebMCPToolCall } from './webmcp.types.js';
 import { SecuritySignal, AuditLedgerEntry, BotProtectionAudit, HeaderSecurityAudit } from './security.types.js';
-import { StateTransitionGraph, SeoAudit, ReadabilityAudit, FeedDiscoveryAudit } from './explore.types.js';
+import { StateTransitionGraph, SeoAudit, ReadabilityAudit, FeedDiscoveryAudit, MonetizationAudit } from './explore.types.js';
 
 export type UserMode = 'explore' | 'debug' | 'inspect';
 export type TestDriveStatus = 'pending' | 'running' | 'completed' | 'failed';
@@ -222,6 +222,7 @@ export interface TestDriveRun {
   seoAudit?: SeoAudit;
   readabilityAudit?: ReadabilityAudit;
   feedDiscovery?: FeedDiscoveryAudit;
+  monetizationAudit?: MonetizationAudit;
   openRouterApiKey?: string;
   virtualToolCode?: string;
   isVirtualRun?: boolean;
