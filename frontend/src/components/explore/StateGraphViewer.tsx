@@ -9,7 +9,7 @@ interface StateGraphViewerProps {
 }
 
 export const StateGraphViewer: React.FC<StateGraphViewerProps> = ({ graph }) => {
-  const initialKey = graph?.initialState || (graph?.states ? Object.keys(graph.states)[0] : 'ANONYMOUS_BROWSING');
+  const initialKey = graph?.initialState || (graph?.states ? Object.keys(graph.states)[0] : 'ENTRY_HUB');
   const [selectedState, setSelectedState] = useState<string>(initialKey);
 
   useEffect(() => {

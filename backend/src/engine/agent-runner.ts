@@ -302,40 +302,51 @@ export async function executeRealTestDrive(run: TestDriveRun, options?: LaunchBr
           }
         }
 
-        // Ensure cart & product parameters have valid entity identifiers
-        if (matchingTool.name === 'add_to_cart' || matchingTool.name === 'add_item') {
-          const schemaEnums = (matchingTool.inputSchema as any)?.properties?.product_id?.enum || (matchingTool.inputSchema as any)?.properties?.productId?.enum;
-          const targetId = resolvedParams.productId || resolvedParams.product_id;
-          let validId = targetId;
-          if (Array.isArray(schemaEnums) && schemaEnums.length > 0) {
-            if (!schemaEnums.includes(validId)) {
-              validId = schemaEnums[0];
-            }
-          } else {
-            const isKnownId = typeof targetId === 'string' && (toolDiscoveredEntityIds.includes(targetId) || discoveredProductIds.includes(targetId));
-            validId = isKnownId
-              ? (targetId as string)
-              : (preferredEntityId || (typeof targetId === 'string' && targetId.startsWith('lap-') ? targetId : 'item-1'));
-          }
-          resolvedParams.product_id = validId;
-          resolvedParams.productId = validId;
-          const explicitQty =
-            typeof step.parameters?.quantity === 'number' && step.parameters.quantity > 0
-              ? step.parameters.quantity
-              : typeof resolvedParams.quantity === 'number' && resolvedParams.quantity > 0
-                ? resolvedParams.quantity
-                : extractRequestedQuantity(run.task);
-          resolvedParams.quantity = explicitQty;
-        }
+        // Generic Schema-Driven Parameter Resolution for ANY WebMCP tool (3D, docs, canvas, SaaS, commerce)
+        const schemaProps = (matchingTool.inputSchema as any)?.properties || {};
+        for (const [propName, propDef] of Object.entries(schemaProps)) {
+          const pDef = propDef as any;
+          const pNameLower = propName.toLowerCase();
 
-        if (matchingTool.name === 'get_product_details' || matchingTool.name === 'get_product_reviews') {
-          const targetId = resolvedParams.productId || resolvedParams.product_id;
-          const isKnownId = typeof targetId === 'string' && (toolDiscoveredEntityIds.includes(targetId) || discoveredProductIds.includes(targetId));
-          const validId = isKnownId
-            ? (targetId as string)
-            : (preferredEntityId || (typeof targetId === 'string' && targetId.startsWith('lap-') ? targetId : 'item-1'));
-          resolvedParams.product_id = validId;
-          resolvedParams.productId = validId;
+          // 1. Enum Validation & Auto-Correction
+          if (pDef?.enum && Array.isArray(pDef.enum) && pDef.enum.length > 0) {
+            const currentVal = resolvedParams[propName];
+            if (!pDef.enum.includes(currentVal)) {
+              // Pick matching enum from user prompt or use first valid enum
+              const matchingEnum = pDef.enum.find((e: any) => run.task.toLowerCase().includes(String(e).toLowerCase()));
+              resolvedParams[propName] = matchingEnum || pDef.enum[0];
+            }
+          }
+
+          // 2. ID / Ref resolution
+          if (pNameLower.includes('id') || pNameLower.includes('ref') || pNameLower.includes('item') || pNameLower.includes('model') || pNameLower.includes('doc')) {
+            const currentVal = resolvedParams[propName];
+            const isPlaceholder = typeof currentVal === 'string' && (currentVal.startsWith('$') || currentVal.startsWith('<') || currentVal.includes('placeholder'));
+            if (!currentVal || isPlaceholder) {
+              const knownId = toolDiscoveredEntityIds[0] || discoveredProductIds[0];
+              if (knownId) {
+                resolvedParams[propName] = knownId;
+              }
+            }
+          }
+
+          // 3. Dynamic numeric parameters (quantity, count, zoom, fov, limit)
+          if (pNameLower.includes('quantity') || pNameLower.includes('count') || pNameLower.includes('amount')) {
+            const explicitQty =
+              typeof step.parameters?.[propName] === 'number' && step.parameters[propName] > 0
+                ? step.parameters[propName]
+                : typeof resolvedParams[propName] === 'number' && resolvedParams[propName] > 0
+                  ? resolvedParams[propName]
+                  : extractRequestedQuantity(run.task);
+            resolvedParams[propName] = explicitQty;
+          }
+
+          // 4. Dynamic query strings / prompt fields
+          if (pNameLower.includes('query') || pNameLower.includes('search') || pNameLower.includes('prompt') || pNameLower.includes('topic') || pNameLower === 'q') {
+            if (!resolvedParams[propName] || (typeof resolvedParams[propName] === 'string' && resolvedParams[propName].startsWith('$'))) {
+              resolvedParams[propName] = run.task;
+            }
+          }
         }
 
         timeline.push({

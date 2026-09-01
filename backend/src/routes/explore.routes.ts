@@ -11,37 +11,31 @@ import { ExploreCatalogEntity, WebMCPTool, TestDriveRun } from '../types/index.j
 
 export const exploreRouter = new Hono();
 
-// Default mock/demo catalog for exploration snapshot
-const DEMO_CATALOG: ExploreCatalogEntity[] = [
+// Default generic fallback entities for exploration snapshot
+const DEFAULT_EXPLORE_ENTITIES: ExploreCatalogEntity[] = [
   {
-    id: 'lap-901',
-    entityType: 'product',
-    title: 'UltraBook Pro 14 (16GB RAM, 512GB SSD)',
-    summary: 'High performance ultra-slim developer laptop with 16GB RAM under budget.',
-    priceCents: 7499900,
-    tags: ['laptop', '16gb', 'ultrabook', 'developer'],
-    actionTool: 'add_to_cart',
-    actionParams: { product_id: 'lap-901' }
+    id: 'res-01',
+    entityType: 'service',
+    title: 'Application Core Workspace',
+    summary: 'Primary interactive canvas, documentation hub, or application viewport.',
+    tags: ['workspace', 'core', 'interactive'],
+    actionTool: 'explore_workspace',
   },
   {
-    id: 'lap-902',
-    entityType: 'product',
-    title: 'GamerMax 15 (16GB RAM, RTX 4060)',
-    summary: 'Dedicated gaming laptop with high refresh rate display.',
-    priceCents: 8500000,
-    tags: ['laptop', '16gb', 'gaming'],
-    actionTool: 'add_to_cart',
-    actionParams: { product_id: 'lap-902' }
+    id: 'res-02',
+    entityType: 'article',
+    title: 'Technical Documentation & Specifications',
+    summary: 'API references, user manuals, and configuration parameters.',
+    tags: ['docs', 'specifications', 'api'],
+    actionTool: 'query_docs',
   },
   {
-    id: 'lap-903',
-    entityType: 'product',
-    title: 'AirBook Slim (8GB RAM)',
-    summary: 'Budget friendly everyday browsing notebook.',
-    priceCents: 6200000,
-    tags: ['laptop', '8gb', 'budget'],
-    actionTool: 'add_to_cart',
-    actionParams: { product_id: 'lap-903' }
+    id: 'res-03',
+    entityType: 'service',
+    title: 'Settings & Environment Configuration',
+    summary: 'Preferences, sessions, and environment variables.',
+    tags: ['settings', 'config'],
+    actionTool: 'update_settings',
   }
 ];
 
@@ -93,15 +87,7 @@ exploreRouter.get('/snapshot', async (c) => {
   const matchingRun = runs.find((r: TestDriveRun) => r.url.includes(url) || url.includes(r.url)) || runs[0];
   const tools: WebMCPTool[] = matchingRun ? matchingRun.tools : [];
 
-  const dynamicCatalog = (matchingRun?.extractedData as any)?.entities || (url.includes('3002') ? DEMO_CATALOG : [
-    {
-      id: 'ent-1',
-      entityType: 'article' as const,
-      title: `${new URL(url.startsWith('http') ? url : `https://${url}`).hostname} Core Resource`,
-      summary: `Discovered live web endpoint with ${tools.length} WebMCP tool(s) and full DOM controls.`,
-      tags: ['web', 'explored']
-    }
-  ]);
+  const dynamicCatalog = (matchingRun?.extractedData as any)?.entities || DEFAULT_EXPLORE_ENTITIES;
 
   const snapshot = buildExploreSnapshot(url, tools, dynamicCatalog);
   return c.json({ success: true, snapshot });
@@ -114,15 +100,7 @@ exploreRouter.get('/snapshot/sqlite', async (c) => {
   const matchingRun = runs.find((r: TestDriveRun) => r.url.includes(url) || url.includes(r.url)) || runs[0];
   const tools: WebMCPTool[] = matchingRun ? matchingRun.tools : [];
 
-  const dynamicCatalog = (matchingRun?.extractedData as any)?.entities || (url.includes('3002') ? DEMO_CATALOG : [
-    {
-      id: 'ent-1',
-      entityType: 'article' as const,
-      title: `${new URL(url.startsWith('http') ? url : `https://${url}`).hostname} Core Resource`,
-      summary: `Discovered live web endpoint with ${tools.length} WebMCP tool(s).`,
-      tags: ['web', 'explored']
-    }
-  ]);
+  const dynamicCatalog = (matchingRun?.extractedData as any)?.entities || DEFAULT_EXPLORE_ENTITIES;
 
   const sqlScript = generateSqliteExploreScript(url, tools, dynamicCatalog);
   c.header('Content-Type', 'application/sql');

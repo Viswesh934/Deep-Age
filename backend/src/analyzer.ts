@@ -18,52 +18,46 @@ export function analyzeTestDrive(run: TestDriveRun): {
   const toolNames = run.tools.map((t) => t.name);
   const taskLower = run.task.toLowerCase();
 
-  // 1. Friction Detection: Missing Capabilities
-  const wantsAdd = (taskLower.includes('add') && taskLower.includes('cart')) || taskLower.includes('add to cart');
-  const hasAddToCartTool = toolNames.some((name) =>
-    name === 'add_to_cart' || name === 'add_item' || name === 'add_product' || name === 'add_to_bag'
-  );
-  const hasCartApi = run.network.some((n) =>
-    n.url.toLowerCase().includes('/cart') || n.url.toLowerCase().includes('/api/cart')
-  );
-  const hasCartDom = run.domInteractions.some((d) =>
-    d.selector.toLowerCase().includes('cart') || (d.text && d.text.toLowerCase().includes('add to cart'))
-  );
+  // 1. Friction Detection: Missing Tool Capabilities for User Goal
+  const goalTokens = taskLower.replace(/[^a-z0-9\s]/g, ' ').split(/\s+/).filter((t) => t.length > 2);
+  const hasMatchingTool = toolNames.some((name) => {
+    const nLower = name.toLowerCase();
+    return goalTokens.some((t) => nLower.includes(t) || t.includes(nLower.replace(/_/g, '')));
+  });
 
-  if (wantsAdd && !hasAddToCartTool) {
+  if (!hasMatchingTool && run.tools.length > 0) {
+    let candidateToolName = goalTokens.slice(0, 2).join('_') || 'execute_action';
+    candidateToolName = candidateToolName.replace(/[^a-zA-Z0-9_]/g, '');
+
     frictions.push({
-      id: `fric-${Date.now()}-1`,
+      id: `fric-${Date.now()}-missing-capability`,
       type: 'missing_capability',
       severity: 'high',
-      title: 'Missing WebMCP Capability for Cart Operation',
-      description:
-        'The agent attempted to perform a cart action, but no corresponding WebMCP tool (e.g., add_to_cart) was exposed by the website.',
+      title: `Missing WebMCP Capability for "${run.task}"`,
+      description: `The AI agent attempted to fulfill goal "${run.task}", but no matching WebMCP tool (e.g. ${candidateToolName}) was exposed on document.modelContext.`,
       evidence: {
         toolsDiscovered: toolNames,
-        relevantApiEndpoint: hasCartApi ? 'POST /api/cart' : undefined,
-        domElementDetected: hasCartDom ? 'button.add-to-cart' : undefined,
+        domElementDetected: run.domInteractions[0]?.selector,
+        relevantApiEndpoint: run.network[0]?.url,
       },
-      recommendation: 'Expose document.modelContext.registerTool({ name: "add_to_cart", inputSchema: { product_id: "string" } }) so agents can complete purchase journeys programmatically.',
-      codeSnippet: `document.modelContext.registerTool({
-  name: "add_to_cart",
-  description: "Add a specified product item to the user shopping cart",
+      recommendation: `Expose document.modelContext.registerTool({ name: "${candidateToolName}", ... }) so autonomous agents can perform this action programmatically without brittle scraping.`,
+      codeSnippet: `// Drop-in Chrome WebMCP Fix for ${run.task}
+document.modelContext.registerTool({
+  name: '${candidateToolName}',
+  description: 'Programmatically fulfill: ${run.task.replace(/'/g, "\\'")}',
   inputSchema: {
-    type: "object",
+    type: 'object',
     properties: {
-      product_id: { type: "string", description: "Target product ID" },
-      quantity: { type: "number", description: "Quantity of units" }
-    },
-    required: ["product_id"]
+      query: { type: 'string', description: 'Search term or target parameter' },
+      options: { type: 'object', description: 'Additional action settings' }
+    }
   },
   execute: async (input) => {
-    const res = await fetch("/api/cart", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ productId: input.product_id || input.productId || "lap-901", quantity: input.quantity || 1 })
-    });
-    return res.json();
+    // In-page execution handler
+    console.log('[WebMCP] Executing ${candidateToolName}:', input);
+    return { success: true, timestamp: Date.now() };
   }
-});`
+});`,
     });
   }
 
