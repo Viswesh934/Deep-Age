@@ -2,17 +2,40 @@ import React from 'react';
 import { TestDriveRun } from '@/types';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { env } from '@/config/env';
 
 interface SeoReadabilityFeedsPanelProps {
   run: TestDriveRun;
 }
 
 export const SeoReadabilityFeedsPanel: React.FC<SeoReadabilityFeedsPanelProps> = ({ run }) => {
+  const resolveFeedUrl = (rawUrl: string): string => {
+    if (!rawUrl) return '#';
+    if (rawUrl.startsWith('http://') || rawUrl.startsWith('https://')) {
+      return rawUrl;
+    }
+    const base = env.backendUrl || window.location.origin;
+    if (rawUrl.startsWith('/api/explore/snapshot/')) {
+      const targetQuery = run?.url ? `?url=${encodeURIComponent(run.url)}` : '';
+      return `${base}${rawUrl}${targetQuery}`;
+    }
+    if (rawUrl.startsWith('/api/explore/graph')) {
+      const targetQuery = run?.url ? `?url=${encodeURIComponent(run.url)}` : '';
+      return `${base}${rawUrl}${targetQuery}`;
+    }
+    if (run?.url) {
+      try {
+        return new URL(rawUrl, run.url).href;
+      } catch {}
+    }
+    return `${base}${rawUrl.startsWith('/') ? '' : '/'}${rawUrl}`;
+  };
+
   const seo = run.seoAudit || {
     score: 88,
-    title: 'ElectroVault Storefront',
+    title: 'Application Interface',
     titleLength: 22,
-    description: 'Hardware and developer reference store with WebMCP interface',
+    description: 'Web application with autonomous WebMCP observability integration',
     descriptionLength: 61,
     hasOpenGraph: true,
     hasTwitterCard: true,
@@ -37,9 +60,9 @@ export const SeoReadabilityFeedsPanel: React.FC<SeoReadabilityFeedsPanelProps> =
 
   const feeds = run.feedDiscovery || {
     rssFeeds: [
-      { title: 'WebMCP Manifest Feed', url: '/.well-known/webmcp.json', type: 'json' as const },
-      { title: 'State Graph Capability Feed', url: '/api/state-graph', type: 'json' as const },
-      { title: 'SQLite Catalog Feed', url: '/api/catalog.sqlite', type: 'json' as const },
+      { title: 'WebMCP JSON Manifest', url: '/api/explore/snapshot/manifest', type: 'json' as const },
+      { title: 'State Graph Capability Export', url: '/api/explore/graph', type: 'json' as const },
+      { title: 'SQLite Knowledge Database (.sql)', url: '/api/explore/snapshot/sqlite', type: 'json' as const },
     ],
     hasRss: false,
     hasChangelog: false,
@@ -138,7 +161,7 @@ export const SeoReadabilityFeedsPanel: React.FC<SeoReadabilityFeedsPanelProps> =
             {feeds.rssFeeds.map((f, i) => (
               <a
                 key={i}
-                href={f.url}
+                href={resolveFeedUrl(f.url)}
                 target="_blank"
                 rel="noreferrer"
                 className="p-2 rounded-xl bg-secondary/30 hover:bg-secondary/60 border border-border/60 flex items-center justify-between text-foreground transition-all cursor-pointer block"
