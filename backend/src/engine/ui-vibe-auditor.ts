@@ -1,4 +1,4 @@
-import { Page } from 'puppeteer';
+import type { Page } from 'puppeteer';
 import { UIVibeAudit, DOMInteractionEvent } from '@deep-age/shared';
 
 // Common AI Cliché Purple/Indigo Hexes and Gradients

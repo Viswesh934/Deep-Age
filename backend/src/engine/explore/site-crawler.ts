@@ -1,4 +1,4 @@
-import { Page } from 'puppeteer';
+import type { Page } from 'puppeteer';
 import { ExploreCatalogEntity } from '@deep-age/shared';
 
 export interface ExtractedSiteData {

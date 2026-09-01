@@ -1,4 +1,4 @@
-import { Page } from 'puppeteer';
+import type { Page } from 'puppeteer';
 import { WebMCPTool, WebMCPToolCall } from '@deep-age/shared';
 
 export class WebMCPInspector {

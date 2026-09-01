@@ -1,6 +1,6 @@
 name = "deep-age-backend"
 main = "src/index.ts"
-compatibility_date = "2024-04-05"
+compatibility_date = "2024-09-23"
 compatibility_flags = ["nodejs_compat"]
 
 # Cloudflare Browser Rendering Binding

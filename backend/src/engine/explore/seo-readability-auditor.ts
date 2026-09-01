@@ -1,4 +1,4 @@
-import { Page } from 'puppeteer';
+import type { Page } from 'puppeteer';
 import { SeoAudit, ReadabilityAudit, FeedDiscoveryAudit } from '@deep-age/shared';
 
 export async function auditSeoReadabilityAndFeeds(page: Page): Promise<{

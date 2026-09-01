@@ -1,4 +1,4 @@
-import { Page, HTTPRequest, HTTPResponse } from 'puppeteer';
+import type { Page, HTTPRequest, HTTPResponse } from 'puppeteer';
 import { NetworkEvent } from '@deep-age/shared';
 
 export class NetworkInterceptor {

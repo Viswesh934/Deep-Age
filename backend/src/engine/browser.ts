@@ -1,4 +1,4 @@
-import puppeteer, { Browser } from 'puppeteer';
+import type { Browser } from 'puppeteer';
 import { config } from '../config/env.js';
 
 export interface LaunchBrowserOptions {
@@ -19,20 +19,26 @@ export async function launchBrowser(options?: LaunchBrowserOptions): Promise<Bro
   }
 
   // 2. Remote WebSocket endpoint (e.g. Browserless, remote Cloudflare browser endpoint)
-  const wsEndpoint = options?.wsEndpoint || process.env.BROWSER_WS_ENDPOINT;
+  const wsEndpoint = options?.wsEndpoint || (typeof process !== 'undefined' && process.env?.BROWSER_WS_ENDPOINT);
   if (wsEndpoint) {
-    return await puppeteer.connect({ browserWSEndpoint: wsEndpoint });
+    const puppeteer = await import('puppeteer');
+    return await puppeteer.default.connect({ browserWSEndpoint: wsEndpoint });
   }
 
-  // 3. Local Node / Docker Chromium fallback
-  return await puppeteer.launch({
-    headless: config.browser.headless,
-    args: [
-      '--no-sandbox',
-      '--disable-setuid-sandbox',
-      '--disable-dev-shm-usage',
-      '--disable-gpu',
-    ],
-  });
+  // 3. Local Node / Docker Chromium fallback (only in Node.js runtime)
+  if (typeof process !== 'undefined' && process.release?.name === 'node') {
+    const puppeteer = await import('puppeteer');
+    return await puppeteer.default.launch({
+      headless: config.browser.headless,
+      args: [
+        '--no-sandbox',
+        '--disable-setuid-sandbox',
+        '--disable-dev-shm-usage',
+        '--disable-gpu',
+      ],
+    });
+  }
+
+  throw new Error('No compatible browser execution environment found (Cloudflare MYBROWSER binding or WebSocket endpoint required).');
 }
 

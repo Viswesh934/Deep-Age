@@ -1,4 +1,4 @@
-import { Page } from 'puppeteer';
+import type { Page } from 'puppeteer';
 import { AgentStateDump, SemanticElement, InteractionElement, WebMCPTool } from '@deep-age/shared';
 
 export class AgentStateDumper {
