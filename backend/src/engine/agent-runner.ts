@@ -12,7 +12,7 @@ import { NetworkInterceptor } from './network-interceptor.js';
 import { DOMInspector } from './dom-inspector.js';
 import { WebMCPInspector } from './webmcp-inspector.js';
 import { analyzerService } from '../services/analyzer.service.js';
-import { resolveUserIntent } from './explore/intent-resolver.js';
+import { resolveUserIntent, extractRequestedQuantity } from './explore/intent-resolver.js';
 import { buildSiteStateGraph } from './explore/state-graph.js';
 import { extractLiveSiteStructure } from './explore/site-crawler.js';
 import { AgentStateDumper } from './agent-state-dumper.js';
@@ -319,9 +319,13 @@ export async function executeRealTestDrive(run: TestDriveRun, options?: LaunchBr
           }
           resolvedParams.product_id = validId;
           resolvedParams.productId = validId;
-          if (!resolvedParams.quantity) {
-            resolvedParams.quantity = 1;
-          }
+          const explicitQty =
+            typeof step.parameters?.quantity === 'number' && step.parameters.quantity > 0
+              ? step.parameters.quantity
+              : typeof resolvedParams.quantity === 'number' && resolvedParams.quantity > 0
+                ? resolvedParams.quantity
+                : extractRequestedQuantity(run.task);
+          resolvedParams.quantity = explicitQty;
         }
 
         if (matchingTool.name === 'get_product_details' || matchingTool.name === 'get_product_reviews') {

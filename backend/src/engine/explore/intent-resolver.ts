@@ -8,6 +8,36 @@ import {
 
 import { config } from '../../config/env.js';
 
+export function extractRequestedQuantity(prompt: string): number {
+  if (!prompt) return 1;
+  const pLower = prompt.toLowerCase();
+
+  // 1. Number words
+  if (/\b(two|couple)\b/.test(pLower)) return 2;
+  if (/\bthree\b/.test(pLower)) return 3;
+  if (/\bfour\b/.test(pLower)) return 4;
+  if (/\bfive\b/.test(pLower)) return 5;
+  if (/\bsix\b/.test(pLower)) return 6;
+  if (/\bseven\b/.test(pLower)) return 7;
+  if (/\beight\b/.test(pLower)) return 8;
+  if (/\bnine\b/.test(pLower)) return 9;
+  if (/\bten\b/.test(pLower)) return 10;
+
+  // 2. Explicit digits (e.g. "2 coffees", "buy 2", "2 bags", "qty: 3")
+  const digitMatch =
+    pLower.match(/\b(\d+)\s*(?:coffees?|bags?|items?|units?|laptops?|products?|cups?|pack|packs|x)?\b/) ||
+    pLower.match(/\b(?:buy|add|order|get|purchase|cart|quantity|qty)\s*[:=]?\s*(\d+)\b/);
+
+  if (digitMatch && digitMatch[1]) {
+    const parsed = parseInt(digitMatch[1], 10);
+    if (!isNaN(parsed) && parsed > 0 && parsed <= 99) {
+      return parsed;
+    }
+  }
+
+  return 1;
+}
+
 export async function resolveUserIntent(
   request: IntentResolutionRequest,
   tools: WebMCPTool[],
@@ -76,12 +106,13 @@ export async function resolveUserIntent(
   if (wantsCart) {
     if (cartTool) {
       estimatedRisk = 'reversible_write';
+      const requestedQty = extractRequestedQuantity(request.userGoal);
       plan.push({
         step: stepNum++,
         toolName: cartTool.name,
-        parameters: { productId: '$step1.results[0].id', quantity: 1 },
+        parameters: { productId: '$step1.results[0].id', quantity: requestedQty },
         safetyTier: 'reversible_write',
-        explanation: 'Add matching item to cart session with 10-second rollback window.',
+        explanation: `Add ${requestedQty} matching item(s) to cart session with 10-second rollback window.`,
         requiresConfirmation: false
       });
     } else {
