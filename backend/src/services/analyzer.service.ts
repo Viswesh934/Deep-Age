@@ -19,42 +19,39 @@ export class AnalyzerService {
     const toolNames = run.tools.map((t) => t.name);
     const taskLower = run.task.toLowerCase();
 
-    // 1. Friction Detection: Missing Tool Capabilities for User Goal
-    const goalTokens = taskLower.replace(/[^a-z0-9\s]/g, ' ').split(/\s+/).filter((t) => t.length > 2);
+    // 1. Friction Detection: Semantic Tool Capability Check (Pure Token Matching, Zero Hardcoded Lists)
+    const taskTokens = taskLower.replace(/[^a-z0-9\s]/g, ' ').split(/\s+/).filter((t) => t.length > 2);
     const hasMatchingTool = toolNames.some((name) => {
       const nLower = name.toLowerCase();
-      return goalTokens.some((t) => nLower.includes(t) || t.includes(nLower.replace(/_/g, '')));
+      return taskTokens.some((t) => nLower.includes(t) || t.includes(nLower.replace(/_/g, '')));
     });
 
     if (!hasMatchingTool && run.tools.length > 0) {
-      let candidateToolName = goalTokens.slice(0, 2).join('_') || 'execute_action';
-      candidateToolName = candidateToolName.replace(/[^a-zA-Z0-9_]/g, '');
-
+      const candidateToolName = taskTokens.slice(0, 2).join('_') || 'execute_task';
       frictions.push({
         id: `fric-${Date.now()}-missing-capability`,
         type: 'missing_capability',
         severity: 'high',
-        title: `Missing WebMCP Capability for "${run.task}"`,
-        description: `The AI agent attempted to fulfill goal "${run.task}", but no matching WebMCP tool (e.g. ${candidateToolName}) was exposed on document.modelContext.`,
+        title: `Missing WebMCP Tool for "${run.task}"`,
+        description: `The user requested "${run.task}", but the website only exposes tools (${toolNames.join(', ') || 'none'}) and lacks a declarative WebMCP tool matching this goal.`,
         evidence: {
           toolsDiscovered: toolNames,
           domElementDetected: run.domInteractions[0]?.selector,
           relevantApiEndpoint: run.network[0]?.url,
         },
-        recommendation: `Expose document.modelContext.registerTool({ name: "${candidateToolName}", ... }) so autonomous agents can perform this action programmatically without brittle scraping.`,
-        codeSnippet: `// Drop-in Chrome WebMCP Fix for ${run.task}
+        recommendation: `Register document.modelContext.registerTool({ name: "${candidateToolName}", ... }) so autonomous agents can complete this action programmatically without brittle DOM scraping.`,
+        codeSnippet: `// Drop-in WebMCP Fix for ${run.task}
 document.modelContext.registerTool({
   name: '${candidateToolName}',
   description: 'Programmatically fulfill: ${run.task.replace(/'/g, "\\'")}',
   inputSchema: {
     type: 'object',
     properties: {
-      query: { type: 'string', description: 'Search term or target parameter' },
-      options: { type: 'object', description: 'Additional action settings' }
+      query: { type: 'string', description: 'Action parameter or target' },
+      options: { type: 'object', description: 'Action configuration' }
     }
   },
   execute: async (input) => {
-    // In-page execution handler
     console.log('[WebMCP] Executing ${candidateToolName}:', input);
     return { success: true, timestamp: Date.now() };
   }
