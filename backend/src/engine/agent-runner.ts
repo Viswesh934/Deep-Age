@@ -456,9 +456,9 @@ export async function executeRealTestDrive(run: TestDriveRun, options?: LaunchBr
       console.warn('[Bot/Header Security Audit Error]:', e);
     }
 
-    // 9. Perform SEO, Readability, Machine Feed, and Monetization Audit
+    // 9. Perform SEO, Readability, Machine Feed, and Monetization Audit (with OpenRouter AI)
     try {
-      const expAudits = await auditSeoReadabilityAndFeeds(page);
+      const expAudits = await auditSeoReadabilityAndFeeds(page, run.openRouterApiKey);
       run.seoAudit = expAudits.seoAudit;
       run.readabilityAudit = expAudits.readabilityAudit;
       run.feedDiscovery = expAudits.feedDiscovery;

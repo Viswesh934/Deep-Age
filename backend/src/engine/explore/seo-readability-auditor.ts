@@ -1,7 +1,10 @@
 import type { Page } from 'puppeteer';
 import { SeoAudit, ReadabilityAudit, FeedDiscoveryAudit, MonetizationAudit } from '../../types/index.js';
 
-export async function auditSeoReadabilityAndFeeds(page: Page): Promise<{
+export async function auditSeoReadabilityAndFeeds(
+  page: Page,
+  apiKey?: string
+): Promise<{
   seoAudit: SeoAudit;
   readabilityAudit: ReadabilityAudit;
   feedDiscovery: FeedDiscoveryAudit;
@@ -18,7 +21,7 @@ export async function auditSeoReadabilityAndFeeds(page: Page): Promise<{
       const hasTwitter = Boolean(document.querySelector('meta[name="twitter:card"]'));
       const hasCanonical = Boolean(document.querySelector('link[rel="canonical"]'));
       const hasJsonLd = Boolean(document.querySelector('script[type="application/ld+json"]'));
-      const h1Count = document.querySelectorAll('h1').length;
+      const h1List = Array.from(document.querySelectorAll('h1')).map(h => h.textContent?.trim() || '');
 
       // 2. RSS & Machine Feeds
       const feeds: Array<{ title: string; url: string; type: 'rss' | 'atom' | 'json' }> = [];
@@ -36,11 +39,6 @@ export async function auditSeoReadabilityAndFeeds(page: Page): Promise<{
         }
       });
 
-      // Also check standard WebMCP or known endpoints
-      if (document.querySelector('a[href*="webmcp.json"], a[href*="state-graph"], a[href*="catalog.sqlite"]')) {
-        feeds.push({ title: 'WebMCP Manifest Feed', url: '/.well-known/webmcp.json', type: 'json' });
-      }
-
       // 3. Monetization & Ad Network Detection
       const htmlContent = document.documentElement.outerHTML.toLowerCase();
       const detectedNetworks: string[] = [];
@@ -51,17 +49,13 @@ export async function auditSeoReadabilityAndFeeds(page: Page): Promise<{
       if (htmlContent.includes('amazon-adsystem') || htmlContent.includes('aax.amazon-adsystem')) detectedNetworks.push('Amazon Publisher Services');
       if (htmlContent.includes('criteo') || htmlContent.includes('taboola') || htmlContent.includes('outbrain')) detectedNetworks.push('Native Retargeting');
 
-      // 4. CTA Conversion Density
-      const ctaElements = document.querySelectorAll('button, a.btn, a.cta, input[type="submit"], [role="button"]');
-      let ctaCount = 0;
-      ctaElements.forEach(el => {
-        const text = (el.textContent || '').toLowerCase();
-        if (text.includes('buy') || text.includes('order') || text.includes('get') || text.includes('start') || text.includes('subscribe') || text.includes('sign') || text.includes('add') || text.includes('try') || text.includes('download')) {
-          ctaCount++;
-        }
-      });
+      // 4. CTA & Conversion Controls
+      const ctaElements = Array.from(document.querySelectorAll('button, a.btn, a.cta, input[type="submit"], [role="button"]'))
+        .slice(0, 15)
+        .map(el => (el.textContent || '').trim())
+        .filter(txt => txt.length > 0 && txt.length < 50);
 
-      // 5. Body Text & Readability Metrics
+      // 5. Body Text Sample
       const bodyText = (document.body?.innerText || '')
         .replace(/\s+/g, ' ')
         .trim();
@@ -69,7 +63,6 @@ export async function auditSeoReadabilityAndFeeds(page: Page): Promise<{
       const words = bodyText.split(/\s+/).filter(w => w.length > 0);
       const sentences = bodyText.split(/[.!?]+/).filter(s => s.trim().length > 0);
 
-      // Estimate syllables
       let totalSyllables = 0;
       for (const w of words.slice(0, 500)) {
         const clean = w.toLowerCase().replace(/[^a-z]/g, '');
@@ -81,6 +74,7 @@ export async function auditSeoReadabilityAndFeeds(page: Page): Promise<{
       }
 
       return {
+        url: window.location.href,
         title,
         titleLength: title.length,
         description: metaDesc,
@@ -89,16 +83,113 @@ export async function auditSeoReadabilityAndFeeds(page: Page): Promise<{
         hasTwitterCard: hasTwitter,
         hasCanonical,
         hasJsonLd,
-        h1Count,
+        h1Count: h1List.length,
+        h1List,
         feeds,
         detectedNetworks,
-        ctaCount,
+        ctaElements,
+        ctaCount: ctaElements.length,
         wordCount: words.length,
         sentenceCount: Math.max(1, sentences.length),
         sampleSyllables: totalSyllables,
         sampleWordsCount: Math.min(500, words.length),
+        textSample: bodyText.slice(0, 1200),
       };
     });
+
+    const activeApiKey = apiKey || process.env.OPENROUTER_API_KEY;
+
+    // AI-Powered Deep Audit using OpenRouter
+    if (activeApiKey) {
+      try {
+        const aiPrompt = `You are an expert SEO, Readability, and Business Monetization Auditor.
+Analyze this live website:
+URL: ${rawData.url}
+Title: "${rawData.title}"
+Meta Description: "${rawData.description}"
+H1 Headings: ${JSON.stringify(rawData.h1List)}
+CTA Actions Detected: ${JSON.stringify(rawData.ctaElements)}
+Detected Ad Networks / Scripts: ${JSON.stringify(rawData.detectedNetworks)}
+Content Sample: "${rawData.textSample}"
+
+Perform a deep semantic audit. Return ONLY valid JSON with this schema:
+{
+  "seoAudit": {
+    "score": number, // 0-100
+    "title": "${rawData.title}",
+    "titleLength": ${rawData.titleLength},
+    "description": "${rawData.description}",
+    "descriptionLength": ${rawData.descriptionLength},
+    "hasOpenGraph": ${rawData.hasOpenGraph},
+    "hasTwitterCard": ${rawData.hasTwitterCard},
+    "hasJsonLd": ${rawData.hasJsonLd},
+    "hasCanonical": ${rawData.hasCanonical},
+    "hasRobotsTxt": true,
+    "hasSitemap": true,
+    "issues": ["string"],
+    "recommendations": ["string"]
+  },
+  "readabilityAudit": {
+    "score": number, // 0-100
+    "readingGradeLevel": "string",
+    "fleschKincaidReadingEase": number,
+    "estimatedReadTimeMinutes": number,
+    "wordCount": ${rawData.wordCount},
+    "sentenceCount": ${rawData.sentenceCount},
+    "jargonDensity": "low" | "moderate" | "high",
+    "clarityAssessment": "string"
+  },
+  "monetizationAudit": {
+    "score": number, // 0-100
+    "adNetworksDetected": ${JSON.stringify(rawData.detectedNetworks.length > 0 ? rawData.detectedNetworks : ['None Detected'])},
+    "hasAdsTxt": ${rawData.detectedNetworks.length > 0},
+    "ctaDensity": ${rawData.ctaCount},
+    "commercialIntent": "high" | "moderate" | "informational",
+    "viewabilityEstimate": "string",
+    "adSpaceRecommendation": "string"
+  }
+}`;
+
+        const aiRes = await fetch('https://openrouter.ai/api/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${activeApiKey}`,
+            'Content-Type': 'application/json',
+            'HTTP-Referer': 'https://deep-age.dev',
+            'X-Title': 'Deep Age Observability'
+          },
+          body: JSON.stringify({
+            model: 'openai/gpt-4o-mini',
+            messages: [{ role: 'user', content: aiPrompt }]
+          })
+        });
+
+        if (aiRes.ok) {
+          const aiJson: any = await aiRes.json();
+          const content = aiJson.choices?.[0]?.message?.content;
+          if (content) {
+            const first = content.indexOf('{');
+            const last = content.lastIndexOf('}');
+            if (first !== -1 && last !== -1) {
+              const parsed = JSON.parse(content.slice(first, last + 1));
+              return {
+                seoAudit: parsed.seoAudit,
+                readabilityAudit: parsed.readabilityAudit,
+                feedDiscovery: {
+                  rssFeeds: rawData.feeds,
+                  hasRss: rawData.feeds.some(f => f.type === 'rss' || f.type === 'atom'),
+                  hasChangelog: false,
+                  hasSitemap: true,
+                },
+                monetizationAudit: parsed.monetizationAudit,
+              };
+            }
+          }
+        }
+      } catch (aiErr) {
+        console.warn('[auditSeoReadabilityAndFeeds] OpenRouter AI fallback to token calculation:', aiErr);
+      }
+    }
 
     // Compute SEO Score
     const seoIssues: string[] = [];
