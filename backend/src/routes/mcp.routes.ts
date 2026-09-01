@@ -192,7 +192,8 @@ mcpRouter.post('/', async (c: Context) => {
         };
 
         await storeService.set(runId, initialRun);
-        const executedRun = await executeRealTestDrive(initialRun, {});
+        const browserBinding = (c.env as any)?.MYBROWSER;
+        const executedRun = await executeRealTestDrive(initialRun, { browserBinding });
         await storeService.set(runId, executedRun);
 
         return c.json({
