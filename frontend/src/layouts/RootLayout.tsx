@@ -3,6 +3,7 @@ import { Outlet, useLocation } from 'react-router-dom';
 import { useTestDriveContext } from '@/context/TestDriveContext';
 import { Sidebar } from '@/components/Sidebar';
 import { StartForm } from '@/components/StartForm';
+import { TestDriveLoadingOverlay } from '@/components/common/TestDriveLoadingOverlay';
 import { Terminal, Copy, Check } from 'lucide-react';
 import {
   Dialog,
@@ -17,7 +18,7 @@ import { Button } from '@/components/ui/button';
 import { env } from '@/config/env';
 
 export const RootLayout: React.FC = () => {
-  const { isDark, showMcpModal, setShowMcpModal } = useTestDriveContext();
+  const { isDark, showMcpModal, setShowMcpModal, isLoading, url, task } = useTestDriveContext();
   const [copiedMcp, setCopiedMcp] = useState<boolean>(false);
   const [mcpTab, setMcpTab] = useState<'remote' | 'cli' | 'tools'>('remote');
   const location = useLocation();
@@ -96,6 +97,9 @@ export const RootLayout: React.FC = () => {
           </div>
         )}
       </div>
+
+      {/* Global Interactive Loading & Progress Overlay */}
+      <TestDriveLoadingOverlay isLoading={isLoading} targetUrl={url} targetTask={task} />
 
       {/* Compact, Zero-Overflow MCP Dialog */}
       <Dialog open={showMcpModal} onOpenChange={setShowMcpModal}>

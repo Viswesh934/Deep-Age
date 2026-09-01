@@ -99,11 +99,10 @@ tools = client.get_tools() # ['run_test_drive', 'inspect_url', 'generate_patch']
 
         <div className="space-y-3 max-w-4xl mx-auto">
           <h1 className="text-3xl sm:text-5xl md:text-6xl font-black tracking-tight text-foreground leading-[1.1]">
-            Test-Drive Any Website with <span className="text-primary underline decoration-border/80">AI Agents</span>.
+            Test Any Website with <span className="text-primary underline decoration-border/80">Autonomous AI Agents</span>.
           </h1>
           <p className="text-base sm:text-lg text-muted-foreground max-w-2xl mx-auto font-normal leading-relaxed">
-            Run autonomous browser test-drives to diagnose friction, generate WebMCP patches, and connect{' '}
-            <strong className="text-foreground font-semibold">Cursor, Claude Desktop, & Antigravity</strong> directly to any web interface.
+            Simulate how AI assistants, autonomous bots, and coding agents browse and interact with your website. Pinpoint missing actions, uncover navigation friction, and get instant code fixes.
           </p>
         </div>
 
@@ -145,33 +144,33 @@ tools = client.get_tools() # ['run_test_drive', 'inspect_url', 'generate_patch']
       <section className="bg-card border border-border/80 rounded-3xl p-5 md:p-6 shadow-xl space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-2 pb-3 border-b border-border/60">
           <div>
-            <h2 className="text-sm font-bold text-foreground">Interactive Browser Test-Drive Bench</h2>
-            <p className="text-[11px] text-muted-foreground font-mono">Autonomous Execution • DOM Interception • WebMCP Evaluation</p>
+            <h2 className="text-sm font-bold text-foreground">Interactive Website Test-Drive</h2>
+            <p className="text-[11px] text-muted-foreground font-mono">Live Browser Simulation • Action & Button Discovery • AI Diagnosis</p>
           </div>
 
           <div className="flex items-center gap-2">
             <span className="text-[11px] text-muted-foreground font-semibold uppercase tracking-wider hidden sm:inline">
-              Demo Scenarios:
+              Quick Presets:
             </span>
             <Button
               type="button"
               variant="ghost"
               size="sm"
               onClick={() => handleRunPresetScenario(false)}
-              className="h-7 px-3 text-xs font-medium rounded-full bg-secondary/80 hover:bg-secondary border border-border/60"
+              className="h-7 px-3 text-xs font-medium rounded-full bg-secondary/80 hover:bg-secondary border border-border/60 cursor-pointer"
             >
               <span className="w-2 h-2 rounded-full bg-[#ff8527] mr-1.5"></span>
-              Friction Demo
+              Simulate Friction
             </Button>
             <Button
               type="button"
               variant="ghost"
               size="sm"
               onClick={() => handleRunPresetScenario(true)}
-              className="h-7 px-3 text-xs font-medium rounded-full bg-secondary/80 hover:bg-secondary border border-border/60"
+              className="h-7 px-3 text-xs font-medium rounded-full bg-secondary/80 hover:bg-secondary border border-border/60 cursor-pointer"
             >
               <span className="w-2 h-2 rounded-full bg-[#5ae561] mr-1.5"></span>
-              WebMCP Pass
+              Simulate Smooth Pass
             </Button>
           </div>
         </div>
@@ -183,7 +182,7 @@ tools = client.get_tools() # ['run_test_drive', 'inspect_url', 'generate_patch']
               type="text"
               value={url}
               onChange={(e) => setUrl(e.target.value)}
-              placeholder="e.g. http://127.0.0.1:3002"
+              placeholder="e.g. https://your-website.com"
               className="bg-transparent text-xs font-mono outline-none w-full text-foreground placeholder:text-muted-foreground/70"
             />
           </div>
@@ -193,7 +192,7 @@ tools = client.get_tools() # ['run_test_drive', 'inspect_url', 'generate_patch']
               type="text"
               value={task}
               onChange={(e) => setTask(e.target.value)}
-              placeholder="e.g. Find a laptop under ₹80k and add to cart"
+              placeholder="e.g. Test checkout flow, find documentation, or verify controls"
               className="bg-transparent text-xs outline-none w-full text-foreground placeholder:text-muted-foreground/70"
             />
           </div>
@@ -291,9 +290,9 @@ tools = client.get_tools() # ['run_test_drive', 'inspect_url', 'generate_patch']
             <div className="w-7 h-7 rounded-full bg-secondary text-foreground flex items-center justify-center font-bold text-xs font-mono">
               1
             </div>
-            <h3 className="text-sm font-bold text-foreground">Point & Simulate</h3>
+            <h3 className="text-sm font-bold text-foreground">Simulate & Observe</h3>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              Enter any URL or staging environment. Deep Age launches an isolated browser sandbox with DOM and network interception.
+              Enter any URL or staging environment. Deep Age launches a real headless browser session to observe how autonomous agents navigate and interact.
             </p>
           </Card>
 
@@ -301,9 +300,9 @@ tools = client.get_tools() # ['run_test_drive', 'inspect_url', 'generate_patch']
             <div className="w-7 h-7 rounded-full bg-secondary text-foreground flex items-center justify-center font-bold text-xs font-mono">
               2
             </div>
-            <h3 className="text-sm font-bold text-foreground">Evaluate WebMCP & Friction</h3>
+            <h3 className="text-sm font-bold text-foreground">Diagnose Gaps & Friction</h3>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              Discovers client-side <code className="font-mono text-[11px] text-foreground font-semibold">document.modelContext</code> tools, validates input schemas, and pinpoints where autonomous agents get stuck.
+              Discovers interactive controls, evaluates conversion paths, and pinpoints exactly where autonomous AI agents encounter roadblocks.
             </p>
           </Card>
 
@@ -311,9 +310,9 @@ tools = client.get_tools() # ['run_test_drive', 'inspect_url', 'generate_patch']
             <div className="w-7 h-7 rounded-full bg-secondary text-foreground flex items-center justify-center font-bold text-xs font-mono">
               3
             </div>
-            <h3 className="text-sm font-bold text-foreground">Remediate & Serve via MCP</h3>
+            <h3 className="text-sm font-bold text-foreground">Instant Fixes & Exports</h3>
             <p className="text-xs text-muted-foreground leading-relaxed">
-              Generates drop-in code fixes for React/Next.js/Node and serves real-time browser capabilities to your coding agents via SSE.
+              Generates drop-in TypeScript code snippets, exports portable state transition models, and connects directly to coding assistants via MCP.
             </p>
           </Card>
         </div>
